@@ -1,0 +1,46 @@
+<div class="chatbot-container">
+  <!-- Chat Window -->
+  <div class="chat-window" [class.open]="isOpen()">
+    <div class="chat-header">
+      <div class="header-info">
+        <div class="avatar">
+          <img src="https://www.poliba.it/sites/default/files/poliba_logo_0.png" alt="Poliba Logo" onerror="this.src='https://via.placeholder.com/40'">
+        </div>
+        <div class="title-area">
+          <h3>Poliba Assistant</h3>
+          <span class="status">Online</span>
+        </div>
+      </div>
+      <button class="close-btn" (click)="toggleChat()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+      </button>
+    </div>
+
+    <div class="chat-messages">
+      <div *ngFor="let msg of messages()" class="message" [class.user]="msg.sender === 'user'" [class.bot]="msg.sender === 'bot'">
+        <div class="message-content">
+          {{ msg.text }}
+        </div>
+        <span class="timestamp">{{ msg.timestamp | date:'shortTime' }}</span>
+      </div>
+    </div>
+
+    <div class="chat-input-area">
+      <input 
+        type="text" 
+        [ngModel]="currentInput()" 
+        (ngModelChange)="currentInput.set($event)" 
+        (keyup.enter)="sendMessage()"
+        placeholder="Scrivi un messaggio..."
+      >
+      <button class="send-btn" (click)="sendMessage()" [disabled]="!currentInput().trim()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Floating Toggle Button -->
+  <button class="chat-toggle-btn" (click)="toggleChat()" [class.hidden]="isOpen()">
+    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+  </button>
+</div>

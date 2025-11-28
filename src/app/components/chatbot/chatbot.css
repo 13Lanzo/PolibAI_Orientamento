@@ -1,0 +1,233 @@
+.chatbot-container {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 1000;
+  font-family: 'Inter', sans-serif;
+}
+
+/* Toggle Button */
+.chat-toggle-btn {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #005cbb, #003d7a); /* Poliba Blue-ish */
+  color: white;
+  border: none;
+  box-shadow: 0 4px 15px rgba(0, 92, 187, 0.4);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.chat-toggle-btn:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 20px rgba(0, 92, 187, 0.6);
+}
+
+.chat-toggle-btn.hidden {
+  transform: scale(0);
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Chat Window */
+.chat-window {
+  position: absolute;
+  bottom: 80px;
+  right: 0;
+  width: 350px;
+  height: 500px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transform-origin: bottom right;
+  transform: scale(0);
+  opacity: 0;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+.chat-window.open {
+  transform: scale(1);
+  opacity: 1;
+}
+
+/* Header */
+.chat-header {
+  background: linear-gradient(135deg, #005cbb, #003d7a);
+  padding: 15px 20px;
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.avatar {
+  width: 35px;
+  height: 35px;
+  background: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  padding: 2px;
+}
+
+.avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.title-area h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.status {
+  font-size: 12px;
+  opacity: 0.8;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.status::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  background: #4caf50;
+  border-radius: 50%;
+  display: block;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  opacity: 0.8;
+  transition: opacity 0.2s;
+  padding: 5px;
+}
+
+.close-btn:hover {
+  opacity: 1;
+}
+
+/* Messages */
+.chat-messages {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  background: #f8f9fa;
+}
+
+.message {
+  max-width: 80%;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.message.user {
+  align-self: flex-end;
+  align-items: flex-end;
+}
+
+.message.bot {
+  align-self: flex-start;
+  align-items: flex-start;
+}
+
+.message-content {
+  padding: 10px 15px;
+  border-radius: 15px;
+  font-size: 14px;
+  line-height: 1.4;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.message.user .message-content {
+  background: #005cbb;
+  color: white;
+  border-bottom-right-radius: 2px;
+}
+
+.message.bot .message-content {
+  background: white;
+  color: #333;
+  border-bottom-left-radius: 2px;
+}
+
+.timestamp {
+  font-size: 10px;
+  color: #999;
+  margin: 0 5px;
+}
+
+/* Input Area */
+.chat-input-area {
+  padding: 15px;
+  background: white;
+  border-top: 1px solid #eee;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.chat-input-area input {
+  flex: 1;
+  padding: 10px 15px;
+  border: 1px solid #ddd;
+  border-radius: 25px;
+  outline: none;
+  transition: border-color 0.2s;
+  font-family: inherit;
+}
+
+.chat-input-area input:focus {
+  border-color: #005cbb;
+}
+
+.send-btn {
+  background: #005cbb;
+  color: white;
+  border: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.send-btn:hover:not(:disabled) {
+  background: #004a99;
+  transform: scale(1.05);
+}
+
+.send-btn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
