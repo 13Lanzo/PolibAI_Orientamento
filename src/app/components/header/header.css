@@ -1,6 +1,6 @@
 /* Variables (should be moved to global styles later) */
 :host {
-  --poliba-blue: #003366;
+  --poliba-blue: #037F8C;
   --poliba-light-blue: #005596;
   --text-color: #333;
   --white: #ffffff;
@@ -9,9 +9,10 @@
 }
 
 .site-header {
-  font-family: 'Roboto', sans-serif; /* Assuming Roboto or similar */
+  font-family: 'Roboto', sans-serif;
+  /* Assuming Roboto or similar */
   width: 100%;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 .container {
@@ -51,7 +52,7 @@
 }
 
 .lang-separator {
-  color: rgba(255,255,255,0.5);
+  color: rgba(255, 255, 255, 0.5);
 }
 
 /* Main Header */
