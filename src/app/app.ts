@@ -5,10 +5,12 @@ import { Header } from './components/header/header';
 import { Navbar } from './components/navbar/navbar';
 import { Hero } from './components/hero/hero';
 import { Footer } from './components/footer/footer';
+import { PrimoPiano } from './components/primo-piano/primo-piano';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, Header, Navbar, Hero, Footer],
+  standalone: true,
+  imports: [RouterOutlet, Header, Navbar, Hero, Footer, PrimoPiano],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })

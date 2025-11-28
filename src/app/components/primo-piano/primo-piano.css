@@ -1,0 +1,142 @@
+.primo-piano-section {
+    padding: 60px 0;
+    background-color: #fff;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 15px;
+}
+
+.section-header {
+    margin-bottom: 40px;
+    position: relative;
+}
+
+.section-header h2 {
+    color: #003366;
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 0;
+    text-transform: uppercase;
+    display: inline-block;
+    background-color: #fff;
+    padding-right: 20px;
+    position: relative;
+    z-index: 1;
+}
+
+.header-line {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background-color: #ddd;
+    z-index: 0;
+}
+
+.news-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 30px;
+}
+
+.news-item {
+    background-color: #fff;
+    border: 1px solid #eee;
+    transition: transform 0.2s, box-shadow 0.2s;
+    display: flex;
+    flex-direction: column;
+}
+
+.news-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.news-image {
+    height: 200px;
+    background-color: #eee;
+    background-size: cover;
+    background-position: center;
+}
+
+.placeholder-image {
+    background-color: #e0e0e0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.placeholder-image::after {
+    content: 'IMG';
+    color: #999;
+    font-weight: bold;
+}
+
+.news-content {
+    padding: 20px;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.news-date {
+    color: #005596;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-bottom: 10px;
+    display: block;
+}
+
+.news-item h3 {
+    margin: 0 0 10px 0;
+    font-size: 1.2rem;
+    line-height: 1.4;
+}
+
+.news-item h3 a {
+    color: #333;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.news-item h3 a:hover {
+    color: #003366;
+}
+
+.news-item p {
+    color: #666;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin: 0;
+    flex-grow: 1;
+}
+
+.section-footer {
+    text-align: right;
+    margin-top: 30px;
+}
+
+.btn-view-all {
+    display: inline-block;
+    color: #003366;
+    text-decoration: none;
+    font-weight: 600;
+    border: 2px solid #003366;
+    padding: 10px 20px;
+    transition: all 0.2s;
+}
+
+.btn-view-all:hover {
+    background-color: #003366;
+    color: #fff;
+}
+
+@media (max-width: 768px) {
+    .news-grid {
+        grid-template-columns: 1fr;
+    }
+}
