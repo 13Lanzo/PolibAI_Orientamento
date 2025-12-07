@@ -6,15 +6,17 @@ import os
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}})
 
+#AIzaSyC1i84XdaciQCANtgZQdKw9Z2qNlQ7FerI    -> chiave di Lanzo
+
 # --- INCOLLA QUI LA TUA CHIAVE ---
-API_KEY = "AIzaSyC1i84XdaciQCANtgZQdKw9Z2qNlQ7FerI"
+API_KEY = "AIzaSyDKhBJMEBqVo34ieK-o4K7gEQQsCpiYcxs"
 genai.configure(api_key=API_KEY)
 
 istruzioni_poliba = """
 Sei l'assistente virtuale ufficiale del sito del Politecnico di Bari (Poliba).
 Rispondi in modo breve e professionale.
-Se non sai una risposta, dì di visitare poliba.it.
-"""
+Se non sai una risposta, dì di visitare poliba.it."""
+
 
 # --- BLOCCO DI RICERCA AUTOMATICA DEL MODELLO ---
 print("🔍 Sto cercando un modello funzionante per la tua Chiave API...")
@@ -26,7 +28,7 @@ try:
         # Cerchiamo un modello che supporti la generazione di testo (generateContent)
         if 'generateContent' in m.supported_generation_methods:
             # Preferiamo gemini-pro se c'è, altrimenti va bene il primo che troviamo
-            if 'gemini-1.5-flash' in m.name:
+            if 'gemini-2.5-flash-lite' in m.name:
                 modello_scelto = m.name
                 break
             elif 'gemini-pro' in m.name:
