@@ -4,8 +4,10 @@
     <div class="chat-header">
       <div class="header-info">
         <div class="avatar">
-          <img src="assets/images/logo-poliba.png" alt="Poliba Logo"
-            onerror="this.src='https://via.placeholder.com/40'">
+          <!-- Placeholder logo Poliba -->
+          <div
+            class="w-10 h-10 bg-white rounded-full flex items-center justify-center text-blue-900 font-bold border-2 border-red-700">
+            P</div>
         </div>
         <div class="title-area">
           <h3>Poliba Assistant</h3>
@@ -21,19 +23,54 @@
       </button>
     </div>
 
-    <div class="chat-messages">
+    <div class="chat-messages" #scrollContainer>
+      <!-- Loop dei messaggi -->
       <div *ngFor="let msg of messages()" class="message" [class.user]="msg.sender === 'user'"
         [class.bot]="msg.sender === 'bot'">
-        <div class="message-content">
+
+        <!-- CASO 1: MESSAGGIO DI TESTO NORMALE -->
+        <div *ngIf="!msg.type || msg.type === 'text'" class="message-content">
           {{ msg.text }}
         </div>
+
+        <!-- CASO 2: OPZIONI (BOTTONI) -->
+        <!-- Questo appare quando il bot chiede "Dove ti trovi?" -->
+        <div *ngIf="msg.type === 'options'" class="message-content options-wrapper">
+          <p>{{ msg.text }}</p>
+          <div class="buttons-container">
+            <button *ngFor="let opt of msg.options" (click)="sendOption(opt.value, opt.label)" class="option-btn">
+              {{ opt.label }}
+            </button>
+          </div>
+        </div>
+
+        <!-- CASO 3: MAPPA (IMMAGINE) -->
+        <!-- Questo appare quando il bot ti dà il percorso -->
+        <div *ngIf="msg.type === 'map'" class="message-content map-wrapper">
+          <div class="map-header">
+            <strong>📍 {{ msg.mapTitle }}</strong>
+          </div>
+          <div class="map-image-container" (click)="openMap(msg.mapUrl)">
+            <img [src]="msg.mapUrl" alt="Mappa Percorso" title="Clicca per ingrandire">
+            <div class="overlay">🔍 Ingrandisci</div>
+          </div>
+          <p class="map-desc">{{ msg.text }}</p>
+        </div>
+
         <span class="timestamp">{{ msg.timestamp | date:'shortTime' }}</span>
+      </div>
+
+      <!-- Loading Indicator -->
+      <div *ngIf="isLoading()" class="message bot">
+        <div class="message-content typing-indicator">
+          <span>.</span><span>.</span><span>.</span>
+        </div>
       </div>
     </div>
 
     <div class="chat-input-area">
       <input type="text" [ngModel]="currentInput()" (ngModelChange)="currentInput.set($event)"
-        (keyup.enter)="sendMessage()" placeholder="Scrivi un messaggio...">
+        (keyup.enter)="sendMessage()" placeholder="Chiedi: Dov'è l'aula magna?">
       <button class="send-btn" (click)="sendMessage()" [disabled]="!currentInput().trim()">
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
           stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
