@@ -66,9 +66,27 @@ def popola_database():
                 "ufficio_mongiello_reDavid",
                 "assets/images/maps/ufficio_mongiello_reDavid.png",
                 "Entrato dall'ingresso di via Re David, gira leggermente a destra e prosegui dritto fino a quando dinnanzi a te vedrai un grande spazio centrale (Atrio Cherubini); a questo punto attraverso e sali con delle scale grandi al primo piano, dove di fronte a te vedrai L'AULA MAGNA ATTILIO ALTO. Prosegui sulla sinistra fino a quando non vedrai una piccola porta in fondo, affianco all'aula magna. Entrando in questo edificio, giungi fino al terzo piano e sarai arrivato all'ufficio della prof.ssa Mongiello!"
+            ),
+            (
+                "immagine_campus_LabDDV_ulpiani",
+                "assets/images/maps/immagine_campus_LabDDV_ulpiani.jpg",
+                "Entrando dall'ingresso in via Celso Ulpiani, proseguendo dritto troverai subito dinnanzi a te le aule Celso Ulpiani (del dipartimento DArCoD). Entrando nell'edificio, troverai quasi subito l'aula G4, ovvero il laboratorio di Elettronica della prof.ssa De Venuto!"
+            ),
+            (
+                "immagine_campus_LabDDV_reDavid",
+                "assets/images/maps/immagine_campus_LabDDV_reDavid.jpg",
+                "Entrando dall'ingresso in via Re David, prosegui sempre dritto, scendendo da una rampa e proseguendo sempre dritto fino al dipartimento di Architettura. A questo punto svolta a sinistra e prosegui fin quando non vedrai dinnanzi a te le aule Celso Ulpiani (del dipartimento DArCoD). Entrando nell'edificio, troverai quasi subito l'aula G4, ovvero il laboratorio di Elettronica della prof.ssa De Venuto!"
+            ),
+            (
+                "immagine_campus_LabDDV_Orabona2",
+                "assets/images/maps/immagine_campus_LabDDV_Orabona2.jpg",
+                "Percorso consigliato: entrando dallingresso per soli pedoni in via Orabona, svolta a destra e prosegui dritto. A questo punto potrai seguire il percorso dell'ingresso principale di via Orabona. Quindi prosegui sempre dritto per circa 200 metri e camminando lungo la strada asfaltata che divide gli edifici del Politecnico e il dipartimento di Geologia, vedrai sulla tua sinistra le aule Celso Ulpiani (del dipartimento DArCoD). Entrando nell'edificio, troverai quasi subito l'aula G4, ovvero il laboratorio di Elettronica della prof.ssa De Venuto!"
+            ),
+            (
+                "immagine_campus_LabDDV_Orabona1",
+                "assets/images/maps/immagine_campus_LabDDV_Orabona1.jpg",
+                "Entrando dall'ingresso principale di via Orabona, prosegui sempre dritto per circa 200 metri e camminando lungo la strada asfaltata che divide gli edifici del Politecnico e il dipartimento di Geologia, vedrai sulla tua sinistra le aule Celso Ulpiani (del dipartimento DArCoD). Entrando nell'edificio, troverai quasi subito l'aula G4, ovvero il laboratorio di Elettronica della prof.ssa De Venuto!"
             )
-
-            # Puoi aggiungere qui altri percorsi se hai caricato altre immagini
         ]
 
         # 5. Esecuzione Inserimento
