@@ -9,20 +9,17 @@ def popola_database():
         'user': 'root',
         'password': '',
         'host': 'localhost',
-        'raise_on_warnings': True
+        'database': 'poliba_chatbot', # Ci colleghiamo direttamente al DB esistente
+        'raise_on_warnings': False    # Evita blocchi se ci sono avvisi non critici
     }
 
     try:
-        # 1. Connessione al Server
+        # 1. Connessione al Server MySQL
         conn = mysql.connector.connect(**config)
         cursor = conn.cursor()
+        print(f"✅ Connesso al database 'poliba_chatbot'.")
 
-        # 2. Selezione Database (Creazione se non esiste)
-        dbPoliba = 'poliba_chatbot'
-        cursor.execute(f"CREATE DATABASE IF NOT EXISTS {dbPoliba} DEFAULT CHARACTER SET 'utf8'")
-        conn.database = dbPoliba
-
-        # 3. Creazione Tabella (Se non esiste)
+        # 2. Creazione Tabella (Solo se non esiste, per sicurezza)
         query_tabella = """
         CREATE TABLE IF NOT EXISTS mappe (
             id INT AUTO_INCREMENT PRIMARY KEY,
@@ -34,8 +31,8 @@ def popola_database():
         cursor.execute(query_tabella)
         print("✅ Tabella 'mappe' verificata.")
 
-        # 4. DATI DA INSERIRE (Popolamento)
-        # Nota: I percorsi puntano alla cartella che hai creato tu: assets/images/maps/
+        # 3. DATI DA INSERIRE
+        # I percorsi corrispondono alla tua cartella: src/assets/images/maps/
         dati_mappe = [
             (
                 "mappa_campus_poliLibrary_Orabona", 
@@ -89,8 +86,7 @@ def popola_database():
             )
         ]
 
-        # 5. Esecuzione Inserimento
-        # Usiamo "ON DUPLICATE KEY UPDATE" per aggiornare i dati se esistono già senza dare errore
+        # 4. Esecuzione Inserimento/Aggiornamento
         query_insert = """
         INSERT INTO mappe (chiave, immagine_url, descrizione) 
         VALUES (%s, %s, %s)
@@ -100,7 +96,7 @@ def popola_database():
         """
         
         cursor.executemany(query_insert, dati_mappe)
-        conn.commit() # IMPORTANTE: Salva le modifiche!
+        conn.commit() 
 
         print(f"🎉 Successo! Inseriti/Aggiornati {cursor.rowcount} percorsi nel database.")
 
@@ -111,7 +107,7 @@ def popola_database():
         if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
             print("❌ Errore: Username o Password di XAMPP sbagliati.")
         elif err.errno == errorcode.ER_BAD_DB_ERROR:
-            print("❌ Errore: Il database non esiste.")
+            print("❌ Errore: Il database 'poliba_chatbot' non esiste.")
         else:
             print(f"❌ Errore MySQL: {err}")
 
