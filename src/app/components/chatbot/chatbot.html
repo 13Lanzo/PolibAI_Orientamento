@@ -5,7 +5,8 @@
       <div class="header-info">
         <div class="avatar">
           <!-- Placeholder logo Poliba -->
-          <img src="assets/images/logo-poliba.png" alt="Poliba Logo" class="w-10 h-10 rounded-full object-cover bg-white">
+          <img src="assets/images/logo-poliba.png" alt="Poliba Logo"
+            class="w-10 h-10 rounded-full object-cover bg-white">
         </div>
         <div class="title-area">
           <h3>Poliba Assistant</h3>
@@ -68,7 +69,7 @@
 
     <div class="chat-input-area">
       <input type="text" [ngModel]="currentInput()" (ngModelChange)="currentInput.set($event)"
-        (keyup.enter)="sendMessage()" placeholder="Chiedi: Dov'è l'aula magna?">
+        (keyup.enter)="sendMessage()" placeholder="Chiedi qualcosa...">
       <button class="send-btn" (click)="sendMessage()" [disabled]="!currentInput().trim()">
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
           stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
