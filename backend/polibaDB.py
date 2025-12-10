@@ -2,7 +2,7 @@ import mysql.connector
 from mysql.connector import errorcode
 
 def popola_database():
-    print("🐬 Connessione a XAMPP (MySQL) per inserimento dati...")
+    print("Connessione a XAMPP (MySQL) per inserimento dati...")
 
     # Configurazione Standard XAMPP
     config = {
@@ -17,7 +17,7 @@ def popola_database():
         # 1. Connessione al Server MySQL
         conn = mysql.connector.connect(**config)
         cursor = conn.cursor()
-        print(f"✅ Connesso al database 'poliba_chatbot'.")
+        print(f"Connesso al database 'poliba_chatbot'.")
 
         # 2. Creazione Tabella (Solo se non esiste, per sicurezza)
         query_tabella = """
@@ -29,7 +29,7 @@ def popola_database():
         ) ENGINE=InnoDB
         """
         cursor.execute(query_tabella)
-        print("✅ Tabella 'mappe' verificata.")
+        print("Tabella 'mappe' verificata.")
 
         # 3. DATI DA INSERIRE
         # I percorsi corrispondono alla tua cartella: src/assets/images/maps/
@@ -98,18 +98,18 @@ def popola_database():
         cursor.executemany(query_insert, dati_mappe)
         conn.commit() 
 
-        print(f"🎉 Successo! Inseriti/Aggiornati {cursor.rowcount} percorsi nel database.")
+        print(f"Successo! Inseriti/Aggiornati {cursor.rowcount} percorsi nel database.")
 
         cursor.close()
         conn.close()
 
     except mysql.connector.Error as err:
         if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
-            print("❌ Errore: Username o Password di XAMPP sbagliati.")
+            print("Errore: Username o Password di XAMPP sbagliati.")
         elif err.errno == errorcode.ER_BAD_DB_ERROR:
-            print("❌ Errore: Il database 'poliba_chatbot' non esiste.")
+            print("Errore: Il database 'poliba_chatbot' non esiste.")
         else:
-            print(f"❌ Errore MySQL: {err}")
+            print(f"Errore MySQL: {err}")
 
 if __name__ == '__main__':
     popola_database()

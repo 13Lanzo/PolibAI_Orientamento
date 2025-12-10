@@ -1,87 +1,3 @@
-'''
-
-from flask import Flask, request, jsonify
-from flask_cors import CORS
-import google.generativeai as genai
-import os
-
-app = Flask(__name__)
-CORS(app, resources={r"/*": {"origins": "*"}})
-
-#AIzaSyC1i84XdaciQCANtgZQdKw9Z2qNlQ7FerI    -> chiave di Lanzo
-
-# --- INCOLLA QUI LA TUA CHIAVE ---
-API_KEY = "AIzaSyDKhBJMEBqVo34ieK-o4K7gEQQsCpiYcxs"
-genai.configure(api_key=API_KEY)
-
-istruzioni_poliba = """
-Sei l'assistente virtuale ufficiale del sito del Politecnico di Bari (Poliba).
-Rispondi in modo breve e professionale.
-Se non sai una risposta, dì di visitare poliba.it."""
-
-
-# --- BLOCCO DI RICERCA AUTOMATICA DEL MODELLO ---
-print("🔍 Sto cercando un modello funzionante per la tua Chiave API...")
-modello_scelto = None
-
-try:
-    # Chiediamo a Google la lista dei modelli
-    for m in genai.list_models():
-        # Cerchiamo un modello che supporti la generazione di testo (generateContent)
-        if 'generateContent' in m.supported_generation_methods:
-            # Preferiamo gemini-pro se c'è, altrimenti va bene il primo che troviamo
-            if 'gemini-2.5-flash-lite' in m.name:
-                modello_scelto = m.name
-                break
-            elif 'gemini-pro' in m.name:
-                modello_scelto = m.name
-            
-            # Se non abbiamo ancora scelto nulla, prendiamo questo come riserva
-            if not modello_scelto:
-                modello_scelto = m.name
-
-    if modello_scelto:
-        print(f"✅ TROVATO E SELEZIONATO: {modello_scelto}")
-        model = genai.GenerativeModel(modello_scelto)
-        chat_session = model.start_chat(history=[])
-    else:
-        print("❌ NESSUN MODELLO COMPATIBILE TROVATO. La chiave potrebbe non avere accessi.")
-
-except Exception as e:
-    print(f"❌ Errore nella ricerca modelli: {e}")
-
-
-@app.route('/chat', methods=['POST', 'OPTIONS'])
-def chat_endpoint():
-    if request.method == 'OPTIONS':
-        return jsonify({"status": "ok"}), 200
-
-    if not modello_scelto:
-        return jsonify({"error": "Errore interno: Nessun modello AI trovato."}), 500
-
-    data = request.json
-    messaggio_utente = data.get('message')
-    print(f"📩 Domanda: {messaggio_utente}")
-
-    if not messaggio_utente:
-        return jsonify({"error": "Messaggio vuoto"}), 400
-
-    try:
-        # Costruiamo il prompt a mano per massima compatibilità
-        prompt = f"{istruzioni_poliba}\n\nUtente: {messaggio_utente}"
-        response = chat_session.send_message(prompt)
-        print("📤 Risposta inviata!")
-        return jsonify({"response": response.text})
-    except Exception as e:
-        print(f"🔥 Errore generazione: {e}")
-        return jsonify({"response": "⚠️ Errore momentaneo del server AI."}), 200
-
-if __name__ == "__main__":
-    print("--- SERVER POLIBA AUTO-CONFIGURATO ---")
-    app.run(debug=True, port=5000)
-
-'''
-
 
 from flask import Flask, request, jsonify
 from flask_cors import CORS
@@ -112,7 +28,7 @@ def get_db_connection():
         )
         return conn
     except mysql.connector.Error as err:
-        print(f"❌ Errore connessione MySQL: {err}")
+        print(f"Errore connessione MySQL: {err}")
         return None
 
 def get_percorso_from_mysql(chiave_cercata):
@@ -129,16 +45,16 @@ def get_percorso_from_mysql(chiave_cercata):
             cursor.close()
             conn.close()
         except Exception as e:
-            print(f"❌ Errore Query: {e}")
+            print(f"Errore Query: {e}")
     return percorso
 
 # Memoria temporanea
 contesto_utente = {"destinazione_pendente": None}
 
 # =============================================================================
-# 🔍 RICERCA AUTOMATICA MODELLO
+# RICERCA AUTOMATICA MODELLO
 # =============================================================================
-print("🔍 Sto cercando un modello funzionante...")
+print("Sto cercando un modello funzionante...")
 modello_scelto = None
 chat_session = None
 
@@ -154,13 +70,13 @@ try:
                 modello_scelto = m.name
 
     if modello_scelto:
-        print(f"✅ TROVATO: {modello_scelto}")
+        print(f"TROVATO: {modello_scelto}")
         model = genai.GenerativeModel(modello_scelto)
         chat_session = model.start_chat(history=[])
     else:
-        print("❌ NESSUN MODELLO TROVATO.")
+        print("NESSUN MODELLO TROVATO.")
 except Exception as e:
-    print(f"❌ Errore ricerca modelli: {e}")
+    print(f"Errore ricerca modelli: {e}")
 
 
 @app.route('/chat', methods=['POST', 'OPTIONS'])
@@ -171,11 +87,11 @@ def chat_endpoint():
     messaggio_utente = data.get('message', '')
     if not messaggio_utente: return jsonify({"error": "Messaggio vuoto"}), 400
 
-    print(f"📩 Domanda: {messaggio_utente}")
+    print(f"Domanda: {messaggio_utente}")
     messaggio_lower = messaggio_utente.lower()
 
     # =============================================================================
-    # 📍 LOGICA MAPPE SPECIALIZZATA
+    # LOGICA MAPPE SPECIALIZZATA
     # =============================================================================
     
     # A. IDENTIFICAZIONE LUOGO SPECIFICO
@@ -204,9 +120,9 @@ def chat_endpoint():
                 "type": "options", 
                 "options": [
                     {"label": "📍 Via Orabona (Principale)", "value": "Orabona1"},
-                    {"label": "🚶 Via Orabona (Pedoni)", "value": "Orabona2"},
-                    {"label": "🚗 Via Re David", "value": "reDavid"},
-                    {"label": "🧪 Via Celso Ulpiani", "value": "ulpiani"}
+                    {"label": "📍 Via Orabona (Pedoni)", "value": "Orabona2"},
+                    {"label": "📍 Via Re David", "value": "reDavid"},
+                    {"label": "📍 Via Celso Ulpiani", "value": "ulpiani"}
                 ]
             })
 
@@ -250,7 +166,7 @@ def chat_endpoint():
             # Chiavi: immagine_campus_LabDDV_ulpiani, _reDavid, _Orabona1, _Orabona2
             chiave_db = f"immagine_campus_LabDDV_{start}"
 
-        print(f"🔑 Cerco nel DB la chiave: {chiave_db}")
+        print(f"Cerco nel DB la chiave: {chiave_db}")
         
         percorso_data = get_percorso_from_mysql(chiave_db)
         contesto_utente["destinazione_pendente"] = None # Reset
@@ -264,12 +180,12 @@ def chat_endpoint():
             })
         else:
             return jsonify({
-                "response": f"⚠️ Non ho una mappa specifica per questo percorso ({start} -> {dest}). Prova un altro ingresso.", 
+                "response": f"Non ho una mappa specifica per questo percorso ({start} -> {dest}). Prova un altro ingresso.", 
                 "type": "text"
             })
 
     # =============================================================================
-    # 🤖 LOGICA AI (FALLBACK)
+    # LOGICA AI (FALLBACK)
     # =============================================================================
     if not modello_scelto: return jsonify({"error": "Errore AI"}), 500
 
@@ -279,8 +195,8 @@ def chat_endpoint():
         return jsonify({"response": response.text, "type": "text"})
     except Exception as e:
         if "429" in str(e):
-            return jsonify({"response": "⚠️ Troppe richieste. Riprova tra poco.", "type": "text"}), 200
-        return jsonify({"response": "⚠️ Errore AI.", "type": "text"}), 200
+            return jsonify({"response": "Troppe richieste. Riprova tra poco.", "type": "text"}), 200
+        return jsonify({"response": "Errore AI.", "type": "text"}), 200
 
 if __name__ == "__main__":
     app.run(debug=True, port=5000)
