@@ -2,15 +2,24 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import google.generativeai as genai
-import mysql.connector # Driver per XAMPP
+import mysql.connector
 import os
+import traceback
+from dotenv import load_dotenv
+
+# Carica variabili d'ambiente
+load_dotenv()
 
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}})
 
-# --- INCOLLA QUI LA TUA CHIAVE ---
-API_KEY = "AIzaSyDKhBJMEBqVo34ieK-o4K7gEQQsCpiYcxs"
-genai.configure(api_key=API_KEY)
+# --- CONFIGURAZIONE CHIAVE API ---
+# Leggiamo dal file .env per sicurezza
+API_KEY = os.getenv("GOOGLE_API_KEY")
+if API_KEY:
+    genai.configure(api_key=API_KEY)
+else:
+    print("ERRORE: Chiave API mancante nel file .env")
 
 istruzioni_poliba = """
 SEI L'ASSISTENTE VIRTUALE UFFICIALE DEL POLITECNICO DI BARI (POLIBA).
@@ -33,7 +42,7 @@ Devi agire come una guida esperta del Campus. Riconosci automaticamente richiest
 """
 
 # =============================================================================
-# FUNZIONI DATABASE MYSQL (XAMPP)
+# DATABASE MYSQL (XAMPP)
 # =============================================================================
 def get_db_connection():
     try:
@@ -42,7 +51,7 @@ def get_db_connection():
         )
         return conn
     except mysql.connector.Error as err:
-        print(f"Errore connessione MySQL: {err}")
+        print(f"Errore MySQL: {err}")
         return None
 
 def get_percorso_from_mysql(chiave_cercata):
@@ -51,8 +60,7 @@ def get_percorso_from_mysql(chiave_cercata):
     if conn:
         try:
             cursor = conn.cursor(dictionary=True)
-            query = "SELECT immagine_url, descrizione FROM mappe WHERE chiave = %s"
-            cursor.execute(query, (chiave_cercata,))
+            cursor.execute("SELECT immagine_url, descrizione FROM mappe WHERE chiave = %s", (chiave_cercata,))
             row = cursor.fetchone()
             if row:
                 percorso = {"img": row["immagine_url"], "desc": row["descrizione"]}
@@ -62,35 +70,36 @@ def get_percorso_from_mysql(chiave_cercata):
             print(f"Errore Query: {e}")
     return percorso
 
-# Memoria temporanea
-contesto_utente = {"destinazione_pendente": None}
-
 # =============================================================================
-# RICERCA AUTOMATICA MODELLO
+# RICERCA AUTOMATICA MODELLO (La tua logica)
 # =============================================================================
-print("Sto cercando un modello funzionante...")
+print("Ricerca modello funzionante...")
 modello_scelto = None
 chat_session = None
 
 try:
-    for m in genai.list_models():
-        if 'generateContent' in m.supported_generation_methods:
-            if 'gemini-2.5-flash-lite' in m.name:
-                modello_scelto = m.name
-                break
-            elif 'gemini-pro' in m.name:
-                modello_scelto = m.name
-            if not modello_scelto:
-                modello_scelto = m.name
+    if API_KEY:
+        for m in genai.list_models():
+            if 'generateContent' in m.supported_generation_methods:
+                if 'gemini-2.5-flash-lite' in m.name:
+                    modello_scelto = m.name
+                    break
+                elif 'gemini-pro' in m.name:
+                    modello_scelto = m.name
+                
+                if not modello_scelto:
+                    modello_scelto = m.name
 
-    if modello_scelto:
-        print(f"TROVATO: {modello_scelto}")
-        model = genai.GenerativeModel(modello_scelto)
-        chat_session = model.start_chat(history=[])
-    else:
-        print("NESSUN MODELLO TROVATO.")
+        if modello_scelto:
+            print(f"TROVATO: {modello_scelto}")
+            model = genai.GenerativeModel(modello_scelto)
+            chat_session = model.start_chat(history=[])
+        else:
+            print("NESSUN MODELLO TROVATO.")
 except Exception as e:
     print(f"Errore ricerca modelli: {e}")
+
+contesto_utente = {"destinazione_pendente": None}
 
 
 @app.route('/chat', methods=['POST', 'OPTIONS'])
@@ -101,34 +110,28 @@ def chat_endpoint():
     messaggio_utente = data.get('message', '')
     if not messaggio_utente: return jsonify({"error": "Messaggio vuoto"}), 400
 
-    print(f"Domanda: {messaggio_utente}")
+    print(f"📩 Domanda: {messaggio_utente}")
     messaggio_lower = messaggio_utente.lower()
 
     # =============================================================================
     # LOGICA MAPPE SPECIALIZZATA
     # =============================================================================
     
-    # A. IDENTIFICAZIONE LUOGO SPECIFICO
-    # Cerchiamo solo i luoghi per cui hai le mappe
+    # A. IDENTIFICAZIONE LUOGO
     if "dove" in messaggio_lower or "dov'è" in messaggio_lower or "posizione" in messaggio_lower or "come arrivo" in messaggio_lower:
         destinazione = None
         
-        # 1. PoliLibrary
         if "biblioteca" in messaggio_lower or "library" in messaggio_lower:
             destinazione = "poliLibrary"
-        
-        # 2. Ufficio Mongiello
         elif "mongiello" in messaggio_lower:
             destinazione = "mongiello"
-            
-        # 3. Lab Elettronica / De Venuto
         elif "elettronica" in messaggio_lower or "de venuto" in messaggio_lower or "labddv" in messaggio_lower:
             destinazione = "LabDDV"
             
         if destinazione:
-            contesto_utente["destinazione_pendente"] = destinazione
+            global contesto_utente
+            contesto_utente = destinazione
             
-            # Mostriamo tutti gli ingressi possibili come opzioni
             return jsonify({
                 "response": f"Per raggiungere {destinazione}, da quale ingresso accedi?",
                 "type": "options", 
@@ -140,50 +143,39 @@ def chat_endpoint():
                 ]
             })
 
-    # B. GESTIONE RISPOSTA E COSTRUZIONE CHIAVE DB
+    # B. GESTIONE RISPOSTA BOTTONI
     ingressi_noti = ["Orabona1", "Orabona2", "reDavid", "ulpiani"]
     
-    # Se il messaggio corrisponde a un valore dei bottoni (case sensitive nei valori, ma qui controlliamo lower)
-    # Nota: Angular manda il 'value' del bottone, quindi ci aspettiamo es. "Orabona1"
-    messaggio_input = messaggio_utente # Non usiamo lower per il match esatto del value se necessario, ma i valori sono camelCase
-    
-    # Troviamo se l'input corrisponde a uno degli ingressi noti (case insensitive per sicurezza)
-    ingresso_trovato = next((i for i in ingressi_noti if i.lower() == messaggio_lower), None)
+    # Cerca se nel messaggio c'è un valore noto (es. value del bottone)
+    # Nota: Angular manda il 'value' (es. Orabona1), quindi cerchiamo quello
+    ingresso_trovato = next((i for i in ingressi_noti if i.lower() in messaggio_lower), None)
 
-    if ingresso_trovato and contesto_utente["destinazione_pendente"]:
-        dest = contesto_utente["destinazione_pendente"]
+    # Verifica se 'contesto_utente' è una stringa (la destinazione)
+    destinazione_salvata = contesto_utente if isinstance(contesto_utente, str) else None
+
+    if ingresso_trovato and destinazione_salvata:
         start = ingresso_trovato
+        dest = destinazione_salvata
         chiave_db = ""
 
-        # --- COSTRUZIONE CHIAVI SPECIFICHE (Mapping logico) ---
-        
-        # CASO 1: POLILIBRARY
+        # --- COSTRUZIONE CHIAVI ---
         if dest == "poliLibrary":
-            # Nel tuo DB hai: mappa_campus_poliLibrary_Orabona, _reDavid
-            # Non distingui Orabona1/2 nel nome file per la library?
-            # Assumo che entrambi gli Orabona portino alla chiave "Orabona" generica se non specificato diversamente
-            if "Orabona" in start:
-                chiave_db = "mappa_campus_poliLibrary_Orabona"
-            elif start == "reDavid":
-                chiave_db = "mappa_campus_poliLibrary_reDavid"
-            else:
-                chiave_db = "mappa_campus_poliLibrary" # Fallback generico
+            if "Orabona" in start: chiave_db = "mappa_campus_poliLibrary_Orabona"
+            elif "reDavid" in start: chiave_db = "mappa_campus_poliLibrary_reDavid"
+            else: chiave_db = "mappa_campus_poliLibrary" # Fallback
 
-        # CASO 2: MONGIELLO
         elif dest == "mongiello":
-            # Chiavi: ufficio_mongiello_Orabona1, _Orabona2, _reDavid
-            chiave_db = f"ufficio_mongiello_{start}" 
-            # Nota: se start è "ulpiani", non hai la mappa, darà errore (giustamente)
+            chiave_db = f"ufficio_mongiello_{start}"
 
-        # CASO 3: LAB ELETTRONICA (LabDDV)
         elif dest == "LabDDV":
-            # Chiavi: immagine_campus_LabDDV_ulpiani, _reDavid, _Orabona1, _Orabona2
             chiave_db = f"immagine_campus_LabDDV_{start}"
 
-        print(f"Cerco nel DB la chiave: {chiave_db}")
+        print(f"Cerco chiave: {chiave_db}")
         
         percorso_data = get_percorso_from_mysql(chiave_db)
-        contesto_utente["destinazione_pendente"] = None # Reset
+        
+        # Reset contesto (usando global per modificarla correttamente)
+        contesto_utente = None 
         
         if percorso_data:
             return jsonify({
@@ -201,16 +193,20 @@ def chat_endpoint():
     # =============================================================================
     # LOGICA AI (FALLBACK)
     # =============================================================================
-    if not modello_scelto: return jsonify({"error": "Errore AI"}), 500
+    if not modello_scelto or not chat_session:
+        return jsonify({"error": "Errore AI: Modello non disponibile"}), 500
 
     try:
         prompt = f"{istruzioni_poliba}\n\nUtente: {messaggio_utente}"
         response = chat_session.send_message(prompt)
+        print("Risposta AI inviata!")
         return jsonify({"response": response.text, "type": "text"})
     except Exception as e:
-        if "429" in str(e):
+        errore = str(e)
+        print(f"Errore AI: {errore}")
+        if "429" in errore:
             return jsonify({"response": "Troppe richieste. Riprova tra poco.", "type": "text"}), 200
-        return jsonify({"response": "Errore AI.", "type": "text"}), 200
+        return jsonify({"response": "Errore AI generico.", "type": "text"}), 500
 
 if __name__ == "__main__":
     app.run(debug=True, port=5000)
