@@ -1,5 +1,20 @@
 # See https://docs.github.com/get-started/getting-started-with-git/ignoring-files for more about ignoring files.
 
+# Ignora il file con la password
+backend/.env
+.env
+
+# Ignora file inutili di Python
+__pycache__/
+*.pyc
+
+# Ignora file di sistema
+.DS_Store
+Thumbs.db
+
+# Ignora cartelle pesanti (se usi Angular/Node)
+node_modules/
+
 # Compiled output
 /dist
 /tmp
