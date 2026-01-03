@@ -71,7 +71,7 @@ def get_percorso_from_mysql(chiave_cercata):
     return percorso
 
 # =============================================================================
-# RICERCA AUTOMATICA MODELLO (La tua logica)
+# RICERCA AUTOMATICA MODELLO 
 # =============================================================================
 print("Ricerca modello funzionante...")
 modello_scelto = None
@@ -110,7 +110,7 @@ def chat_endpoint():
     messaggio_utente = data.get('message', '')
     if not messaggio_utente: return jsonify({"error": "Messaggio vuoto"}), 400
 
-    print(f"📩 Domanda: {messaggio_utente}")
+    print(f"Domanda: {messaggio_utente}")
     messaggio_lower = messaggio_utente.lower()
 
     # =============================================================================
@@ -191,7 +191,7 @@ def chat_endpoint():
             })
 
     # =============================================================================
-    # LOGICA AI (FALLBACK)
+    # LOGICA AI 
     # =============================================================================
     if not modello_scelto or not chat_session:
         return jsonify({"error": "Errore AI: Modello non disponibile"}), 500

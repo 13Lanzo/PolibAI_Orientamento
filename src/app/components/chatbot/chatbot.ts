@@ -66,7 +66,7 @@ export class Chatbot {
         this.callBackend(text);
     }
 
-    // 2. INVIO SCELTA DA BOTTONE (Nuovo metodo)
+    // 2. INVIO SCELTA DA BOTTONE 
     sendOption(value: string, label: string) {
         // Mostriamo visivamente cosa ha scelto l'utente
         this.addMessageToChat({
@@ -80,7 +80,7 @@ export class Chatbot {
         this.callBackend(value);
     }
 
-    // 3. APERTURA MAPPA (Nuovo metodo)
+    // 3. APERTURA MAPPA 
     openMap(url: string | undefined) {
         if (url) window.open(url, '_blank');
     }

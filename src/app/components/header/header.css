@@ -1,4 +1,4 @@
-/* Variables (should be moved to global styles later) */
+/* Variabili (dovrebbero essere spostate negli stili globali in seguito) */
 :host {
   --poliba-blue: #037F8C;
   --poliba-light-blue: #005596;
@@ -9,7 +9,7 @@
 
 .site-header {
   font-family: 'Roboto', sans-serif;
-  /* Assuming Roboto or similar */
+  /* Presupponendo Roboto o simile */
   width: 100%;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
@@ -20,7 +20,7 @@
   padding: 0 15px;
 }
 
-/* Top Bar */
+/* Barra Superiore */
 .top-bar {
   background-color: var(--poliba-blue);
   color: var(--white);
@@ -53,7 +53,7 @@
   color: rgba(255, 255, 255, 0.5);
 }
 
-/* Main Header */
+/* Header Principale */
 .main-header {
   background-color: var(--white);
   padding: 20px 0;
@@ -72,7 +72,7 @@
 }
 
 .logo-placeholder {
-  /* Placeholder styling */
+  /* Stile segnaposto */
 }
 
 .logo-circle {
@@ -98,9 +98,9 @@
   line-height: 1.2;
 }
 
-/* Search Section */
+/* Sezione Ricerca */
 .search-section {
-  /* Styling for search bar */
+  /* Stile per la barra di ricerca */
 }
 
 .search-form {

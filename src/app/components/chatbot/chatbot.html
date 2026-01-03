@@ -1,5 +1,5 @@
 <div class="chatbot-container">
-  <!-- Chat Window -->
+  <!-- Finestra Chat -->
   <div class="chat-window" [class.open]="isOpen()">
     <div class="chat-header">
       <div class="header-info">
@@ -23,7 +23,7 @@
     </div>
 
     <div class="chat-messages" #scrollContainer>
-      <!-- Loop dei messaggi -->
+      <!-- Ciclo dei messaggi -->
       <div *ngFor="let msg of messages()" class="message" [class.user]="msg.sender === 'user'"
         [class.bot]="msg.sender === 'bot'">
 
@@ -59,7 +59,7 @@
         <span class="timestamp">{{ msg.timestamp | date:'shortTime' }}</span>
       </div>
 
-      <!-- Loading Indicator -->
+      <!-- Indicatore di Caricamento -->
       <div *ngIf="isLoading()" class="message bot">
         <div class="message-content typing-indicator">
           <span>.</span><span>.</span><span>.</span>
@@ -80,7 +80,7 @@
     </div>
   </div>
 
-  <!-- Floating Toggle Button -->
+  <!-- Pulsante Mobile di Apertura/Chiusura -->
   <button class="chat-toggle-btn" (click)="toggleChat()" [class.hidden]="isOpen()">
     <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor"
       stroke-width="2" stroke-linecap="round" stroke-linejoin="round">

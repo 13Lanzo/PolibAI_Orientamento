@@ -13,7 +13,7 @@
   height: 60px;
   border-radius: 50%;
   background: linear-gradient(135deg, #005cbb, #003d7a);
-  /* Poliba Blue-ish */
+  /* Blu Poliba */
   color: white;
   border: none;
   box-shadow: 0 4px 15px rgba(0, 92, 187, 0.4);
@@ -316,7 +316,7 @@
   background: white;
 }
 
-/* --- INDICATORE DI DIGITAZIONE (Sta scrivendo...) --- */
+/* --- INDICATORE DI DIGITAZIONE --- */
 .typing-indicator {
   display: flex;
   align-items: center;

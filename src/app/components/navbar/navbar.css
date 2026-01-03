@@ -2,10 +2,10 @@
     display: block;
     width: 100%;
     background-color: #037F8C;
-    /* Poliba Blue */
+
     border-top: 1px solid rgba(255, 255, 255, 0.1);
     position: relative;
-    /* Ensure z-index works contextually */
+    /* Assicura che z-index funzioni contestualmente */
     z-index: 1000;
 }
 
@@ -30,7 +30,7 @@
 
 .nav-item {
     position: static;
-    /* Important for full-width dropdown */
+    /* Importante per il dropdown a larghezza intera */
 }
 
 .nav-link {
@@ -47,11 +47,10 @@
 .nav-link:hover,
 .nav-item:hover .nav-link {
     background-color: #005596;
-    /* Lighter blue */
     color: white;
 }
 
-/* Dropdown Styles */
+/* Stili Dropdown */
 .dropdown-menu {
     display: none;
     position: absolute;
@@ -113,7 +112,7 @@
     text-decoration: underline;
 }
 
-/* Responsive adjustments */
+/* Adattamenti Responsive */
 @media (max-width: 768px) {
     .nav-menu {
         flex-direction: column;

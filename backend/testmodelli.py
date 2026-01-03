@@ -1,8 +1,8 @@
 import google.generativeai as genai
 import os
 
-# INSERISCI LA TUA CHIAVE
-API_KEY = "AIzaSyDKhBJMEBqVo34ieK-o4K7gEQQsCpiYcxs"
+# CHIAVE
+API_KEY = ""
 genai.configure(api_key=API_KEY)
 
 print("Cerco i modelli disponibili per la tua chiave...")
