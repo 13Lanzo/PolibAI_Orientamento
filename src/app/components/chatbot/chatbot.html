@@ -70,7 +70,8 @@
       <div *ngFor="let msg of messages()" class="message-row" [class.user-row]="msg.sender === 'user'" [class.bot-row]="msg.sender === 'bot'">
         
         <div class="message-bubble" [class.user-bubble]="msg.sender === 'user'" [class.bot-bubble]="msg.sender === 'bot'">
-          <div *ngIf="!msg.type || msg.type === 'text'" class="msg-text">{{ msg.text }}</div>
+          <div *ngIf="msg.sender === 'user' && (!msg.type || msg.type === 'text')" class="msg-text">{{ msg.text }}</div>
+          <div *ngIf="msg.sender === 'bot' && (!msg.type || msg.type === 'text')" class="msg-text markdown-content" [innerHTML]="msg.htmlText || msg.text"></div>
 
           <div *ngIf="msg.type === 'options'" class="msg-options">
             <p>{{ msg.text }}</p>

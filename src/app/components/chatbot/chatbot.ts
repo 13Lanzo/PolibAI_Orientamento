@@ -2,6 +2,8 @@ import { Component, signal, ViewChild, ElementRef, AfterViewChecked } from '@ang
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ChatbotService } from './chatbot.service';
+import { marked } from 'marked';
+import DOMPurify from 'dompurify';
 
 interface QuickOption {
     label: string;
@@ -10,6 +12,7 @@ interface QuickOption {
 
 interface Message {
     text?: string;
+    htmlText?: string;
     sender: 'user' | 'bot';
     timestamp: Date;
     type: 'text' | 'map' | 'options';
@@ -92,11 +95,24 @@ export class Chatbot implements AfterViewChecked {
         this.chatbotService.sendMessage(msgText).subscribe({
             next: (response: any) => {
                 this.isLoading.set(false);
+                // Parse the markdown string
+                let parsedHTML = '';
+                if (response.response) {
+                    try {
+                        // marked.parse returns a string synchronously when run this way
+                        const rawHtml = marked.parse(response.response) as string;
+                        parsedHTML = DOMPurify.sanitize(rawHtml);
+                    } catch (e) {
+                        parsedHTML = response.response; // Fallback
+                    }
+                }
+
                 const botMsg: Message = {
                     sender: 'bot',
                     timestamp: new Date(),
                     type: response.type || 'text',
                     text: response.response,
+                    htmlText: parsedHTML,
                     mapUrl: response.mapUrl,
                     mapTitle: response.mapTitle,
                     options: response.options
