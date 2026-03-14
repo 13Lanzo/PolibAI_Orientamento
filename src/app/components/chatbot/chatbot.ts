@@ -1,21 +1,17 @@
-import { Component, signal } from '@angular/core';
+import { Component, signal, ViewChild, ElementRef, AfterViewChecked } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ChatbotService } from './chatbot.service';
 
-// --- NUOVA INTERFACCIA PER I BOTTONI ---
 interface QuickOption {
     label: string;
     value: string;
 }
 
-// --- INTERFACCIA MESSAGGIO AGGIORNATA ---
 interface Message {
-    text?: string; // Reso opzionale per gestire solo mappe
+    text?: string;
     sender: 'user' | 'bot';
     timestamp: Date;
-
-    // Campi aggiunti per la logica Mappe/Opzioni
     type: 'text' | 'map' | 'options';
     mapUrl?: string;
     mapTitle?: string;
@@ -29,32 +25,36 @@ interface Message {
     templateUrl: './chatbot.html',
     styleUrl: './chatbot.css'
 })
-export class Chatbot {
-    isOpen = signal(false);
+export class Chatbot implements AfterViewChecked {
+    @ViewChild('scrollContainer') private scrollContainer!: ElementRef;
+    
     currentInput = signal('');
     isLoading = signal(false);
-
-    messages = signal<Message[]>([
-        {
-            text: 'Ciao! Sono l\'assistente virtuale del Poliba. Posso indicarti aule e percorsi. Come posso aiutarti?',
-            sender: 'bot',
-            timestamp: new Date(),
-            type: 'text' // Tipo default
-        }
-    ]);
+    messages = signal<Message[]>([]);
 
     constructor(private chatbotService: ChatbotService) { }
 
-    toggleChat() {
-        this.isOpen.set(!this.isOpen());
+    ngAfterViewChecked() {
+        this.scrollToBottom();
     }
 
-    // 1. INVIO MESSAGGIO TESTUALE (Dall'input)
+    private scrollToBottom(): void {
+        try {
+            if (this.scrollContainer) {
+                this.scrollContainer.nativeElement.scrollTop = this.scrollContainer.nativeElement.scrollHeight;
+            }
+        } catch(err) { }
+    }
+
+    sendSuggestion(text: string) {
+        this.currentInput.set(text);
+        this.sendMessage();
+    }
+
     sendMessage() {
         const text = this.currentInput().trim();
         if (!text) return;
 
-        // Aggiungi messaggio utente
         this.addMessageToChat({
             text,
             sender: 'user',
@@ -66,46 +66,41 @@ export class Chatbot {
         this.callBackend(text);
     }
 
-    // 2. INVIO SCELTA DA BOTTONE 
     sendOption(value: string, label: string) {
-        // Mostriamo visivamente cosa ha scelto l'utente
         this.addMessageToChat({
             text: `Ho scelto: ${label}`,
             sender: 'user',
             timestamp: new Date(),
             type: 'text'
         });
-
-        // Mandiamo il valore tecnico al backend
         this.callBackend(value);
     }
 
-    // 3. APERTURA MAPPA 
     openMap(url: string | undefined) {
         if (url) window.open(url, '_blank');
     }
 
-    // --- LOGICA COMUNE CHIAMATA SERVER ---
+    resetChat() {
+        this.messages.set([]);
+        this.currentInput.set('');
+        this.isLoading.set(false);
+    }
+
     private callBackend(msgText: string) {
         this.isLoading.set(true);
 
         this.chatbotService.sendMessage(msgText).subscribe({
             next: (response: any) => {
                 this.isLoading.set(false);
-
-                // Creiamo il messaggio bot basandoci sul "type" ricevuto dal Python
                 const botMsg: Message = {
                     sender: 'bot',
                     timestamp: new Date(),
-                    type: response.type || 'text', // Se manca, default a text
-                    text: response.response,       // Il testo descrittivo
-
-                    // Mappiamo i campi specifici dal JSON Python
+                    type: response.type || 'text',
+                    text: response.response,
                     mapUrl: response.mapUrl,
                     mapTitle: response.mapTitle,
                     options: response.options
                 };
-
                 this.addMessageToChat(botMsg);
             },
             error: (error) => {
@@ -121,7 +116,6 @@ export class Chatbot {
         });
     }
 
-    // Helper per aggiornare il signal in modo pulito
     private addMessageToChat(msg: Message) {
         this.messages.update(msgs => [...msgs, msg]);
     }

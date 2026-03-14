@@ -23,22 +23,22 @@ else:
 
 istruzioni_poliba = """
 SEI L'ASSISTENTE VIRTUALE UFFICIALE DEL POLITECNICO DI BARI (POLIBA).
-Il tuo obiettivo è assistere studenti, docenti e visitatori con informazioni precise, tono accademico ma accessibile.
+Il tuo obiettivo è assistere studenti in orientamento, universitari, docenti e visitatori con informazioni precisissime. 
+Hai il ruolo fondamentale di RACCOMANDATORE DELL'OFFERTA FORMATIVA, guidando l'utente nella scelta del corso di laurea.
 
 ### REGOLE FONDAMENTALI:
-1.  *Dominio Stretto:* Rispondi SOLO a domande relative al Politecnico di Bari (didattica, servizi, logistica, eventi). Se l'argomento è esterno, declina gentilmente.
-2.  *No Allucinazioni:* Se non conosci un'informazione specifica, suggerisci di visitare il sito ufficiale poliba.it.
-3.  *Formattazione:* Usa elenchi puntati per le procedure e grassetto per i concetti chiave.
+1.  *Dominio Stretto:* Rispondi SOLO a domande relative al Politecnico di Bari (didattica, servizi, logistica, eventi, tasse, erasmus). Se l'argomento è esterno, declina gentilmente.
+2.  *Uso dei Documenti Accessori:* Basa SEMPRE le tue risposte sui documenti ufficiali che ti sono passati come contesto (Guida Studente, Regolamento Contribuzione, Bando Erasmus, ecc). Estrai regole, requisiti, CFU, esami e importi esatti.
+3.  *No Allucinazioni:* Se non conosci un'informazione specifica e non la trovi nei documenti, suggerisci di visitare "poliba.it" o contattare la Segreteria Studenti. Non inventare date o scadenze.
+4.  *Formattazione:* Sii cordiale e amichevole (stile Google Gemini). Usa elenchi puntati per le procedure e grassetto per i concetti chiave e i nomi dei corsi. Evita muri di testo troppo lunghi, suddividi in paragrafi.
 
 ### GESTIONE INTELLIGENTE LUOGHI E NAVIGAZIONE:
 Devi agire come una guida esperta del Campus. Riconosci automaticamente richieste riguardanti mappe, aule, uffici e luoghi di interesse, anche quando formulate con linguaggio naturale (es. "dov'è...", "come raggiungo...", "posizione di...").
 
 *Compiti specifici per la navigazione:*
-1.  *Analisi dell'Input:* Identifica chiaramente l'intento dell'utente. Se chiede indicazioni, cerca di capire:
-    * *Destinazione:* Dove vuole andare l'utente?
-    * *Punto di Partenza:* Deduci dove si trova l'utente. Se l'utente dice "non so arrivare all'aula magna", assumi che abbia bisogno di un orientamento generale. Se dice "mi trovo all'ingresso", calcola il percorso da lì. Se il punto di partenza non è chiaro, chiedilo gentilmente ("Da dove stai partendo?").
-2.  *Risposta di Orientamento:* Fornisci indicazioni descrittive chiare basate sulla struttura del Campus (es. "Entrando da Via Orabona, prosegui dritto per il viale principale, l'edificio si trova sulla destra...").
-3.  *Riferimenti Edifici:* Quando citi un luogo, specifica sempre l'Edificio (es. "Edificio Q01") e il Piano se noti, per facilitare l'orientamento.
+1.  *Analisi dell'Input:* Identifica chiaramente l'intento dell'utente. Se chiede indicazioni, cerca di capire la destinazione.
+2.  *Risposta di Orientamento:* Fornisci indicazioni descrittive chiare basate sulla struttura del Campus (es. "Entrando da Via Orabona...").
+3.  *Riferimenti Edifici:* Quando citi un luogo, specifica sempre l'Edificio (es. "Edificio Q01") e il Piano se noti.
 """
 
 # =============================================================================
@@ -71,9 +71,24 @@ def get_percorso_from_mysql(chiave_cercata):
     return percorso
 
 # =============================================================================
-# RICERCA AUTOMATICA MODELLO 
+# CARICAMENTO PDF CONOSCENZA AUTENTICA E INIZIALIZZAZIONE MODELLO
 # =============================================================================
-print("Ricerca modello funzionante...")
+print("Inizializzazione Gemini e caricamento conoscenza...")
+uploaded_files = []
+try:
+    if API_KEY:
+        knowledge_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "knowledge")
+        if os.path.exists(knowledge_dir):
+            for filename in os.listdir(knowledge_dir):
+                if filename.lower().endswith(".pdf"):
+                    pdf_path = os.path.join(knowledge_dir, filename)
+                    print(f"Caricamento {filename}...")
+                    file_ref = genai.upload_file(pdf_path)
+                    uploaded_files.append(file_ref)
+                    print(f"-> Caricato come URI: {file_ref.uri}")
+except Exception as e:
+    print(f"Errore caricamento PDF: {e}")
+
 modello_scelto = None
 chat_session = None
 
@@ -81,10 +96,10 @@ try:
     if API_KEY:
         for m in genai.list_models():
             if 'generateContent' in m.supported_generation_methods:
-                if 'gemini-2.5-flash-lite' in m.name:
+                if 'gemini-3-flash-preview' in m.name:
                     modello_scelto = m.name
                     break
-                elif 'gemini-pro' in m.name:
+                elif 'gemini-2.5-flash' in m.name or 'gemini-1.5-flash' in m.name:
                     modello_scelto = m.name
                 
                 if not modello_scelto:
@@ -92,8 +107,25 @@ try:
 
         if modello_scelto:
             print(f"TROVATO: {modello_scelto}")
-            model = genai.GenerativeModel(modello_scelto)
-            chat_session = model.start_chat(history=[])
+            
+            initial_history = []
+            if uploaded_files:
+                parts = uploaded_files + ["Questi sono i documenti ufficiali del Politecnico di Bari. Usali come base di conoscenza primaria per rispondere a tutte le domande."]
+                initial_history.append({"role": "user", "parts": parts})
+                initial_history.append({"role": "model", "parts": ["Certamente! Ho assimilato i documenti ufficiali e li utilizzerò come fonte principale per assistere l'utente in modo preciso."]})
+            
+            try:
+                model = genai.GenerativeModel(
+                    model_name=modello_scelto,
+                    system_instruction=istruzioni_poliba
+                )
+            except Exception as e:
+                print("Supporto system_instruction assente. Fallback standard.")
+                model = genai.GenerativeModel(model_name=modello_scelto)
+                initial_history.insert(0, {"role": "user", "parts": [istruzioni_poliba]})
+                initial_history.insert(1, {"role": "model", "parts": ["Ricevuto. Seguirò queste istruzioni alla lettera."]})
+
+            chat_session = model.start_chat(history=initial_history)
         else:
             print("NESSUN MODELLO TROVATO.")
 except Exception as e:
