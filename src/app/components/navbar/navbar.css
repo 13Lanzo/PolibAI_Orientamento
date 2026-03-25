@@ -1,0 +1,159 @@
+:host {
+    display: block;
+    width: 100%;
+    background-color: #037F8C;
+
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    position: relative;
+    /* Assicura che z-index funzioni contestualmente */
+    z-index: 1000;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 15px;
+    position: relative;
+}
+
+.main-navbar {
+    width: 100%;
+}
+
+.nav-menu {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.nav-item {
+    position: static;
+    /* Importante per il dropdown a larghezza intera */
+}
+
+.nav-link {
+    display: block;
+    color: white;
+    text-decoration: none;
+    padding: 15px 20px;
+    font-size: 1rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.nav-link:hover,
+.nav-item:hover .nav-link {
+    background-color: #005596;
+    color: white;
+}
+
+/* Stili Dropdown */
+.dropdown-menu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    background-color: #f9f9f9;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    z-index: 1001;
+    border-top: 3px solid #005596;
+    padding: 20px 0;
+}
+
+.nav-item:hover .dropdown-menu {
+    display: block;
+}
+
+.dropdown-content {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 30px;
+}
+
+.dropdown-column {
+    flex: 1;
+    min-width: 200px;
+}
+
+.dropdown-column h3 {
+    color: #003366;
+    font-size: 0.9rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+    margin-top: 0;
+    text-transform: uppercase;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 5px;
+}
+
+.dropdown-column ul {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 20px 0;
+}
+
+.dropdown-column ul li {
+    margin-bottom: 5px;
+}
+
+.dropdown-column ul li a {
+    color: #555;
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: color 0.2s;
+}
+
+.dropdown-column ul li a:hover {
+    color: #003366;
+    text-decoration: underline;
+}
+
+/* Adattamenti Responsive */
+@media (max-width: 768px) {
+    .nav-menu {
+        flex-direction: column;
+    }
+
+    .nav-link {
+        padding: 10px 15px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .nav-item {
+        position: relative;
+    }
+
+    .dropdown-menu {
+        position: static;
+        box-shadow: none;
+        border-top: none;
+        background-color: #002a55;
+        padding: 0;
+    }
+
+    .dropdown-content {
+        flex-direction: column;
+        gap: 0;
+    }
+
+    .dropdown-column {
+        padding: 10px 20px;
+    }
+
+    .dropdown-column h3 {
+        color: #fff;
+        border-bottom-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .dropdown-column ul li a {
+        color: #ccc;
+    }
+
+    .dropdown-column ul li a:hover {
+        color: #fff;
+    }
+}
