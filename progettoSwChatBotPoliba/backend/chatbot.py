@@ -158,6 +158,31 @@ def chat_endpoint():
     messaggio_lower = messaggio_utente.lower()
 
     # =============================================================================
+    # LOGICA INFOGRAFICHE STATICHE LATO BACKEND
+    # =============================================================================
+    if messaggio_utente.startswith("INFO_"):
+        codice_corso = messaggio_utente.replace("INFO_", "")
+        mappa_img = {
+            "L7_IngegneriaEdile": "ingegneria_edile.jpg", # Placeholder matching the name asked by the user or actual
+            "L8_IngegneriaSistemiMedicali": "ingegneria_sistemi_medicali.jpg",
+            "L8_IngegneriaCreativitaDigitale": "ingegneria_creativita_digitale.jpg",
+            "L9_IngegneriaMeccanica": "ingegneria_meccanica.jpg",
+            "L8_IngegneriaInformaticaAutomazione": "ingegneria_informatica_automazione.jpg"
+        }
+        
+        if codice_corso in mappa_img:
+            # Pulizia per il testo a schermo (aggiungendo spazi prima delle maiuscole)
+            import re
+            nome_pulito = codice_corso.split("_", 1)[1] if "_" in codice_corso else codice_corso
+            nome_spaziato = re.sub(r'([A-Z])', r' \1', nome_pulito).strip()
+            
+            return jsonify({
+                "response": f"Ecco l'infografica per il corso di laurea in **{nome_spaziato}**.",
+                "type": "image",
+                "mapUrl": f"assets/infografiche/{mappa_img[codice_corso]}"
+            })
+
+    # =============================================================================
     # LOGICA MAPPE SPECIALIZZATA
     # =============================================================================
     
@@ -245,8 +270,34 @@ def chat_endpoint():
         response = chat_session.send_message(prompt)
         testo_risposta = response.text
 
-        print("Risposta AI inviata!")
-        return jsonify({"response": testo_risposta, "type": "text"})
+        # =============================================================================
+        # AGGIUNTA DINAMICA OPZIONI ("Bottone Infografica")
+        # =============================================================================
+        testo_lower = testo_risposta.lower()
+        opzioni_infografica = []
+        
+        if ("l7" in testo_lower or "l-7" in testo_lower) and "edile" in testo_lower:
+            opzioni_infografica.append({"label": "🖼️ Mostra Infografica Ingegneria Edile", "value": "INFO_L7_IngegneriaEdile"})
+            
+        if ("l8" in testo_lower or "l-8" in testo_lower) and ("medical" in testo_lower or "sistemi medicali" in testo_lower or "sistemi medici" in testo_lower):
+            opzioni_infografica.append({"label": "🖼️ Mostra Infografica Sistemi Medicali", "value": "INFO_L8_IngegneriaSistemiMedicali"})
+            
+        if ("l8" in testo_lower or "l-8" in testo_lower) and ("creatività digitale" in testo_lower or "creativita digitale" in testo_lower):
+            opzioni_infografica.append({"label": "🖼️ Mostra Infografica Creatività Digitale", "value": "INFO_L8_IngegneriaCreativitaDigitale"})
+            
+        if ("l9" in testo_lower or "l-9" in testo_lower) and "meccanica" in testo_lower:
+            opzioni_infografica.append({"label": "🖼️ Mostra Infografica Ingegneria Meccanica", "value": "INFO_L9_IngegneriaMeccanica"})
+            
+        if ("l8" in testo_lower or "l-8" in testo_lower) and ("informatica" in testo_lower or "automazione" in testo_lower):
+            # Preveniamo attivazioni doppie con creatività digitale
+            if not any(opt['value'] == "INFO_L8_IngegneriaCreativitaDigitale" for opt in opzioni_infografica):
+                opzioni_infografica.append({"label": "🖼️ Mostra Infografica Ing. Informatica e Automazione", "value": "INFO_L8_IngegneriaInformaticaAutomazione"})
+
+        print("Risposta AI inviata con opzioni aggiuntive calcolate!")
+        if opzioni_infografica:
+            return jsonify({"response": testo_risposta, "type": "text", "options": opzioni_infografica})
+        else:
+            return jsonify({"response": testo_risposta, "type": "text"})
     except Exception as e:
         errore = str(e)
         print(f"Errore AI: {errore}")

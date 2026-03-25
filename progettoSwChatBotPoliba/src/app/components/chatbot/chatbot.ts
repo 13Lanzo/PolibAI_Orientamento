@@ -70,43 +70,14 @@ export class Chatbot implements AfterViewChecked {
     }
 
     sendOption(value: string, label: string) {
-        if (value.startsWith('MOSTRA_INFO_')) {
-            const courseName = value.replace('MOSTRA_INFO_', '');
-            this.handleShowInfographic(courseName);
-            return;
-        }
-
         this.addMessageToChat({
             text: `Ho scelto: ${label}`,
             sender: 'user',
             timestamp: new Date(),
             type: 'text'
         });
+        
         this.callBackend(value);
-    }
-
-    handleShowInfographic(courseName: string) {
-        // Map common courses to their static filenames
-        const fileNameMap: { [key: string]: string } = {
-            'Ingegneria Informatica': 'ingegneria_informatica.jpg',
-            'Ingegneria Meccanica': 'ingegneria_meccanica.jpg',
-            'Ingegneria Gestionale': 'ingegneria_gestionale.jpg',
-            'Ingegneria Civile': 'ingegneria_civile.jpg',
-            'Ingegneria Edile': 'ingegneria_edile.jpg',
-            'Architettura': 'architettura.jpg',
-            'Design': 'design.jpg'
-        };
-
-        const fileName = fileNameMap[courseName] || 'default.jpg';
-        const imgUrl = `assets/infografiche/${fileName}`;
-
-        this.addMessageToChat({
-            sender: 'bot',
-            timestamp: new Date(),
-            type: 'image',
-            mapUrl: imgUrl,
-            text: `Ecco un'infografica riassuntiva per il corso di laurea in **${courseName}**.`
-        });
     }
 
     openMap(url: string | undefined) {
@@ -138,21 +109,6 @@ export class Chatbot implements AfterViewChecked {
                 }
 
                 let injectedOptions = response.options || [];
-                const txt = response.response?.toLowerCase() || '';
-                
-                // Auto-detect degree course to suggest infographic
-                if (!injectedOptions.some((o: QuickOption) => o.value.startsWith('MOSTRA_INFO'))) {
-                    const courses = ['Ingegneria Informatica', 'Ingegneria Meccanica', 'Ingegneria Gestionale', 'Ingegneria Civile', 'Ingegneria Edile', 'Architettura', 'Design'];
-                    for (const c of courses) {
-                        if (txt.includes(c.toLowerCase())) {
-                            injectedOptions.push({
-                                label: `🖼️ Mostra Infografica ${c}`,
-                                value: `MOSTRA_INFO_${c}`
-                            });
-                            break; // Add only one option max
-                        }
-                    }
-                }
 
                 const botMsg: Message = {
                     sender: 'bot',

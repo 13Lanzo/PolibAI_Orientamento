@@ -100,7 +100,7 @@
             <p *ngIf="msg.type === 'options'">{{ msg.text }}</p>
             <div class="options-flex">
               <button *ngFor="let opt of msg.options" class="opt-btn" 
-                      [class.infographic-btn]="opt.value.startsWith('MOSTRA_INFO')"
+                      [class.infographic-btn]="opt.value.startsWith('INFO_')"
                       (click)="sendOption(opt.value, opt.label)">
                 {{ opt.label }}
               </button>
