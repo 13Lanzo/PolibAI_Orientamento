@@ -166,7 +166,7 @@ def chat_endpoint():
             "L7_IngegneriaEdile": "ingegneria_edile.jpg", # Placeholder matching the name asked by the user or actual
             "L8_IngegneriaSistemiMedicali": "ingegneria_sistemi_medicali.jpg",
             "L8_IngegneriaCreativitaDigitale": "ingegneria_creativita_digitale.jpg",
-            "L9_IngegneriaMeccanica": "ingegneria_meccanica.jpg",
+            "L9_IngegneriaMeccanica": "L9-IngegneriaMeccanica.png",
             "L8_IngegneriaInformaticaAutomazione": "ingegneria_informatica_automazione.jpg"
         }
         
