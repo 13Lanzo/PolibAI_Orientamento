@@ -24,55 +24,55 @@ interface Message {
 /* ── SVG icons extracted as tiny components for readability ── */
 const LogoIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M21.42 10.922a2 2 0 0 1-.019 1.838L12.83 23h-1.63L2.6 12.76a2 2 0 0 1-.02-1.838L11.19 1h1.64Z"/>
-    <path d="m22 10-10 6-10-6 10-6Z"/>
-    <path d="M6 12v5c0 2.21 2.69 4 6 4s6-1.79 6-4v-5"/>
+    <path d="M21.42 10.922a2 2 0 0 1-.019 1.838L12.83 23h-1.63L2.6 12.76a2 2 0 0 1-.02-1.838L11.19 1h1.64Z" />
+    <path d="m22 10-10 6-10-6 10-6Z" />
+    <path d="M6 12v5c0 2.21 2.69 4 6 4s6-1.79 6-4v-5" />
   </svg>
 )
 
 const ResetIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
-    <path d="M3 3v5h5"/>
+    <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+    <path d="M3 3v5h5" />
   </svg>
 )
 
 const SendIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <line x1="22" x2="11" y1="2" y2="13"/>
-    <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+    <line x1="22" x2="11" y1="2" y2="13" />
+    <polygon points="22 2 15 22 11 13 2 9 22 2" />
   </svg>
 )
 
 const BookIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/>
+    <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20" />
   </svg>
 )
 
 const SparkleIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/>
+    <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z" />
   </svg>
 )
 
 const InfoIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <circle cx="12" cy="12" r="10"/>
-    <path d="M12 16v-4"/>
-    <path d="M12 8h.01"/>
+    <circle cx="12" cy="12" r="10" />
+    <path d="M12 16v-4" />
+    <path d="M12 8h.01" />
   </svg>
 )
 
 const ChevronRight = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="m9 18 6-6-6-6"/>
+    <path d="m9 18 6-6-6-6" />
   </svg>
 )
 
 const DownloadIcon = () => (
   <svg viewBox="0 0 24 24" fill="none" className="download-icon">
-    <path d="M12 15V3M12 15L8 11M12 15L16 11M21 21H3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+    <path d="M12 15V3M12 15L8 11M12 15L16 11M21 21H3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
   </svg>
 )
 
@@ -81,25 +81,25 @@ const SUGGESTIONS = [
   {
     icon: <LogoIcon />,
     title: 'Corsi di Laurea',
-    preview: 'Quali sono i corsi di laurea trienna...',
+    preview: 'Quali corsi di laurea offre il Poliba',
     text: 'Quali sono i corsi di laurea triennale disponibili?',
   },
   {
     icon: <BookIcon />,
     title: 'Ammissione',
-    preview: 'Come funzionano i test di...',
+    preview: 'Come funzionano i test di ammissione ai corsi di laurea?',
     text: 'Come funzionano i test di ammissione ai corsi di laurea?',
   },
   {
     icon: <SparkleIcon />,
     title: 'Perché Poliba?',
-    preview: 'Quali sono i vantaggi di studiare a...',
+    preview: 'Quali sono i vantaggi di studiare al Politecnico di Bari?',
     text: 'Quali sono i vantaggi di studiare al Politecnico di Bari?',
   },
   {
     icon: <InfoIcon />,
     title: 'Tasse e Borse',
-    preview: 'Informazioni su tasse universitarie ...',
+    preview: 'Informazioni su tasse universitarie e bandi',
     text: 'Quali sono le informazioni riguardo alle tasse universitarie e le borse di studio al Poliba?',
   },
 ]
