@@ -1,68 +1,95 @@
 # Poliba Orientamento AI - Chatbot 🎓
 
-Questo progetto è l'Assistente Virtuale Ufficiale per l'Orientamento Universitario del Politecnico di Bari. È progettato per aiutare i futuri studenti, interagendo in modo intelligente basandosi su documenti ufficiali, offrendo indicazioni di navigazione all'interno del campus e generando infografiche per i corsi di laurea!
+Assistente Virtuale Ufficiale per l'Orientamento Universitario del Politecnico di Bari.  
+Interagisce in modo intelligente basandosi su documenti ufficiali, offre indicazioni di navigazione nel campus e mostra infografiche statiche per i corsi di laurea.
 
-L'architettura del progetto è suddivisa in due parti principali:
-- **Frontend**: un'applicazione moderna sviluppata in Angular.
-- **Backend**: un server Python basato su Flask, che si integra con l'API di Google Gemini per l'elaborazione del linguaggio naturale e con un DB MySQL per le informazioni sul campus.
+## Architettura
 
----
-
-## 🚀 Prerequisiti per l'installazione
-
-Per eseguire correttamente questo progetto sul tuo computer, assicurati di avere installato:
-1. **Node.js e npm** (per il frontend in Angular).
-2. **Python 3.10+ e pip** (per il server backend).
-3. **XAMPP / MySQL** (per il database delle mappe del campus).
-4. Una **chiave API Google Gemini**, ottenibile tramite Google AI Studio.
+| Layer | Tecnologia | Porta |
+|-------|-----------|-------|
+| **Frontend** | React 19 + Vite + TypeScript | `4201` |
+| **Backend** | Python Flask + Google Gemini API | `5000` |
+| **Database** | MySQL (XAMPP) | `3306` |
 
 ---
 
-## 🛠️ Configurazione e Avvio del Progetto
+## 🚀 Prerequisiti
 
-Segui questi due passaggi principali per avviare l'applicazione in locale. Assicurati di aprire **due terminali separati**, uno per il Backend e uno per il Frontend.
-
-### 1. Avvio del Backend (Python / Flask)
-
-Il backend gestisce l'intelligenza artificiale, le richeste sui corsi (suggerendo e servendo localmente infografiche statiche) e le interrogazioni al database.
-
-1. Apri un terminale e spostati nella cartella root del progetto.
-2. Assicurati che il server MySQL (es. tramite XAMPP) sia in esecuzione (database richiesto: `poliba_chatbot`).
-3. Installa le dipendenze Python necessarie:
-   ```bash
-   pip install flask flask-cors google-generativeai mysql-connector-python python-dotenv
-   ```
-4. Crea un file `.env` nella cartella `backend/` e inserisci la tua API key di Gemini:
-   ```env
-   GOOGLE_API_KEY=la_tua_chiave_api_qui
-   ```
-5. Avvia il server backend:
-   ```bash
-   python backend/chatbot.py
-   ```
-   *Il server sarà in ascolto su `http://127.0.0.1:5000`*.
-
-### 2. Avvio del Frontend (Angular)
-
-Il frontend contiene l'interfaccia chat interattiva e dinamica.
-
-1. Apri un secondo terminale, sempre nella cartella root del progetto.
-2. Installa tutte le dipendenze Node:
-   ```bash
-   npm install
-   ```
-3. Avvia il server di sviluppo Angular:
-   ```bash
-   npm start
-   ```
-   *Oppure usa `ng serve` se hai Angular CLI installato globalmente.*
-4. Visita [http://localhost:4201](http://localhost:4201) (o la porta specificata nel tuo terminale) sul tuo browser!
+1. **Node.js 18+** e **npm**
+2. **Python 3.10+** e **pip**
+3. **XAMPP / MySQL** (per il database `poliba_chatbot` con le mappe campus)
+4. Una **chiave API Google Gemini** da [Google AI Studio](https://aistudio.google.com/)
 
 ---
 
-## ✨ Funzionalità Principali
+## 🛠️ Setup e Avvio
 
-* **Retrieval-Augmented Generation (RAG)**: Il bot basa le sue risposte sui bandi e sulle guide dello studente ufficiali.
-* **Mappe Dinamiche**: Piena integrazione basata su DB per istruire lo studente nell'orientamento fisico all'interno dei plessi del campus (via Orabona, ecc.).
-* **Infografiche Dinamiche**: Ricerca i corsi di Ingegneria (Medicale, Informatica, Edile, ecc.) per far apparire le opzioni con l'Infografica correlata istantaneamente generata/caricata in chat.
-* **Calcolo Tasse Context-Aware**.
+### 1. Backend (Flask)
+
+```bash
+# Installa le dipendenze Python
+pip install flask flask-cors google-generativeai mysql-connector-python python-dotenv
+
+# Crea il file .env nella cartella backend/
+echo GOOGLE_API_KEY=la_tua_chiave > backend/.env
+
+# Avvia il server
+python backend/chatbot.py
+```
+Il server sarà in ascolto su `http://127.0.0.1:5000`.
+
+### 2. Frontend (React + Vite)
+
+```bash
+# Installa le dipendenze Node
+npm install
+
+# Avvia il dev server
+npm start
+```
+L'interfaccia sarà disponibile su [http://127.0.0.1:4201](http://127.0.0.1:4201).
+
+---
+
+## ✨ Funzionalità
+
+- **RAG (Retrieval-Augmented Generation)**: risposte basate su Guida dello Studente, regolamento tasse e bando Erasmus
+- **Mappe Campus**: navigazione interattiva con scelta dell'ingresso e mappa dinamica da MySQL
+- **Infografiche Statiche**: bottoni contestuali per visualizzare infografiche pre-caricate dei corsi di laurea (L7, L8, L9)
+- **Markdown Rendering**: risposte formattate con grassetto, elenchi e emoji
+
+---
+
+## 📁 Struttura del Progetto
+
+```
+├── backend/
+│   ├── chatbot.py          # Server Flask + logica AI + routing infografiche
+│   ├── polibaDB.py         # Utility MySQL
+│   ├── knowledge/          # PDF della conoscenza (guide, bandi, regolamenti)
+│   └── .env                # API key (non versionato)
+├── public/
+│   ├── assets/
+│   │   ├── images/maps/    # Mappe campus
+│   │   └── infografiche/   # Infografiche statiche dei corsi
+│   └── favicon.ico
+├── src/
+│   ├── api/chatService.ts  # Client HTTP per il backend
+│   ├── components/
+│   │   └── Chatbot/
+│   │       ├── Chatbot.tsx  # Componente principale React
+│   │       └── Chatbot.css  # Stili del chatbot
+│   ├── App.tsx
+│   ├── main.tsx
+│   └── index.css
+├── vite.config.ts
+├── tsconfig.json
+└── package.json
+```
+
+---
+
+## 📝 Note
+
+- Le infografiche sono gestite lato backend (`chatbot.py`): il server analizza la risposta di Gemini e inietta automaticamente i bottoni "Mostra Infografica" quando rileva un corso di laurea nella risposta.
+- Il frontend è completamente data-driven: non contiene alcuna logica hardcoded per i corsi.
