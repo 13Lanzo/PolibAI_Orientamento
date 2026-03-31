@@ -1,0 +1,345 @@
+<div class="advisor-container">
+
+  <!-- ═══════════════════════════════════════════════ -->
+  <!-- HEADER                                         -->
+  <!-- ═══════════════════════════════════════════════ -->
+  <header class="advisor-header">
+    <div class="header-brand">
+      <div class="brand-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/>
+        </svg>
+      </div>
+      <div>
+        <div class="brand-title">Poliba Course Advisor</div>
+        <div class="brand-sub">Powered by Gemini AI · A.A. 2024–2025</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ═══════════════════════════════════════════════ -->
+  <!-- STEP: INTRO                                    -->
+  <!-- ═══════════════════════════════════════════════ -->
+  <div class="step-content" *ngIf="step() === 'intro'">
+    <div class="intro-section">
+      <div class="intro-badge">
+        <span class="badge-dot"></span>
+        AI-powered · Personalizzato per te
+      </div>
+      <h1 class="intro-title">
+        Qual è il corso<br>fatto per te?
+      </h1>
+      <p class="intro-desc">
+        Raccontaci le tue materie preferite e i tuoi sogni lavorativi.
+        L'AI analizzerà il tuo profilo e ti consiglierà il corso di laurea
+        perfetto tra i 23 offerti dal Politecnico di Bari.
+      </p>
+    </div>
+
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">🎯</div>
+        <div class="feature-label">Personalizzato</div>
+        <div class="feature-desc">Basato sul tuo profilo unico</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">⚡</div>
+        <div class="feature-label">In tempo reale</div>
+        <div class="feature-desc">Risposta istantanea dall'AI</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📚</div>
+        <div class="feature-label">23 corsi</div>
+        <div class="feature-desc">Tutta l'offerta Poliba 2024-25</div>
+      </div>
+    </div>
+
+    <button class="btn-primary btn-full" (click)="goToForm()">
+      Inizia il quiz
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+    </button>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════ -->
+  <!-- STEP: FORM                                     -->
+  <!-- ═══════════════════════════════════════════════ -->
+  <div class="step-content" *ngIf="step() === 'form'">
+
+    <!-- Materie -->
+    <div class="form-section">
+      <div class="step-indicator">Passo 1 di 2</div>
+      <h2 class="section-title">Le tue materie preferite</h2>
+      <p class="section-desc">Quali discipline ti appassionano di più? Aggiungi anche più di una.</p>
+
+      <div class="tags-container">
+        <span class="tag tag-materia" *ngFor="let m of materie()">
+          {{ m }}
+          <span class="tag-remove" (click)="removeMateria(m)">×</span>
+        </span>
+      </div>
+
+      <div class="input-row">
+        <input
+          type="text"
+          [ngModel]="materiInput()"
+          (ngModelChange)="materiInput.set($event)"
+          (keydown)="onMateriaKeydown($event)"
+          placeholder="Es. Matematica, Fisica, Arte…"
+          class="text-input"
+        />
+        <button class="btn-secondary" (click)="addMateria()">Aggiungi</button>
+      </div>
+
+      <div class="suggestions-row">
+        <span
+          class="suggestion-chip"
+          *ngFor="let s of filteredInterests()"
+          (click)="addMateriaFromSuggestion(s)"
+        >+ {{ s }}</span>
+      </div>
+    </div>
+
+    <!-- Aspirazioni -->
+    <div class="form-section">
+      <div class="step-indicator">Passo 2 di 2</div>
+      <h2 class="section-title">Le tue aspirazioni</h2>
+      <p class="section-desc">Che lavoro sogni di fare? Pensa in grande!</p>
+
+      <div class="tags-container">
+        <span class="tag tag-aspirazione" *ngFor="let a of aspirazioni()">
+          {{ a }}
+          <span class="tag-remove" (click)="removeAspirazione(a)">×</span>
+        </span>
+      </div>
+
+      <div class="input-row">
+        <input
+          type="text"
+          [ngModel]="aspInput()"
+          (ngModelChange)="aspInput.set($event)"
+          (keydown)="onAspKeydown($event)"
+          placeholder="Es. Ingegnere AI, Architetto, Designer…"
+          class="text-input"
+        />
+        <button class="btn-secondary" (click)="addAspirazione()">Aggiungi</button>
+      </div>
+
+      <div class="suggestions-row">
+        <span
+          class="suggestion-chip"
+          *ngFor="let s of filteredJobs()"
+          (click)="addAspirazioneFromSuggestion(s)"
+        >+ {{ s }}</span>
+      </div>
+    </div>
+
+    <!-- Note -->
+    <div class="form-section">
+      <label class="note-label">Vuoi aggiungere qualcosa? (facoltativo)</label>
+      <textarea
+        [ngModel]="note()"
+        (ngModelChange)="note.set($event)"
+        placeholder="Es. Mi piace lavorare in team, vorrei vivere all'estero, sono creativo ma anche analitico…"
+        rows="3"
+        class="text-area"
+      ></textarea>
+    </div>
+
+    <!-- Error -->
+    <div class="error-banner" *ngIf="error()">{{ error() }}</div>
+
+    <!-- Actions -->
+    <div class="form-actions">
+      <button class="btn-ghost" (click)="goToIntro()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+        Indietro
+      </button>
+      <button
+        class="btn-primary"
+        [class.btn-disabled]="!canSubmit()"
+        [disabled]="!canSubmit()"
+        (click)="getRecommendation()"
+      >
+        Analizza il mio profilo con AI
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════ -->
+  <!-- STEP: LOADING                                  -->
+  <!-- ═══════════════════════════════════════════════ -->
+  <div class="step-content loading-content" *ngIf="step() === 'loading'">
+    <div class="loading-icon-wrap">
+      <div class="loading-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/>
+        </svg>
+      </div>
+    </div>
+    <h2 class="loading-title">L'AI sta analizzando il tuo profilo…</h2>
+    <p class="loading-sub">Confrontando i tuoi interessi con i 23 corsi del Poliba</p>
+    <div class="progress-bar">
+      <div class="progress-fill" [style.width.%]="getLoadingPercent()"></div>
+    </div>
+    <div class="loading-pct">{{ getLoadingPercent() }}% completato</div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════ -->
+  <!-- STEP: RESULT                                   -->
+  <!-- ═══════════════════════════════════════════════ -->
+  <div class="step-content result-content" *ngIf="step() === 'result' && result()">
+
+    <div class="result-header">
+      <div class="result-badge">
+        <span class="badge-dot badge-dot--green"></span>
+        Analisi completata
+      </div>
+      <h2 class="result-subtitle">Il corso perfetto per te è:</h2>
+    </div>
+
+    <!-- Main Course Card -->
+    <div class="course-card">
+      <div class="course-card-top">
+        <div class="course-info">
+          <span
+            class="dept-badge"
+            *ngIf="result()!.courseData"
+            [style.background]="getDeptColor(result()!.dipartimento).bg"
+            [style.color]="getDeptColor(result()!.dipartimento).text"
+            [style.borderColor]="getDeptColor(result()!.dipartimento).border"
+          >{{ result()!.dipartimento }}</span>
+          <h3 class="course-name">{{ result()!.corsoConsigliato }}</h3>
+          <div class="course-meta" *ngIf="result()!.courseData">
+            <span>{{ result()!.courseData!.tipo }}</span>
+            <span>· {{ result()!.courseData!.classe }}</span>
+            <span class="badge-en" *ngIf="result()!.courseData!.en">🌍 In inglese</span>
+            <span class="badge-new" *ngIf="result()!.courseData!.nuovo">★ Nuovo</span>
+          </div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-number">93.8%</div>
+          <div class="stat-label">occupati<br>a 3 anni</div>
+        </div>
+      </div>
+      <p class="course-motivation">{{ result()!.motivazione }}</p>
+    </div>
+
+    <!-- Punti di forza + Sbocchi -->
+    <div class="info-grid">
+      <div class="info-card">
+        <div class="info-card-title">Punti di forza</div>
+        <div class="info-item" *ngFor="let p of result()!.puntiForza">
+          <span class="check-circle">✓</span>
+          <span>{{ p }}</span>
+        </div>
+      </div>
+      <div class="info-card">
+        <div class="info-card-title">Sbocchi lavorativi</div>
+        <div class="info-item" *ngFor="let s of result()!.sbocchiLavorativi">
+          <span class="dot-blue"></span>
+          <span>{{ s }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Internazionale -->
+    <div class="intl-card" *ngIf="result()!.opportunitaInternazionali">
+      <div class="intl-title">🌍 Opportunità internazionali</div>
+      <p class="intl-text">{{ result()!.opportunitaInternazionali }}</p>
+    </div>
+
+    <!-- Consiglio personale -->
+    <div class="advice-card" *ngIf="result()!.consiglio">
+      <div class="advice-title">💡 Consiglio personale</div>
+      <p class="advice-text">"{{ result()!.consiglio }}"</p>
+    </div>
+
+    <!-- ══════════════════════════════════════════ -->
+    <!-- RADAR CHART                               -->
+    <!-- ══════════════════════════════════════════ -->
+    <div class="radar-section" *ngIf="result()!.areeInteresse && result()!.areeInteresse.length > 0">
+      <h3 class="radar-title">📊 Le tue aree di interesse</h3>
+      <p class="radar-desc">Distribuzione delle affinità con il corso consigliato</p>
+
+      <div class="radar-chart-wrapper">
+        <svg viewBox="0 0 300 300" class="radar-svg">
+          <!-- Grid circles -->
+          <polygon [attr.points]="getRadarGridPoints(25)" class="radar-grid"/>
+          <polygon [attr.points]="getRadarGridPoints(50)" class="radar-grid"/>
+          <polygon [attr.points]="getRadarGridPoints(75)" class="radar-grid"/>
+          <polygon [attr.points]="getRadarGridPoints(100)" class="radar-grid"/>
+
+          <!-- Axes -->
+          <line *ngFor="let area of result()!.areeInteresse; let i = index"
+            x1="150" y1="150"
+            [attr.x2]="getRadarAxisEndX(i)"
+            [attr.y2]="getRadarAxisEndY(i)"
+            class="radar-axis"
+          />
+
+          <!-- Data polygon -->
+          <polygon
+            [attr.points]="getRadarPoints(result()!.areeInteresse, chartAnimated())"
+            class="radar-data"
+            [class.radar-data--animated]="chartAnimated()"
+          />
+
+          <!-- Data points -->
+          <ng-container *ngIf="chartAnimated()">
+            <circle *ngFor="let area of result()!.areeInteresse; let i = index"
+              [attr.cx]="getRadarAxisEndX(i) * (area.percentuale / 100) + 150 * (1 - area.percentuale / 100)"
+              [attr.cy]="getRadarAxisEndY(i) * (area.percentuale / 100) + 150 * (1 - area.percentuale / 100)"
+              r="4"
+              class="radar-point"
+            />
+          </ng-container>
+
+          <!-- Labels -->
+          <text *ngFor="let area of result()!.areeInteresse; let i = index"
+            [attr.x]="getRadarLabelX(i)"
+            [attr.y]="getRadarLabelY(i)"
+            class="radar-label"
+            text-anchor="middle"
+            dominant-baseline="central"
+          >{{ area.nome }}</text>
+        </svg>
+      </div>
+
+      <!-- Percentage bars -->
+      <div class="radar-bars">
+        <div class="radar-bar-item" *ngFor="let area of result()!.areeInteresse">
+          <div class="radar-bar-header">
+            <span class="radar-bar-name">{{ area.nome }}</span>
+            <span class="radar-bar-pct">{{ area.percentuale }}%</span>
+          </div>
+          <div class="radar-bar-track">
+            <div
+              class="radar-bar-fill"
+              [style.width.%]="chartAnimated() ? area.percentuale : 0"
+              [style.background]="getDeptColor(result()!.dipartimento).text"
+            ></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Alternative -->
+    <div class="alt-section" *ngIf="result()!.corsiAlternativi && result()!.corsiAlternativi.length > 0">
+      <div class="alt-label">Altri corsi che potrebbero interessarti:</div>
+      <div class="alt-chips">
+        <span class="alt-chip" *ngFor="let c of result()!.corsiAlternativi">{{ c }}</span>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="result-actions">
+      <button class="btn-ghost btn-half" (click)="reset()">Ricomincia</button>
+      <button class="btn-primary btn-half" (click)="openPoliba()">
+        Scopri su poliba.it
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" x2="21" y1="14" y2="3"/></svg>
+      </button>
+    </div>
+  </div>
+
+</div>
