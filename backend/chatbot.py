@@ -110,7 +110,7 @@ try:
     if API_KEY:
         for m in genai.list_models():
             if 'generateContent' in m.supported_generation_methods:
-                if 'gemini-1.5-flash-8b' in m.name:
+                if 'gemini-2.5-flash' in m.name:
                     modello_scelto = m.name
                     break
                 elif 'gemini-2.5-flash' in m.name or 'gemini-3-flash-preview' in m.name:
