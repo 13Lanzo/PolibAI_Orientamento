@@ -110,7 +110,7 @@ try:
     if API_KEY:
         for m in genai.list_models():
             if 'generateContent' in m.supported_generation_methods:
-                if 'gemini-2.5-flash' in m.name:
+                if 'gemini-3.1-flash-lite-preview' in m.name:
                     modello_scelto = m.name
                     break
                 elif 'gemini-2.5-flash' in m.name or 'gemini-3-flash-preview' in m.name:
@@ -150,8 +150,6 @@ contesto_utente = {"destinazione_pendente": None}
 
 @app.route('/chat', methods=['POST', 'OPTIONS'])
 def chat_endpoint():
-    if request.method == 'OPTIONS': return jsonify({"status": "ok"}), 200
-
     data = request.json
     messaggio_utente = data.get('message', '')
     if not messaggio_utente: return jsonify({"error": "Messaggio vuoto"}), 400
@@ -324,9 +322,6 @@ REGOLE IMPORTANTI:
 
 @app.route('/recommend', methods=['POST', 'OPTIONS'])
 def recommend_endpoint():
-    if request.method == 'OPTIONS':
-        return jsonify({"status": "ok"}), 200
-
     data = request.json
     materie = data.get('materie', [])
     aspirazioni = data.get('aspirazioni', [])
