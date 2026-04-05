@@ -108,10 +108,10 @@ try:
     if API_KEY:
         for m in genai.list_models():
             if 'generateContent' in m.supported_generation_methods:
-                if 'gemini-3-flash-preview' in m.name:
+                if 'gemini-2.5-flash' in m.name:
                     modello_scelto = m.name
                     break
-                elif 'gemini-2.5-flash' in m.name or 'gemini-1.5-flash' in m.name:
+                elif 'gemini-1.5-flash' in m.name:
                     modello_scelto = m.name
                 
                 if not modello_scelto:
@@ -146,10 +146,8 @@ except Exception as e:
 contesto_utente = {"destinazione_pendente": None}
 
 
-@app.route('/chat', methods=['POST', 'OPTIONS'])
+@app.route('/chat', methods=['POST'])
 def chat_endpoint():
-    if request.method == 'OPTIONS': return jsonify({"status": "ok"}), 200
-
     data = request.json
     messaggio_utente = data.get('message', '')
     if not messaggio_utente: return jsonify({"error": "Messaggio vuoto"}), 400
@@ -304,6 +302,134 @@ def chat_endpoint():
         if "429" in errore:
             return jsonify({"response": "Troppe richieste. Riprova tra poco.", "type": "text"}), 200
         return jsonify({"response": "Errore AI generico.", "type": "text"}), 500
+
+
+# =============================================================================
+# ENDPOINT: RACCOMANDAZIONE CORSO (Course Advisor AI)
+# =============================================================================
+
+istruzioni_advisor = """
+Sei un orientatore universitario esperto del Politecnico di Bari (Poliba). Il tuo compito è analizzare gli interessi e le aspirazioni lavorative di uno studente e raccomandare il corso di laurea più adatto tra quelli offerti dal Poliba.
+
+Ecco i corsi disponibili al Poliba (A.A. 2024-2025):
+- Architettura (Magistrale a Ciclo Unico 5 anni, LM4, Dipartimento: ARCOD)
+- Architecture Sciences for Heritage (Triennale, L17, Dipartimento: ARCOD, in inglese, NUOVO)
+- Design (Triennale, L4, Dipartimento: ARCOD)
+- Industrial Design (Magistrale, LM12, Dipartimento: ARCOD, in inglese)
+- Costruzioni e Gestione Ambientale e Territoriale (Triennale Professionalizzante, L-P01, Dipartimento: DICATECh)
+- Ingegneria Civile e Ambientale (Triennale, L7, Dipartimento: DICATECh)
+- Ingegneria Edile (Triennale, L7, Dipartimento: DICATECh)
+- Ingegneria della Mobilità Sostenibile (Magistrale, LM26, Dipartimento: DICATECh)
+- Ingegneria Gestionale (Triennale, L9, Dipartimento: DMMM)
+- Ingegneria Meccanica (Triennale, L9, Dipartimento: DMMM)
+- Management Engineering for Innovation (Triennale, L9, Dipartimento: DMMM, in inglese, NUOVO)
+- Ingegneria Industriale e dei Sistemi Navali (Triennale, L9, Dipartimento: DMMM)
+- Ingegneria Elettrica (Triennale, L9, Dipartimento: DEI)
+- Ingegneria dei Sistemi Aerospaziali (Triennale, L8, Dipartimento: DEI)
+- Ingegneria dei Sistemi Medicali (Triennale, L8, Dipartimento: DEI)
+- Energy Engineering (Magistrale, LM30, Dipartimento: DEI, in inglese)
+- Automation and Robotics Engineering (Magistrale, LM32, Dipartimento: DIEI, in inglese)
+- Computer Engineering (Magistrale, LM32, Dipartimento: DIEI, in inglese)
+- Electronics Engineering (Magistrale, LM29, Dipartimento: DIEI, in inglese)
+- Telecommunication and Internet Technologies Engineering (Magistrale, LM27, Dipartimento: DIEI, in inglese)
+- Ingegneria Informatica e dell'Automazione (Triennale, L8, Dipartimento: DIEI)
+- Ingegneria Elettronica e delle Tecnologie Internet (Triennale, L8, Dipartimento: DIEI)
+- Ingegneria della Creatività Digitale (Triennale, L8, Dipartimento: DIEI, NUOVO)
+
+INFORMAZIONI CHIAVE SUL POLIBA:
+- 11.000 studenti, 93.8% occupati a 3 anni dalla laurea magistrale
+- Sede principale a Bari, sedi a Taranto, Foggia, Brindisi
+- Double Degree con NYU, Cranfield, NJ Tech, Illinois Tech, Grenoble, Côte d'Azur
+- 6 corsi magistrali in inglese, Erasmus+ con 40+ università
+- #9 top 10 italiano per Architettura & Design (QS Rankings 2024)
+- Career Service con 500+ aziende partner, Career Fair annuale
+- 5 dipartimenti: ARCOD (Architettura), DICATECh (Civile/Chimica), DMMM (Meccanica/Management), DEI (Elettrica/Aerospaziale), DIEI (Informatica/Elettronica)
+
+Rispondi SEMPRE in italiano con questo formato JSON esatto (SOLO il JSON, nessun testo aggiuntivo, nessun blocco markdown):
+{
+  "corsoConsigliato": "Nome esatto del corso dalla lista sopra",
+  "dipartimento": "Codice dipartimento (ARCOD, DICATECh, DMMM, DEI o DIEI)",
+  "motivazione": "2-3 frasi che spiegano perché questo corso è perfetto per lo studente, usando un tono entusiasmante e personale",
+  "puntiForza": ["punto 1", "punto 2", "punto 3"],
+  "sbocchiLavorativi": ["sbocco 1", "sbocco 2", "sbocco 3"],
+  "opportunitaInternazionali": "Descrizione breve delle opportunità internazionali specifiche per questo corso",
+  "corsiAlternativi": ["Corso alternativo 1", "Corso alternativo 2"],
+  "consiglio": "Un consiglio personale e motivazionale per lo studente (1-2 frasi)",
+  "areeInteresse": [
+    {"nome": "Area 1", "percentuale": 85},
+    {"nome": "Area 2", "percentuale": 70},
+    {"nome": "Area 3", "percentuale": 60},
+    {"nome": "Area 4", "percentuale": 50},
+    {"nome": "Area 5", "percentuale": 40},
+    {"nome": "Area 6", "percentuale": 30}
+  ]
+}
+
+REGOLE IMPORTANTI:
+- areeInteresse deve contenere esattamente 6 aree rilevanti per il profilo dello studente con percentuali da 0 a 100
+- Le percentuali indicano quanto ogni area è affine al profilo dello studente
+- I nomi dei corsi devono corrispondere ESATTAMENTE alla lista
+- Rispondi SOLO con il JSON, nessun testo aggiuntivo, nessun blocco ```json
+"""
+
+@app.route('/recommend', methods=['POST'])
+def recommend_endpoint():
+    data = request.json
+    materie = data.get('materie', [])
+    aspirazioni = data.get('aspirazioni', [])
+    note = data.get('note', '')
+
+    if not materie and not aspirazioni:
+        return jsonify({"error": "Inserisci almeno una materia o un'aspirazione"}), 400
+
+    print(f"[ADVISOR] Materie: {materie}, Aspirazioni: {aspirazioni}, Note: {note}")
+
+    if not modello_scelto:
+        return jsonify({"error": "Modello AI non disponibile"}), 500
+
+    user_message = f"""Materie preferite: {', '.join(materie) if materie else 'non specificate'}
+Aspirazioni lavorative: {', '.join(aspirazioni) if aspirazioni else 'non specificate'}
+Note aggiuntive: {note if note else 'nessuna'}
+
+Analizza il mio profilo e consigliami il corso di laurea più adatto al Politecnico di Bari."""
+
+    try:
+        import json as json_module
+
+        # Use a fresh model call (not the chat session) for advisor
+        advisor_model = genai.GenerativeModel(model_name=modello_scelto)
+        
+        # Build parts with knowledge files if available
+        parts = []
+        if uploaded_files:
+            parts.extend(uploaded_files)
+        parts.append(f"{istruzioni_advisor}\n\n{user_message}")
+
+        response = advisor_model.generate_content(parts)
+        response_text = response.text.strip()
+        
+        # Clean up response - remove markdown code blocks if present
+        if response_text.startswith("```"):
+            response_text = response_text.split("\n", 1)[1] if "\n" in response_text else response_text[3:]
+        if response_text.endswith("```"):
+            response_text = response_text[:-3]
+        response_text = response_text.strip()
+
+        parsed = json_module.loads(response_text)
+        print(f"[ADVISOR] Corso consigliato: {parsed.get('corsoConsigliato', 'N/A')}")
+        return jsonify(parsed)
+
+    except json_module.JSONDecodeError as je:
+        print(f"[ADVISOR] Errore parsing JSON: {je}")
+        print(f"[ADVISOR] Risposta raw: {response_text[:500]}")
+        return jsonify({"error": "Errore nel formato della risposta AI"}), 500
+    except Exception as e:
+        errore = str(e)
+        print(f"[ADVISOR] Errore: {errore}")
+        if "429" in errore:
+            return jsonify({"error": "Troppe richieste. Riprova tra poco."}), 429
+        return jsonify({"error": "Errore nella raccomandazione AI"}), 500
+
 
 
 if __name__ == "__main__":
