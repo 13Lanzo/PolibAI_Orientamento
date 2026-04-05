@@ -8,14 +8,12 @@ import traceback
 from dotenv import load_dotenv
 
 # Carica variabili d'ambiente
-dotenv_path = os.path.join(os.path.dirname(__file__), '.env')
-load_dotenv(dotenv_path, override=True)
+load_dotenv()
 
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}})
 
 # --- CONFIGURAZIONE CHIAVE API ---
-# Leggiamo dal file .env per sicurezza
 API_KEY = os.getenv("GOOGLE_API_KEY")
 if API_KEY:
     genai.configure(api_key=API_KEY)
@@ -38,7 +36,7 @@ Il tuo scopo è guidare futuri studenti, iscritti, docenti e visitatori. Devi fo
 # [UTILIZZO DELLE FUNZIONALITÀ AVANZATE MULTIMODALI]
 - ANALISI PAGELLE/DIPLOMI (Vision): Se l'utente carica l'immagine di una pagella o un documento, analizza i voti, individua le materie in cui eccelle (es. Matematica, Fisica, Disegno) e le sue attitudini. Basandoti su questo, suggerisci 2-3 corsi di laurea del Poliba altamente compatibili, motivando la tua scelta in modo incoraggiante.
 - LETTURA GRAFICI: Se l'utente carica brochure o grafici del Poliba, estrai i dati salienti e spiegali in linguaggio semplice e accessibile.
-- GENERAZIONE INFOGRAFICHE: Se l'utente richiede un'infografica o un'immagine riassuntiva (es. "Genera un'infografica per Ingegneria Edile"), conferma con entusiasmo e aziona lo strumento di generazione immagini (Gemini Flash Image) creando un prompt visivo dettagliato che illustri i vantaggi, le materie chiave e gli sbocchi lavorativi del corso, usando i colori istituzionali (Blu e Arancio).
+- INFOGRAFICHE: Se l'utente richiede un'infografica o se suggerisci un corso di ingegneria, informalo che può cliccare sul bottone "Mostra Infografica" sottostante per visualizzarla. Nelle opzioni rapide verrà inserito il bottone per mostrare l'infografica pertinente.
 
 # [GUIDA E NAVIGAZIONE DEL CAMPUS]
 Agisci come una guida esperta del Campus del Politecnico di Bari.
@@ -113,10 +111,10 @@ try:
                 if 'gemini-2.5-flash' in m.name:
                     modello_scelto = m.name
                     break
-                elif 'gemini-1.5-flash' in m.name or 'gemini-3-flash-preview' in m.name:
-                    if not modello_scelto:
-                        modello_scelto = m.name
-                elif not modello_scelto:
+                elif 'gemini-1.5-flash' in m.name:
+                    modello_scelto = m.name
+                
+                if not modello_scelto:
                     modello_scelto = m.name
 
         if modello_scelto:
@@ -148,7 +146,7 @@ except Exception as e:
 contesto_utente = {"destinazione_pendente": None}
 
 
-@app.route('/chat', methods=['POST', 'OPTIONS'])
+@app.route('/chat', methods=['POST'])
 def chat_endpoint():
     data = request.json
     messaggio_utente = data.get('message', '')
@@ -156,6 +154,31 @@ def chat_endpoint():
 
     print(f"Domanda: {messaggio_utente}")
     messaggio_lower = messaggio_utente.lower()
+
+    # =============================================================================
+    # LOGICA INFOGRAFICHE STATICHE LATO BACKEND
+    # =============================================================================
+    if messaggio_utente.startswith("INFO_"):
+        codice_corso = messaggio_utente.replace("INFO_", "")
+        mappa_img = {
+            "L7_IngegneriaEdile": "ingegneria_edile.jpg", # Placeholder matching the name asked by the user or actual
+            "L8_IngegneriaSistemiMedicali": "ingegneria_sistemi_medicali.jpg",
+            "L8_IngegneriaCreativitaDigitale": "ingegneria_creativita_digitale.jpg",
+            "L9_IngegneriaMeccanica": "L9-IngegneriaMeccanica.png",
+            "L8_IngegneriaInformaticaAutomazione": "ingegneria_informatica_automazione.jpg"
+        }
+        
+        if codice_corso in mappa_img:
+            # Pulizia per il testo a schermo (aggiungendo spazi prima delle maiuscole)
+            import re
+            nome_pulito = codice_corso.split("_", 1)[1] if "_" in codice_corso else codice_corso
+            nome_spaziato = re.sub(r'([A-Z])', r' \1', nome_pulito).strip()
+            
+            return jsonify({
+                "response": f"Ecco l'infografica per il corso di laurea in **{nome_spaziato}**.",
+                "type": "image",
+                "mapUrl": f"assets/infografiche/{mappa_img[codice_corso]}"
+            })
 
     # =============================================================================
     # LOGICA MAPPE SPECIALIZZATA
@@ -243,14 +266,43 @@ def chat_endpoint():
     try:
         prompt = f"{istruzioni_poliba}\n\nUtente: {messaggio_utente}"
         response = chat_session.send_message(prompt)
-        print("Risposta AI inviata!")
-        return jsonify({"response": response.text, "type": "text"})
+        testo_risposta = response.text
+
+        # =============================================================================
+        # AGGIUNTA DINAMICA OPZIONI ("Bottone Infografica")
+        # =============================================================================
+        testo_lower = testo_risposta.lower()
+        opzioni_infografica = []
+        
+        if ("l7" in testo_lower or "l-7" in testo_lower) and "edile" in testo_lower:
+            opzioni_infografica.append({"label": "🖼️ Mostra Infografica Ingegneria Edile", "value": "INFO_L7_IngegneriaEdile"})
+            
+        if ("l8" in testo_lower or "l-8" in testo_lower) and ("medical" in testo_lower or "sistemi medicali" in testo_lower or "sistemi medici" in testo_lower):
+            opzioni_infografica.append({"label": "🖼️ Mostra Infografica Sistemi Medicali", "value": "INFO_L8_IngegneriaSistemiMedicali"})
+            
+        if ("l8" in testo_lower or "l-8" in testo_lower) and ("creatività digitale" in testo_lower or "creativita digitale" in testo_lower):
+            opzioni_infografica.append({"label": "🖼️ Mostra Infografica Creatività Digitale", "value": "INFO_L8_IngegneriaCreativitaDigitale"})
+            
+        if ("l9" in testo_lower or "l-9" in testo_lower) and "meccanica" in testo_lower:
+            opzioni_infografica.append({"label": "🖼️ Mostra Infografica Ingegneria Meccanica", "value": "INFO_L9_IngegneriaMeccanica"})
+            
+        if ("l8" in testo_lower or "l-8" in testo_lower) and ("informatica" in testo_lower or "automazione" in testo_lower):
+            # Preveniamo attivazioni doppie con creatività digitale
+            if not any(opt['value'] == "INFO_L8_IngegneriaCreativitaDigitale" for opt in opzioni_infografica):
+                opzioni_infografica.append({"label": "🖼️ Mostra Infografica Ing. Informatica e Automazione", "value": "INFO_L8_IngegneriaInformaticaAutomazione"})
+
+        print("Risposta AI inviata con opzioni aggiuntive calcolate!")
+        if opzioni_infografica:
+            return jsonify({"response": testo_risposta, "type": "text", "options": opzioni_infografica})
+        else:
+            return jsonify({"response": testo_risposta, "type": "text"})
     except Exception as e:
         errore = str(e)
         print(f"Errore AI: {errore}")
         if "429" in errore:
             return jsonify({"response": "Troppe richieste. Riprova tra poco.", "type": "text"}), 200
         return jsonify({"response": "Errore AI generico.", "type": "text"}), 500
+
 
 # =============================================================================
 # ENDPOINT: RACCOMANDAZIONE CORSO (Course Advisor AI)
@@ -320,7 +372,7 @@ REGOLE IMPORTANTI:
 - Rispondi SOLO con il JSON, nessun testo aggiuntivo, nessun blocco ```json
 """
 
-@app.route('/recommend', methods=['POST', 'OPTIONS'])
+@app.route('/recommend', methods=['POST'])
 def recommend_endpoint():
     data = request.json
     materie = data.get('materie', [])
@@ -377,6 +429,7 @@ Analizza il mio profilo e consigliami il corso di laurea più adatto al Politecn
         if "429" in errore:
             return jsonify({"error": "Troppe richieste. Riprova tra poco."}), 429
         return jsonify({"error": "Errore nella raccomandazione AI"}), 500
+
 
 
 if __name__ == "__main__":
