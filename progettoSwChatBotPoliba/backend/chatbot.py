@@ -36,7 +36,7 @@ Il tuo scopo è guidare futuri studenti, iscritti, docenti e visitatori. Devi fo
 # [UTILIZZO DELLE FUNZIONALITÀ AVANZATE MULTIMODALI]
 - ANALISI PAGELLE/DIPLOMI (Vision): Se l'utente carica l'immagine di una pagella o un documento, analizza i voti, individua le materie in cui eccelle (es. Matematica, Fisica, Disegno) e le sue attitudini. Basandoti su questo, suggerisci 2-3 corsi di laurea del Poliba altamente compatibili, motivando la tua scelta in modo incoraggiante.
 - LETTURA GRAFICI: Se l'utente carica brochure o grafici del Poliba, estrai i dati salienti e spiegali in linguaggio semplice e accessibile.
-- INFOGRAFICHE: Se l'utente richiede un'infografica o se suggerisci un corso di ingegneria, informalo che può cliccare sul bottone "Mostra Infografica" sottostante per visualizzarla. Nelle opzioni rapide verrà inserito il bottone per mostrare l'infografica pertinente.
+- INFOGRAFICHE: Se l'utente richiede un'infografica o se suggerisci un corso di ingegneria, informalo che può visualizzarle tramite i bottoni presenti sotto al tuo messaggio. NON GENERARE MAI nell'output LLM markdown di immagini e NON INCORPORARE MAI testi come "[Mostra Infografica]". L'interfaccia UI si occupa di far comparire i pulsanti automatici per te.
 
 # [GUIDA E NAVIGAZIONE DEL CAMPUS]
 Agisci come una guida esperta del Campus del Politecnico di Bari.
@@ -108,14 +108,14 @@ try:
     if API_KEY:
         for m in genai.list_models():
             if 'generateContent' in m.supported_generation_methods:
-                if 'gemini-2.5-flash' in m.name:
+                if 'gemini-3.1-flash-lite' in m.name:
                     modello_scelto = m.name
                     break
+                elif 'gemini-2.5-flash' in m.name:
+                    modello_scelto = m.name
                 elif 'gemini-1.5-flash' in m.name:
-                    modello_scelto = m.name
-                
-                if not modello_scelto:
-                    modello_scelto = m.name
+                    if not modello_scelto:
+                        modello_scelto = m.name
 
         if modello_scelto:
             print(f"TROVATO: {modello_scelto}")
@@ -161,11 +161,20 @@ def chat_endpoint():
     if messaggio_utente.startswith("INFO_"):
         codice_corso = messaggio_utente.replace("INFO_", "")
         mappa_img = {
-            "L7_IngegneriaEdile": "ingegneria_edile.jpg", # Placeholder matching the name asked by the user or actual
+            "L7_IngegneriaEdile": "ingegneria_edile.jpg",
             "L8_IngegneriaSistemiMedicali": "ingegneria_sistemi_medicali.jpg",
             "L8_IngegneriaCreativitaDigitale": "ingegneria_creativita_digitale.jpg",
-            "L9_IngegneriaMeccanica": "L9-IngegneriaMeccanica.png",
-            "L8_IngegneriaInformaticaAutomazione": "ingegneria_informatica_automazione.jpg"
+            "L9_IngegneriaMeccanica": "L9-IngegneriaMeccanica.jpg",
+            "L8_IngegneriaInformaticaAutomazione": "ingegneria_informatica_automazione.jpg",
+            "LP01_CostruzioniGestioneAmbientale": "L-P01.jpg",
+            "L4_Design": "L4-design.jpg",
+            "L7_IngegneriaCivileAmbientale": "L7-ingegneriaCivileAmbientale.jpg",
+            "L8_IngegneriaElettronicaTecnologieInternet": "L8-IngegneriaElettronicaeTecnologieInternet.jpg",
+            "L8_IngegneriaSistemiAerospaziali": "L8L9-IngegneriadeiSistemiAereospaziali.jpg",
+            "L9_IngegneriaElettrica": "L9-IngegneriaElettrica.jpg",
+            "L9_IngegneriaGestionale": "L9-IngegneriaGestionale.jpg",
+            "L9_IngegneriaIndustrialeSistemiNavali": "L9-IngegneriaIndustrialeeSistemiNavali.jpg",
+            "LM4_Architettura": "LM4-Architettura.jpg"
         }
         
         if codice_corso in mappa_img:
@@ -260,6 +269,11 @@ def chat_endpoint():
     # =============================================================================
     # LOGICA AI 
     # =============================================================================
+    if messaggio_lower.strip() in ["mostra infografica", "infografica", "mostrami l'infografica", "voglio vedere l'infografica"]:
+        return jsonify({
+            "response": "Per poterti mostrare l'infografica esatta, ho bisogno di sapere a quale **Corso di Laurea** ti riferisci. Inserisci il nome del corso (es. 'Mostra infografica Ingegneria Gestionale').",
+            "type": "text"
+        })
     if not modello_scelto or not chat_session:
         return jsonify({"error": "Errore AI: Modello non disponibile"}), 500
 
@@ -274,22 +288,32 @@ def chat_endpoint():
         testo_lower = testo_risposta.lower()
         opzioni_infografica = []
         
-        if ("l7" in testo_lower or "l-7" in testo_lower) and "edile" in testo_lower:
-            opzioni_infografica.append({"label": "🖼️ Mostra Infografica Ingegneria Edile", "value": "INFO_L7_IngegneriaEdile"})
-            
-        if ("l8" in testo_lower or "l-8" in testo_lower) and ("medical" in testo_lower or "sistemi medicali" in testo_lower or "sistemi medici" in testo_lower):
-            opzioni_infografica.append({"label": "🖼️ Mostra Infografica Sistemi Medicali", "value": "INFO_L8_IngegneriaSistemiMedicali"})
-            
-        if ("l8" in testo_lower or "l-8" in testo_lower) and ("creatività digitale" in testo_lower or "creativita digitale" in testo_lower):
-            opzioni_infografica.append({"label": "🖼️ Mostra Infografica Creatività Digitale", "value": "INFO_L8_IngegneriaCreativitaDigitale"})
-            
-        if ("l9" in testo_lower or "l-9" in testo_lower) and "meccanica" in testo_lower:
-            opzioni_infografica.append({"label": "🖼️ Mostra Infografica Ingegneria Meccanica", "value": "INFO_L9_IngegneriaMeccanica"})
-            
-        if ("l8" in testo_lower or "l-8" in testo_lower) and ("informatica" in testo_lower or "automazione" in testo_lower):
-            # Preveniamo attivazioni doppie con creatività digitale
-            if not any(opt['value'] == "INFO_L8_IngegneriaCreativitaDigitale" for opt in opzioni_infografica):
-                opzioni_infografica.append({"label": "🖼️ Mostra Infografica Ing. Informatica e Automazione", "value": "INFO_L8_IngegneriaInformaticaAutomazione"})
+        mapping_keywords = [
+            (["costruzioni", "ambientale e territoriale", "l-p01", "lp01"], "Costruzioni e Gestione Ambientale", "INFO_LP01_CostruzioniGestioneAmbientale"),
+            (["design", "l4", "l-4"], "Design", "INFO_L4_Design"),
+            (["civile", "ambientale", "l7", "l-7"], "Ing. Civile e Ambientale", "INFO_L7_IngegneriaCivileAmbientale"),
+            (["edile", "l-7", "l7"], "Ingegneria Edile", "INFO_L7_IngegneriaEdile"),
+            (["elettronica", "tecnologie internet", "l8", "l-8"], "Ingegneria Elettronica", "INFO_L8_IngegneriaElettronicaTecnologieInternet"),
+            (["informatica", "automazione", "l8", "l-8"], "Ing. Informatica e Automazione", "INFO_L8_IngegneriaInformaticaAutomazione"),
+            (["medical", "sistemi medici", "l8", "l-8", "lm-21", "lm21"], "Sistemi Medicali", "INFO_L8_IngegneriaSistemiMedicali"),
+            (["creatività digitale", "creativita digitale", "l8", "l-8"], "Creatività Digitale", "INFO_L8_IngegneriaCreativitaDigitale"),
+            (["aerospazial", "sistemi aerospaziali", "l8", "l9", "l-8"], "Sistemi Aerospaziali", "INFO_L8_IngegneriaSistemiAerospaziali"),
+            (["elettrica", "l9", "l-9"], "Ingegneria Elettrica", "INFO_L9_IngegneriaElettrica"),
+            (["gestionale", "l9", "l-9"], "Ingegneria Gestionale", "INFO_L9_IngegneriaGestionale"),
+            (["sistemi navali", "industriale", "l9", "l-9"], "Ing. Industriale e Sistemi Navali", "INFO_L9_IngegneriaIndustrialeSistemiNavali"),
+            (["meccanica", "l9", "l-9"], "Ingegneria Meccanica", "INFO_L9_IngegneriaMeccanica"),
+            (["architettura", "lm-4", "lm4"], "Architettura", "INFO_LM4_Architettura")
+        ]
+        
+        for kws, name, val in mapping_keywords:
+            if any(kw in testo_lower for kw in kws):
+                if not any(o['value'] == val for o in opzioni_infografica):
+                    if any(c in kws for c in ["l8", "l7", "l9"]):
+                        kws_descrittivi = [k for k in kws if len(k) > 4]
+                        if any(kd in testo_lower for kd in kws_descrittivi):
+                            opzioni_infografica.append({"label": f"🖼️ Mostra Infografica {name}", "value": val})
+                    else:
+                        opzioni_infografica.append({"label": f"🖼️ Mostra Infografica {name}", "value": val})
 
         print("Risposta AI inviata con opzioni aggiuntive calcolate!")
         if opzioni_infografica:
