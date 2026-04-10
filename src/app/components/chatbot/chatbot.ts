@@ -15,7 +15,7 @@ interface Message {
     htmlText?: string;
     sender: 'user' | 'bot';
     timestamp: Date;
-    type: 'text' | 'map' | 'options';
+    type: 'text' | 'map' | 'options' | 'image';
     mapUrl?: string;
     mapTitle?: string;
     options?: QuickOption[];
