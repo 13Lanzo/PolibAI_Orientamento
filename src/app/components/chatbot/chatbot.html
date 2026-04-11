@@ -134,6 +134,25 @@
             </div>
             <p class="map-desc">{{ msg.text }}</p>
           </div>
+
+          <div *ngIf="msg.type === 'image'" class="infographic-container">
+            <div *ngIf="msg.text || msg.htmlText" class="msg-text markdown-content" [innerHTML]="msg.htmlText || msg.text"></div>
+            <img *ngIf="msg.mapUrl" [src]="msg.mapUrl" alt="Infografica Corso" class="generated-infographic">
+            <a *ngIf="msg.mapUrl" [href]="msg.mapUrl" download="infografica.png" class="download-button" target="_blank">
+              ⬇️ Scarica Infografica
+            </a>
+            <div *ngIf="msg.options && msg.options.length > 0" class="options-flex" style="margin-top: 15px;">
+              <button *ngFor="let opt of msg.options" class="opt-btn" (click)="sendOption(opt.value, opt.label)">
+                🔗 {{ opt.label }}
+              </button>
+            </div>
+          </div>
+
+          <div *ngIf="msg.infograficaId" class="options-flex" style="margin-top: 10px;">
+            <button class="opt-btn infographic-btn" (click)="loadInfographic(msg.infograficaId)">
+              📊 Mostra Infografica
+            </button>
+          </div>
         </div>
       </div>
 

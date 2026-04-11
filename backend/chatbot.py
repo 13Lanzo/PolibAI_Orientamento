@@ -158,37 +158,29 @@ def chat_endpoint():
     # =============================================================================
     # LOGICA INFOGRAFICHE STATICHE LATO BACKEND
     # =============================================================================
-    if messaggio_utente.startswith("INFO_"):
-        codice_corso = messaggio_utente.replace("INFO_", "")
-        mappa_img = {
-            "L7_IngegneriaEdile": "ingegneria_edile.jpg",
-            "L8_IngegneriaSistemiMedicali": "ingegneria_sistemi_medicali.jpg",
-            "L8_IngegneriaCreativitaDigitale": "ingegneria_creativita_digitale.jpg",
-            "L9_IngegneriaMeccanica": "L9-IngegneriaMeccanica.jpg",
-            "L8_IngegneriaInformaticaAutomazione": "ingegneria_informatica_automazione.jpg",
-            "LP01_CostruzioniGestioneAmbientale": "L-P01.jpg",
-            "L4_Design": "L4-design.jpg",
-            "L7_IngegneriaCivileAmbientale": "L7-ingegneriaCivileAmbientale.jpg",
-            "L8_IngegneriaElettronicaTecnologieInternet": "L8-IngegneriaElettronicaeTecnologieInternet.jpg",
-            "L8_IngegneriaSistemiAerospaziali": "L8L9-IngegneriadeiSistemiAereospaziali.jpg",
-            "L9_IngegneriaElettrica": "L9-IngegneriaElettrica.jpg",
-            "L9_IngegneriaGestionale": "L9-IngegneriaGestionale.jpg",
-            "L9_IngegneriaIndustrialeSistemiNavali": "L9-IngegneriaIndustrialeeSistemiNavali.jpg",
-            "LM4_Architettura": "LM4-Architettura.jpg"
+    # GESTIONE CORSI CORRELATI (infografiche)
+    # =============================================================================
+    if messaggio_utente.startswith("CORSO_"):
+        course_id = messaggio_utente.replace("CORSO_", "")
+        corsi_mappa = {
+            "IIA": "Ingegneria Informatica e dell'Automazione (L-8)",
+            "ICD": "Ingegneria della Creatività Digitale (L-8)",
+            "IETI": "Ingegneria Elettronica e Tecnologie Internet (L-8)",
+            "ICIVAMB": "Ingegneria Civile e Ambientale (L-7)",
+            "IEDILE": "Ingegneria Edile (L-23)",
+            "IELE": "Ingegneria Elettrica (L-9)",
+            "IGEST": "Ingegneria Gestionale (L-9)",
+            "IMEC": "Ingegneria Meccanica (L-9)",
+            "INAVAL": "Ingegneria Industriale e Sistemi Navali (L-9)",
+            "IMED": "Ingegneria dei Sistemi Medicali (L-9)",
+            "IAERO": "Ingegneria dei Sistemi Aerospaziali (L8/L9)",
+            "ARCH": "Architettura (LM-4)",
+            "LDES": "Design (L-4)",
+            "LPOL": "Laurea Politecnica (L-P01)"
         }
-        
-        if codice_corso in mappa_img:
-            # Pulizia per il testo a schermo (aggiungendo spazi prima delle maiuscole)
-            import re
-            nome_pulito = codice_corso.split("_", 1)[1] if "_" in codice_corso else codice_corso
-            nome_spaziato = re.sub(r'([A-Z])', r' \1', nome_pulito).strip()
-            
-            return jsonify({
-                "response": f"Ecco l'infografica per il corso di laurea in **{nome_spaziato}**.",
-                "type": "image",
-                "mapUrl": f"assets/infografiche/{mappa_img[codice_corso]}"
-            })
-
+        nome_corso = corsi_mappa.get(course_id, course_id)
+        messaggio_utente = f"Parliamo del corso di laurea in {nome_corso}. Dimmi di più al riguardo: materie studiate, caratteristiche principali e sbocchi professionali."
+        messaggio_lower = messaggio_utente.lower()
     # =============================================================================
     # LOGICA MAPPE SPECIALIZZATA
     # =============================================================================
@@ -283,43 +275,43 @@ def chat_endpoint():
         testo_risposta = response.text
 
         # =============================================================================
-        # AGGIUNTA DINAMICA OPZIONI ("Bottone Infografica")
+        # AGGIUNTA ID INFOGRAFICA ALLA RISPOSTA
         # =============================================================================
         testo_lower = testo_risposta.lower()
-        opzioni_infografica = []
         
         mapping_keywords = [
-            (["costruzioni", "ambientale e territoriale", "l-p01", "lp01"], "Costruzioni e Gestione Ambientale", "INFO_LP01_CostruzioniGestioneAmbientale"),
-            (["design", "l4", "l-4"], "Design", "INFO_L4_Design"),
-            (["civile", "ambientale", "l7", "l-7"], "Ing. Civile e Ambientale", "INFO_L7_IngegneriaCivileAmbientale"),
-            (["edile", "l-7", "l7"], "Ingegneria Edile", "INFO_L7_IngegneriaEdile"),
-            (["elettronica", "tecnologie internet", "l8", "l-8"], "Ingegneria Elettronica", "INFO_L8_IngegneriaElettronicaTecnologieInternet"),
-            (["informatica", "automazione", "l8", "l-8"], "Ing. Informatica e Automazione", "INFO_L8_IngegneriaInformaticaAutomazione"),
-            (["medical", "sistemi medici", "l8", "l-8", "lm-21", "lm21"], "Sistemi Medicali", "INFO_L8_IngegneriaSistemiMedicali"),
-            (["creatività digitale", "creativita digitale", "l8", "l-8"], "Creatività Digitale", "INFO_L8_IngegneriaCreativitaDigitale"),
-            (["aerospazial", "sistemi aerospaziali", "l8", "l9", "l-8"], "Sistemi Aerospaziali", "INFO_L8_IngegneriaSistemiAerospaziali"),
-            (["elettrica", "l9", "l-9"], "Ingegneria Elettrica", "INFO_L9_IngegneriaElettrica"),
-            (["gestionale", "l9", "l-9"], "Ingegneria Gestionale", "INFO_L9_IngegneriaGestionale"),
-            (["sistemi navali", "industriale", "l9", "l-9"], "Ing. Industriale e Sistemi Navali", "INFO_L9_IngegneriaIndustrialeSistemiNavali"),
-            (["meccanica", "l9", "l-9"], "Ingegneria Meccanica", "INFO_L9_IngegneriaMeccanica"),
-            (["architettura", "lm-4", "lm4"], "Architettura", "INFO_LM4_Architettura")
+            (["informatica", "automazione"], "IIA"),
+            (["creatività digitale", "creativita digitale"], "ICD"),
+            (["elettronica", "tecnologie internet"], "IETI"),
+            (["civile", "ambientale e territoriale"], "ICIVAMB"),
+            (["edile"], "IEDILE"),
+            (["elettrica"], "IELE"),
+            (["gestionale"], "IGEST"),
+            (["meccanica"], "IMEC"),
+            (["sistemi navali", "industriale"], "INAVAL"),
+            (["medical", "sistemi medici", "lm-21", "lm21"], "IMED"),
+            (["aerospazial", "sistemi aerospaziali"], "IAERO"),
+            (["architettura", "lm-4", "lm4"], "ARCH"),
+            (["design", "l4", "l-4"], "LDES"),
+            (["costruzioni", "ambientale", "l-p01", "lp01", "laurea politecnica"], "LPOL")
         ]
         
-        for kws, name, val in mapping_keywords:
+        infografica_selezionata = None
+        for kws, infografica_id in mapping_keywords:
             if any(kw in testo_lower for kw in kws):
-                if not any(o['value'] == val for o in opzioni_infografica):
-                    if any(c in kws for c in ["l8", "l7", "l9"]):
-                        kws_descrittivi = [k for k in kws if len(k) > 4]
-                        if any(kd in testo_lower for kd in kws_descrittivi):
-                            opzioni_infografica.append({"label": f"🖼️ Mostra Infografica {name}", "value": val})
-                    else:
-                        opzioni_infografica.append({"label": f"🖼️ Mostra Infografica {name}", "value": val})
+                infografica_selezionata = infografica_id
+                break
 
-        print("Risposta AI inviata con opzioni aggiuntive calcolate!")
-        if opzioni_infografica:
-            return jsonify({"response": testo_risposta, "type": "text", "options": opzioni_infografica})
-        else:
-            return jsonify({"response": testo_risposta, "type": "text"})
+        print(f"Risposta AI inviata. Infografica ID: {infografica_selezionata}")
+        risposta_json = {
+            "response": testo_risposta,
+            "type": "text",
+            "options": []
+        }
+        if infografica_selezionata:
+            risposta_json["infograficaId"] = infografica_selezionata
+            
+        return jsonify(risposta_json)
     except Exception as e:
         errore = str(e)
         print(f"Errore AI: {errore}")
