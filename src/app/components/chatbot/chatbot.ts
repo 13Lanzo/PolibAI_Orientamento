@@ -78,6 +78,14 @@ export class Chatbot implements AfterViewChecked {
             timestamp: new Date(),
             type: 'text'
         });
+
+        // Se il bottone è un corso correlato → mostra l'infografica direttamente
+        if (value.startsWith('CORSO_')) {
+            const id = value.replace('CORSO_', '');
+            this.loadInfographic(id, true);
+            return;
+        }
+
         this.callBackend(value);
     }
 
@@ -85,15 +93,17 @@ export class Chatbot implements AfterViewChecked {
         if (url) window.open(url, '_blank');
     }
 
-    loadInfographic(id: string) {
+    loadInfographic(id: string, skipUserMsg = false) {
         const info = INFOGRAFICHE.find(i => i.id === id);
         if (info) {
-            this.addMessageToChat({
-                sender: 'user',
-                timestamp: new Date(),
-                type: 'text',
-                text: `Mostra l'infografica: ${info.corso}`
-            });
+            if (!skipUserMsg) {
+                this.addMessageToChat({
+                    sender: 'user',
+                    timestamp: new Date(),
+                    type: 'text',
+                    text: `Mostra l'infografica: ${info.corso}`
+                });
+            }
             this.addMessageToChat({
                 sender: 'bot',
                 timestamp: new Date(),

@@ -155,32 +155,7 @@ def chat_endpoint():
     print(f"Domanda: {messaggio_utente}")
     messaggio_lower = messaggio_utente.lower()
 
-    # =============================================================================
-    # LOGICA INFOGRAFICHE STATICHE LATO BACKEND
-    # =============================================================================
-    # GESTIONE CORSI CORRELATI (infografiche)
-    # =============================================================================
-    if messaggio_utente.startswith("CORSO_"):
-        course_id = messaggio_utente.replace("CORSO_", "")
-        corsi_mappa = {
-            "IIA": "Ingegneria Informatica e dell'Automazione (L-8)",
-            "ICD": "Ingegneria della Creatività Digitale (L-8)",
-            "IETI": "Ingegneria Elettronica e Tecnologie Internet (L-8)",
-            "ICIVAMB": "Ingegneria Civile e Ambientale (L-7)",
-            "IEDILE": "Ingegneria Edile (L-23)",
-            "IELE": "Ingegneria Elettrica (L-9)",
-            "IGEST": "Ingegneria Gestionale (L-9)",
-            "IMEC": "Ingegneria Meccanica (L-9)",
-            "INAVAL": "Ingegneria Industriale e Sistemi Navali (L-9)",
-            "IMED": "Ingegneria dei Sistemi Medicali (L-9)",
-            "IAERO": "Ingegneria dei Sistemi Aerospaziali (L8/L9)",
-            "ARCH": "Architettura (LM-4)",
-            "LDES": "Design (L-4)",
-            "LPOL": "Laurea Politecnica (L-P01)"
-        }
-        nome_corso = corsi_mappa.get(course_id, course_id)
-        messaggio_utente = f"Parliamo del corso di laurea in {nome_corso}. Dimmi di più al riguardo: materie studiate, caratteristiche principali e sbocchi professionali."
-        messaggio_lower = messaggio_utente.lower()
+
     # =============================================================================
     # LOGICA MAPPE SPECIALIZZATA
     # =============================================================================
