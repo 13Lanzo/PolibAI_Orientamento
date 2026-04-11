@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { ChatbotService } from './chatbot.service';
 import { marked } from 'marked';
 import DOMPurify from 'dompurify';
+import { INFOGRAFICHE } from '../../data/infografiche.data';
 
 interface QuickOption {
     label: string;
@@ -19,6 +20,7 @@ interface Message {
     mapUrl?: string;
     mapTitle?: string;
     options?: QuickOption[];
+    infograficaId?: string;
 }
 
 @Component({
@@ -83,6 +85,26 @@ export class Chatbot implements AfterViewChecked {
         if (url) window.open(url, '_blank');
     }
 
+    loadInfographic(id: string) {
+        const info = INFOGRAFICHE.find(i => i.id === id);
+        if (info) {
+            this.addMessageToChat({
+                sender: 'user',
+                timestamp: new Date(),
+                type: 'text',
+                text: `Mostra l'infografica: ${info.corso}`
+            });
+            this.addMessageToChat({
+                sender: 'bot',
+                timestamp: new Date(),
+                type: 'image',
+                text: `Ecco l'infografica per **${info.corso}**.`,
+                mapUrl: info.path,
+                options: info.percorsiCorrelati
+            });
+        }
+    }
+
     resetChat() {
         this.messages.set([]);
         this.currentInput.set('');
@@ -115,7 +137,8 @@ export class Chatbot implements AfterViewChecked {
                     htmlText: parsedHTML,
                     mapUrl: response.mapUrl,
                     mapTitle: response.mapTitle,
-                    options: response.options
+                    options: response.options,
+                    infograficaId: response.infograficaId
                 };
                 this.addMessageToChat(botMsg);
             },
