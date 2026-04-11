@@ -129,11 +129,15 @@ try:
             try:
                 model = genai.GenerativeModel(
                     model_name=modello_scelto,
-                    system_instruction=istruzioni_poliba
+                    system_instruction=istruzioni_poliba,
+                    tools=[{"google_search_retrieval": {}}]
                 )
             except Exception as e:
-                print("Supporto system_instruction assente. Fallback standard.")
-                model = genai.GenerativeModel(model_name=modello_scelto)
+                print("Supporto system_instruction/tools assente. Fallback standard.")
+                model = genai.GenerativeModel(
+                    model_name=modello_scelto,
+                    tools=[{"google_search_retrieval": {}}]
+                )
                 initial_history.insert(0, {"role": "user", "parts": [istruzioni_poliba]})
                 initial_history.insert(1, {"role": "model", "parts": ["Ricevuto. Seguirò queste istruzioni alla lettera."]})
 
