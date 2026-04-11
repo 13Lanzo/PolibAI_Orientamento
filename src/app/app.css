@@ -36,11 +36,11 @@
 }
 
 .nav-tab.nav-active {
-  background: linear-gradient(135deg, #fff0f2 0%, #ffe8ec 100%);
-  color: #C8102E;
+  background: linear-gradient(135deg, #f0fafa 0%, #e6f7f7 100%);
+  color: #0b8686;
   font-weight: 600;
-  border-color: #f7c4cc;
-  box-shadow: 0 2px 12px rgba(200, 16, 46, 0.08);
+  border-color: #b3e0e0;
+  box-shadow: 0 2px 12px rgba(11, 134, 134, 0.08);
 }
 
 .nav-tab svg {

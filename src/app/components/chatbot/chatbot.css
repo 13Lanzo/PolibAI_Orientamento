@@ -2,7 +2,7 @@
   display: flex;
   flex-direction: column;
   height: 100vh;
-  width: 100vw;
+  width: 100%;
   background-color: #ffffff;
   color: #1f1f1f;
   overflow: hidden;
@@ -168,10 +168,7 @@
   margin: 0;
   font-size: 0.85rem;
   color: #80868b;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 200px;
+  line-height: 1.4;
 }
 
 .card-arrow {
@@ -425,4 +422,42 @@
   font-size: 0.75rem;
   color: #9aa0a6;
   letter-spacing: 0.5px;
+}
+
+/* Infografica stili */
+.infographic-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.generated-infographic {
+  max-width: 100%;
+  max-height: 400px;
+  object-fit: contain;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  background: white; /* Per grafiche con trasparenze o bordi scuri */
+}
+
+.download-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background-color: #0b3469;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 20px;
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 500;
+  align-self: flex-start;
+  transition: opacity 0.2s;
+}
+
+.download-button:hover {
+  opacity: 0.9;
+  text-decoration: none;
+  color: white;
 }

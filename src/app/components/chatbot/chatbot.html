@@ -169,7 +169,7 @@
   <footer class="gemini-footer">
     <div class="input-container">
       <input type="text" [ngModel]="currentInput()" (ngModelChange)="currentInput.set($event)"
-        (keyup.enter)="sendMessage()" placeholder="Chiedi informazioni sui corsi, test di ammissione...">
+        (keyup.enter)="sendMessage()" placeholder="Chiedi informazioni o carica una pagella...">
       <button class="send-action-btn" (click)="sendMessage()" [disabled]="!currentInput().trim() || isLoading()">
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
           stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -179,7 +179,7 @@
       </button>
     </div>
     <div class="footer-disclaimer">
-      POLITECNICO DI BARI &bull; ORIENTAMENTO UNIVERSITARIO
+      Politecnico di Bari • Orientamento Universitario PRO
     </div>
   </footer>
 </div>

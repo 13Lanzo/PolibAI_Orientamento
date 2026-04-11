@@ -108,7 +108,8 @@ export class Chatbot implements AfterViewChecked {
                 sender: 'bot',
                 timestamp: new Date(),
                 type: 'image',
-                text: `Ecco l'infografica per **${info.corso}**.`,
+                text: `Ecco l'infografica per ${info.corso}.`,
+                htmlText: `Ecco l'infografica per <strong>${info.corso}</strong>.`,
                 mapUrl: info.path,
                 options: info.percorsiCorrelati
             });
