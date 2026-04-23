@@ -6,6 +6,7 @@ import mysql.connector
 import os
 import traceback
 from dotenv import load_dotenv
+from kpi_data import get_kpi, get_all_course_ids, get_kpi_summary_for_prompt, find_course_id_by_name, COURSE_KPI
 
 # Carica variabili d'ambiente
 load_dotenv()
@@ -37,6 +38,14 @@ Il tuo scopo è guidare futuri studenti, iscritti, docenti e visitatori. Devi fo
 - ANALISI PAGELLE/DIPLOMI (Vision): Se l'utente carica l'immagine di una pagella o un documento, analizza i voti, individua le materie in cui eccelle (es. Matematica, Fisica, Disegno) e le sue attitudini. Basandoti su questo, suggerisci 2-3 corsi di laurea del Poliba altamente compatibili, motivando la tua scelta in modo incoraggiante.
 - LETTURA GRAFICI: Se l'utente carica brochure o grafici del Poliba, estrai i dati salienti e spiegali in linguaggio semplice e accessibile.
 - INFOGRAFICHE: Se l'utente richiede un'infografica o se suggerisci un corso di ingegneria, informalo che può visualizzarle tramite i bottoni presenti sotto al tuo messaggio. NON GENERARE MAI nell'output LLM markdown di immagini e NON INCORPORARE MAI testi come "[Mostra Infografica]". L'interfaccia UI si occupa di far comparire i pulsanti automatici per te.
+
+# [ANALISI QUANTITATIVA — DATI OPIS E ALMALAUREA]
+Quando consigli o descrivi un corso di laurea, DEVI includere una sezione "📊 Dati alla mano" che citi cifre esatte estratte dai report ufficiali OPIS (Opinione Studenti) e AlmaLaurea (Condizione Occupazionale), se disponibili nei documenti forniti.
+In particolare:
+- OPIS: Cita punteggi su chiarezza espositiva dei docenti, stimolo dell'interesse, coerenza del carico di studio e reperibilità del docente.
+- AlmaLaurea: Cita il tasso di occupazione a 1 anno dalla laurea, la retribuzione mensile netta media e la soddisfazione complessiva per il corso.
+- GIUDIZIO COMPARATIVO: Se il tasso di occupazione è superiore alla media di Ateneo (68.5%), evidenzialo come punto di forza ("sopra la media di Ateneo"). Se inferiore, segnalalo come aspetto da considerare.
+- Esempio di output atteso: "I dati AlmaLaurea 2024 mostrano un'ottima retribuzione media di 1.314€ netti. Dai rapporti OPIS, i docenti stimolano molto l'interesse (7.7/10), con un'ottima reperibilità (8.4/10)."
 
 # [GUIDA E NAVIGAZIONE DEL CAMPUS]
 Agisci come una guida esperta del Campus del Politecnico di Bari.
@@ -300,6 +309,31 @@ def chat_endpoint():
 
 
 # =============================================================================
+# ENDPOINT: ANALISI KPI CORSO (/analysis)
+# =============================================================================
+
+@app.route('/analysis', methods=['GET'])
+def analysis_endpoint():
+    """Restituisce i KPI strutturati per un dato course_id."""
+    course_id = request.args.get('course_id', '').strip().upper()
+
+    if not course_id:
+        return jsonify({
+            "error": "Parametro 'course_id' mancante.",
+            "available_ids": get_all_course_ids()
+        }), 400
+
+    data = get_kpi(course_id)
+    if not data:
+        return jsonify({
+            "error": f"Corso '{course_id}' non trovato nel database KPI.",
+            "available_ids": get_all_course_ids()
+        }), 404
+
+    return jsonify(data)
+
+
+# =============================================================================
 # ENDPOINT: RACCOMANDAZIONE CORSO (Course Advisor AI)
 # =============================================================================
 
@@ -364,6 +398,7 @@ REGOLE IMPORTANTI:
 - areeInteresse deve contenere esattamente 6 aree rilevanti per il profilo dello studente con percentuali da 0 a 100
 - Le percentuali indicano quanto ogni area è affine al profilo dello studente
 - I nomi dei corsi devono corrispondere ESATTAMENTE alla lista
+- Nella "motivazione", se hai dati OPIS/AlmaLaurea per il corso consigliato, CITA almeno 1-2 cifre chiave (es. tasso occupazione, retribuzione, punteggio chiarezza docenti)
 - Rispondi SOLO con il JSON, nessun testo aggiuntivo, nessun blocco ```json
 """
 
@@ -398,7 +433,20 @@ Analizza il mio profilo e consigliami il corso di laurea più adatto al Politecn
         parts = []
         if uploaded_files:
             parts.extend(uploaded_files)
-        parts.append(f"{istruzioni_advisor}\n\n{user_message}")
+        
+        # Arricchisci il prompt con i dati KPI disponibili
+        kpi_context = ""
+        for cid in get_all_course_ids():
+            summary = get_kpi_summary_for_prompt(cid)
+            if summary:
+                kpi_context += summary + "\n"
+        
+        if kpi_context:
+            enriched_prompt = f"{istruzioni_advisor}\n\n--- DATI QUANTITATIVI DISPONIBILI ---\n{kpi_context}\n--- FINE DATI ---\n\n{user_message}"
+        else:
+            enriched_prompt = f"{istruzioni_advisor}\n\n{user_message}"
+        
+        parts.append(enriched_prompt)
 
         response = advisor_model.generate_content(parts)
         response_text = response.text.strip()
@@ -411,7 +459,18 @@ Analizza il mio profilo e consigliami il corso di laurea più adatto al Politecn
         response_text = response_text.strip()
 
         parsed = json_module.loads(response_text)
-        print(f"[ADVISOR] Corso consigliato: {parsed.get('corsoConsigliato', 'N/A')}")
+        corso_consigliato = parsed.get('corsoConsigliato', '')
+        print(f"[ADVISOR] Corso consigliato: {corso_consigliato}")
+        
+        # Cerca e allega i KPI del corso consigliato alla risposta
+        course_id = find_course_id_by_name(corso_consigliato)
+        if course_id:
+            kpi = get_kpi(course_id)
+            if kpi:
+                parsed['kpiData'] = kpi
+                parsed['courseKpiId'] = course_id
+                print(f"[ADVISOR] KPI allegati per: {course_id}")
+        
         return jsonify(parsed)
 
     except json_module.JSONDecodeError as je:

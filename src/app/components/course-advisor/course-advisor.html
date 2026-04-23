@@ -225,6 +225,130 @@
       <p class="course-motivation">{{ result()!.motivazione }}</p>
     </div>
 
+    <!-- ══════════════════════════════════════════ -->
+    <!-- DATI ALLA MANO — OPIS + AlmaLaurea        -->
+    <!-- ══════════════════════════════════════════ -->
+    <div class="kpi-section" *ngIf="kpiData()">
+      <div class="kpi-header">
+        <h3 class="kpi-title">📊 Dati alla Mano</h3>
+        <div class="kpi-source">Fonte: OPIS {{ kpiData()!.anno }} · AlmaLaurea</div>
+      </div>
+
+      <!-- OPIS: Opinione Studenti -->
+      <div class="kpi-block">
+        <div class="kpi-block-label">
+          <span class="kpi-block-icon">🎓</span>
+          Opinione degli Studenti (OPIS)
+        </div>
+
+        <!-- Chiarezza Espositiva -->
+        <div class="kpi-rating-row">
+          <div class="kpi-rating-info">
+            <span class="kpi-rating-name">Chiarezza espositiva</span>
+            <span class="kpi-rating-score">{{ kpiData()!.opis.chiarezza_espositiva }}/10</span>
+          </div>
+          <div class="kpi-stars">
+            <span class="star star--full" *ngFor="let s of getFullStars(kpiData()!.opis.chiarezza_espositiva)">★</span>
+            <span class="star star--half" *ngIf="hasHalfStar(kpiData()!.opis.chiarezza_espositiva)">★</span>
+            <span class="star star--empty" *ngFor="let s of getEmptyStars(kpiData()!.opis.chiarezza_espositiva)">★</span>
+          </div>
+          <div class="kpi-bar-track">
+            <div class="kpi-bar-fill kpi-bar-fill--opis" [style.width.%]="chartAnimated() ? kpiData()!.opis.chiarezza_espositiva * 10 : 0"></div>
+          </div>
+        </div>
+
+        <!-- Stimolo Interesse -->
+        <div class="kpi-rating-row">
+          <div class="kpi-rating-info">
+            <span class="kpi-rating-name">Stimolo dell'interesse</span>
+            <span class="kpi-rating-score">{{ kpiData()!.opis.stimolo_interesse }}/10</span>
+          </div>
+          <div class="kpi-stars">
+            <span class="star star--full" *ngFor="let s of getFullStars(kpiData()!.opis.stimolo_interesse)">★</span>
+            <span class="star star--half" *ngIf="hasHalfStar(kpiData()!.opis.stimolo_interesse)">★</span>
+            <span class="star star--empty" *ngFor="let s of getEmptyStars(kpiData()!.opis.stimolo_interesse)">★</span>
+          </div>
+          <div class="kpi-bar-track">
+            <div class="kpi-bar-fill kpi-bar-fill--opis" [style.width.%]="chartAnimated() ? kpiData()!.opis.stimolo_interesse * 10 : 0"></div>
+          </div>
+        </div>
+
+        <!-- Coerenza Carico Studio -->
+        <div class="kpi-rating-row">
+          <div class="kpi-rating-info">
+            <span class="kpi-rating-name">Coerenza carico studio</span>
+            <span class="kpi-rating-score">{{ kpiData()!.opis.coerenza_carico_studio }}/10</span>
+          </div>
+          <div class="kpi-stars">
+            <span class="star star--full" *ngFor="let s of getFullStars(kpiData()!.opis.coerenza_carico_studio)">★</span>
+            <span class="star star--half" *ngIf="hasHalfStar(kpiData()!.opis.coerenza_carico_studio)">★</span>
+            <span class="star star--empty" *ngFor="let s of getEmptyStars(kpiData()!.opis.coerenza_carico_studio)">★</span>
+          </div>
+          <div class="kpi-bar-track">
+            <div class="kpi-bar-fill kpi-bar-fill--warn" [style.width.%]="chartAnimated() ? kpiData()!.opis.coerenza_carico_studio * 10 : 0"></div>
+          </div>
+        </div>
+
+        <!-- Reperibilità Docente -->
+        <div class="kpi-rating-row">
+          <div class="kpi-rating-info">
+            <span class="kpi-rating-name">Reperibilità docente</span>
+            <span class="kpi-rating-score">{{ kpiData()!.opis.reperibilita_docente }}/10</span>
+          </div>
+          <div class="kpi-stars">
+            <span class="star star--full" *ngFor="let s of getFullStars(kpiData()!.opis.reperibilita_docente)">★</span>
+            <span class="star star--half" *ngIf="hasHalfStar(kpiData()!.opis.reperibilita_docente)">★</span>
+            <span class="star star--empty" *ngFor="let s of getEmptyStars(kpiData()!.opis.reperibilita_docente)">★</span>
+          </div>
+          <div class="kpi-bar-track">
+            <div class="kpi-bar-fill kpi-bar-fill--opis" [style.width.%]="chartAnimated() ? kpiData()!.opis.reperibilita_docente * 10 : 0"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- AlmaLaurea: Condizione Occupazionale -->
+      <div class="kpi-block">
+        <div class="kpi-block-label">
+          <span class="kpi-block-icon">💼</span>
+          Condizione Occupazionale (AlmaLaurea)
+        </div>
+
+        <div class="kpi-stats-grid">
+          <div class="kpi-stat-card">
+            <div class="kpi-stat-icon">💼</div>
+            <div class="kpi-stat-value">{{ kpiData()!.almalaurea.tasso_occupazione_1_anno }}%</div>
+            <div class="kpi-stat-label">Occupazione<br>a 1 anno</div>
+            <div class="kpi-stat-badge"
+              [class.kpi-badge--positive]="kpiData()!.giudizio_comparativo.occupazione_vs_media === 'superiore'"
+              [class.kpi-badge--negative]="kpiData()!.giudizio_comparativo.occupazione_vs_media === 'inferiore'"
+              [class.kpi-badge--neutral]="kpiData()!.giudizio_comparativo.occupazione_vs_media === 'nella media'">
+              <span *ngIf="kpiData()!.giudizio_comparativo.delta_occupazione > 0">▲</span>
+              <span *ngIf="kpiData()!.giudizio_comparativo.delta_occupazione < 0">▼</span>
+              {{ kpiData()!.giudizio_comparativo.delta_occupazione > 0 ? '+' : '' }}{{ kpiData()!.giudizio_comparativo.delta_occupazione }}% vs media Ateneo
+            </div>
+          </div>
+
+          <div class="kpi-stat-card">
+            <div class="kpi-stat-icon">💰</div>
+            <div class="kpi-stat-value">{{ formatRetribuzione(kpiData()!.almalaurea.retribuzione_netta_media) }}€</div>
+            <div class="kpi-stat-label">Retribuzione<br>netta/mese</div>
+          </div>
+
+          <div class="kpi-stat-card">
+            <div class="kpi-stat-icon">⭐</div>
+            <div class="kpi-stat-value">{{ kpiData()!.almalaurea.soddisfazione_corso }}/10</div>
+            <div class="kpi-stat-label">Soddisfazione<br>complessiva</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- KPI Loading state -->
+    <div class="kpi-loading" *ngIf="kpiLoading()">
+      <div class="kpi-loading-spinner"></div>
+      <span>Caricamento dati OPIS/AlmaLaurea...</span>
+    </div>
+
     <!-- Punti di forza + Sbocchi -->
     <div class="info-grid">
       <div class="info-card">

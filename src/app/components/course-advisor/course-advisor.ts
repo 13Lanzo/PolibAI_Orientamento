@@ -1,7 +1,7 @@
 import { Component, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { CourseAdvisorService, CourseRecommendation } from './course-advisor.service';
+import { CourseAdvisorService, CourseRecommendation, CourseKPI } from './course-advisor.service';
 
 interface PolibaCourse {
   id: number;
@@ -84,6 +84,10 @@ export class CourseAdvisor {
   result = signal<(CourseRecommendation & { courseData?: PolibaCourse }) | null>(null);
   error = signal<string | null>(null);
   loadingProgress = signal(0);
+
+  // KPI Data
+  kpiData = signal<CourseKPI | null>(null);
+  kpiLoading = signal(false);
 
   // Chart animation
   chartAnimated = signal(false);
@@ -184,6 +188,35 @@ export class CourseAdvisor {
         this.loadingProgress.set(100);
         const courseData = POLIBA_COURSES.find(c => c.nome === response.corsoConsigliato);
         this.result.set({ ...response, courseData });
+
+        // Gestione KPI: controlla se il backend ha allegato i dati
+        if (response.kpiData) {
+          this.kpiData.set(response.kpiData);
+        } else if (response.courseKpiId) {
+          // Fallback: fetch separato dal /analysis endpoint
+          this.kpiLoading.set(true);
+          this.advisorService.getAnalysis(response.courseKpiId).subscribe({
+            next: (kpi) => {
+              this.kpiData.set(kpi);
+              this.kpiLoading.set(false);
+            },
+            error: () => this.kpiLoading.set(false)
+          });
+        } else {
+          // Tenta match per nome corso
+          const courseId = this.findCourseKpiId(response.corsoConsigliato);
+          if (courseId) {
+            this.kpiLoading.set(true);
+            this.advisorService.getAnalysis(courseId).subscribe({
+              next: (kpi) => {
+                this.kpiData.set(kpi);
+                this.kpiLoading.set(false);
+              },
+              error: () => this.kpiLoading.set(false)
+            });
+          }
+        }
+
         setTimeout(() => {
           this.step.set('result');
           // Trigger chart animation after render
@@ -208,6 +241,8 @@ export class CourseAdvisor {
     this.error.set(null);
     this.loadingProgress.set(0);
     this.chartAnimated.set(false);
+    this.kpiData.set(null);
+    this.kpiLoading.set(false);
   }
 
   // --- Helpers for template ---
@@ -275,5 +310,67 @@ export class CourseAdvisor {
 
   openPoliba() {
     window.open('https://www.poliba.it', '_blank');
+  }
+
+  // ─── KPI Helpers ────────────────────────────────────────────
+
+  /**
+   * Mapping nomi corsi → course_id per il fallback KPI lookup.
+   */
+  private readonly NOME_TO_KPI_ID: Record<string, string> = {
+    "ingegneria informatica e dell'automazione": 'IIA',
+    "ingegneria dei sistemi medicali": 'IMED',
+    "ingegneria biomedica": 'IMED',
+  };
+
+  findCourseKpiId(nomecorso: string): string | null {
+    if (!nomecorso) return null;
+    const lower = nomecorso.toLowerCase().trim();
+    for (const [key, id] of Object.entries(this.NOME_TO_KPI_ID)) {
+      if (lower.includes(key) || key.includes(lower)) return id;
+    }
+    return null;
+  }
+
+  /**
+   * Converte un punteggio /10 in stelle /5.
+   * Es: 7.8 → 3.9 stelle
+   */
+  getStars(score: number): number {
+    return Math.round((score / 10) * 5 * 10) / 10; // 1 decimal
+  }
+
+  /**
+   * Restituisce array per le stelle piene. Es: 3.9 → [1,2,3]
+   */
+  getFullStars(score: number): number[] {
+    const stars = this.getStars(score);
+    return Array.from({ length: Math.floor(stars) }, (_, i) => i);
+  }
+
+  /**
+   * True se c'è una mezza stella. Es: 3.9 → true
+   */
+  hasHalfStar(score: number): boolean {
+    const stars = this.getStars(score);
+    return (stars - Math.floor(stars)) >= 0.3;
+  }
+
+  /**
+   * Restituisce array per le stelle vuote.
+   */
+  getEmptyStars(score: number): number[] {
+    const full = Math.floor(this.getStars(score));
+    const half = this.hasHalfStar(score) ? 1 : 0;
+    const empty = 5 - full - half;
+    return Array.from({ length: Math.max(0, empty) }, (_, i) => i);
+  }
+
+  /**
+   * Formatta la retribuzione con separatore migliaia.
+   * Es: 1314 → "1.314"
+   */
+  formatRetribuzione(val: number): string {
+    return val.toLocaleString('it-IT');
   }
 }
