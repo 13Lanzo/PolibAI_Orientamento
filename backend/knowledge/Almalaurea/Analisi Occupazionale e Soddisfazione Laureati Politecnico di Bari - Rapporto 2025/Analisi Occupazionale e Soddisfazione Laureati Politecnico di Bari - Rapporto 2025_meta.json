@@ -1,0 +1,502 @@
+{
+  "table_of_contents": [
+    {
+      "title": "Relazione sulla Condizione\nOccupazionale e Soddisfazione dei\nLaureati: Politecnico di Bari (Rapporto\nAlmaLaurea 2025)",
+      "heading_level": null,
+      "page_id": 0,
+      "polygon": [
+        [
+          71.419921875,
+          76.52239990234375
+        ],
+        [
+          509.48089599609375,
+          76.52239990234375
+        ],
+        [
+          509.48089599609375,
+          199.52239990234375
+        ],
+        [
+          71.419921875,
+          199.52239990234375
+        ]
+      ]
+    },
+    {
+      "title": "1. Analisi Generale dell'Ateneo",
+      "heading_level": null,
+      "page_id": 0,
+      "polygon": [
+        [
+          72.0,
+          295.83984375
+        ],
+        [
+          333.9412841796875,
+          294.29296875
+        ],
+        [
+          333.9412841796875,
+          313.8918151855469
+        ],
+        [
+          71.12109375,
+          313.8918151855469
+        ]
+      ]
+    },
+    {
+      "title": "2. Lauree Triennali (15 Corsi)",
+      "heading_level": null,
+      "page_id": 0,
+      "polygon": [
+        [
+          72.0,
+          427.7109375
+        ],
+        [
+          314.42327880859375,
+          426.1640625
+        ],
+        [
+          314.42327880859375,
+          446.6418151855469
+        ],
+        [
+          70.822265625,
+          446.6418151855469
+        ]
+      ]
+    },
+    {
+      "title": "Elenco Corsi e Dati Occupazionali (L-Livello 1)",
+      "heading_level": null,
+      "page_id": 0,
+      "polygon": [
+        [
+          72.0,
+          510.08203125
+        ],
+        [
+          377.102783203125,
+          508.53515625
+        ],
+        [
+          377.102783203125,
+          525.1380920410156
+        ],
+        [
+          72.0,
+          525.1380920410156
+        ]
+      ]
+    },
+    {
+      "title": "3. Lauree Magistrali e Ciclo Unico (18 Corsi)",
+      "heading_level": null,
+      "page_id": 2,
+      "polygon": [
+        [
+          71.419921875,
+          599.02734375
+        ],
+        [
+          443.64495849609375,
+          599.02734375
+        ],
+        [
+          443.64495849609375,
+          618.3918151855469
+        ],
+        [
+          70.224609375,
+          618.3918151855469
+        ]
+      ]
+    },
+    {
+      "title": "4. Master e Formazione Post-Laurea",
+      "heading_level": null,
+      "page_id": 5,
+      "polygon": [
+        [
+          71.419921875,
+          370.1418151855469
+        ],
+        [
+          384.923095703125,
+          368.9296875
+        ],
+        [
+          384.923095703125,
+          388.1418151855469
+        ],
+        [
+          70.224609375,
+          388.1418151855469
+        ]
+      ]
+    },
+    {
+      "title": "5. Fattori di Influenza e Trend",
+      "heading_level": null,
+      "page_id": 5,
+      "polygon": [
+        [
+          71.71875,
+          560.35546875
+        ],
+        [
+          322.2773132324219,
+          558.80859375
+        ],
+        [
+          322.2773132324219,
+          578.6418151855469
+        ],
+        [
+          71.71875,
+          578.6418151855469
+        ]
+      ]
+    },
+    {
+      "title": "6. Sintesi dei Punti di Forza (Knowledge Base Chatbot)",
+      "heading_level": null,
+      "page_id": 6,
+      "polygon": [
+        [
+          72.0,
+          150.43359375
+        ],
+        [
+          536.4526977539062,
+          148.88671875
+        ],
+        [
+          536.4526977539062,
+          169.141845703125
+        ],
+        [
+          71.12109375,
+          169.141845703125
+        ]
+      ]
+    },
+    {
+      "title": "Bibliografia",
+      "heading_level": null,
+      "page_id": 6,
+      "polygon": [
+        [
+          71.12109375,
+          406.828125
+        ],
+        [
+          139.3881378173828,
+          405.28125
+        ],
+        [
+          139.3881378173828,
+          420.0111999511719
+        ],
+        [
+          71.12109375,
+          420.75
+        ]
+      ]
+    }
+  ],
+  "page_stats": [
+    {
+      "page_id": 0,
+      "text_extraction_method": "pdftext",
+      "block_counts": [
+        [
+          "Span",
+          397
+        ],
+        [
+          "Line",
+          35
+        ],
+        [
+          "TableCell",
+          8
+        ],
+        [
+          "SectionHeader",
+          4
+        ],
+        [
+          "ListItem",
+          4
+        ],
+        [
+          "Text",
+          2
+        ],
+        [
+          "Table",
+          1
+        ],
+        [
+          "ListGroup",
+          1
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 1,
+      "text_extraction_method": "pdftext",
+      "block_counts": [
+        [
+          "Span",
+          153
+        ],
+        [
+          "TableCell",
+          36
+        ],
+        [
+          "Line",
+          28
+        ],
+        [
+          "Table",
+          1
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 2,
+      "text_extraction_method": "pdftext",
+      "block_counts": [
+        [
+          "Span",
+          191
+        ],
+        [
+          "Line",
+          28
+        ],
+        [
+          "TableCell",
+          24
+        ],
+        [
+          "Text",
+          3
+        ],
+        [
+          "Table",
+          1
+        ],
+        [
+          "SectionHeader",
+          1
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 3,
+      "text_extraction_method": "pdftext",
+      "block_counts": [
+        [
+          "Span",
+          161
+        ],
+        [
+          "TableCell",
+          40
+        ],
+        [
+          "Line",
+          38
+        ],
+        [
+          "Table",
+          1
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 4,
+      "text_extraction_method": "pdftext",
+      "block_counts": [
+        [
+          "Span",
+          145
+        ],
+        [
+          "TableCell",
+          40
+        ],
+        [
+          "Line",
+          32
+        ],
+        [
+          "Table",
+          1
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 5,
+      "text_extraction_method": "pdftext",
+      "block_counts": [
+        [
+          "Span",
+          415
+        ],
+        [
+          "Line",
+          32
+        ],
+        [
+          "TableCell",
+          15
+        ],
+        [
+          "ListItem",
+          6
+        ],
+        [
+          "Text",
+          2
+        ],
+        [
+          "SectionHeader",
+          2
+        ],
+        [
+          "ListGroup",
+          2
+        ],
+        [
+          "Table",
+          1
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 6,
+      "text_extraction_method": "pdftext",
+      "block_counts": [
+        [
+          "Span",
+          577
+        ],
+        [
+          "Line",
+          35
+        ],
+        [
+          "ListItem",
+          11
+        ],
+        [
+          "Text",
+          2
+        ],
+        [
+          "SectionHeader",
+          2
+        ],
+        [
+          "ListGroup",
+          2
+        ],
+        [
+          "Equation",
+          1
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 7,
+      "text_extraction_method": "pdftext",
+      "block_counts": [
+        [
+          "Span",
+          15
+        ],
+        [
+          "Line",
+          3
+        ],
+        [
+          "Text",
+          2
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    }
+  ],
+  "debug_data_path": "debug_data\\Analisi Occupazionale e Soddisfazione Laureati Politecnico di Bari - Rapporto 2025"
+}
