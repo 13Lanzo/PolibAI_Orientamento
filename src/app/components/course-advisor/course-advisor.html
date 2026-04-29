@@ -340,6 +340,48 @@
             <div class="kpi-stat-label">Soddisfazione<br>complessiva</div>
           </div>
         </div>
+
+        <!-- Progressione negli Anni -->
+        <div class="kpi-progression">
+          <h4 class="kpi-progression-title">📈 Progressione negli anni</h4>
+          <div class="kpi-progression-timeline">
+            <div class="kpi-timeline-step">
+              <div class="kpi-timeline-year">3 Anni</div>
+              <div class="kpi-timeline-stat">
+                <span class="kpi-timeline-icon">💼</span> {{ kpiData()!.almalaurea.tasso_occupazione_3_anni }}%
+              </div>
+              <div class="kpi-timeline-stat">
+                <span class="kpi-timeline-icon">💰</span> {{ formatRetribuzione(kpiData()!.almalaurea.retribuzione_netta_media_3_anni) }}€
+              </div>
+            </div>
+            
+            <div class="kpi-timeline-divider"></div>
+            
+            <div class="kpi-timeline-step">
+              <div class="kpi-timeline-year">5 Anni</div>
+              <div class="kpi-timeline-stat kpi-timeline-stat--highlight">
+                <span class="kpi-timeline-icon">💼</span> {{ kpiData()!.almalaurea.tasso_occupazione_5_anni }}%
+              </div>
+              <div class="kpi-timeline-stat kpi-timeline-stat--highlight">
+                <span class="kpi-timeline-icon">💰</span> {{ formatRetribuzione(kpiData()!.almalaurea.retribuzione_netta_media_5_anni) }}€
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Impatto Fattori -->
+        <div class="kpi-impact-card">
+          <div class="kpi-impact-icon-wrapper">
+            <span class="kpi-impact-icon">🚀</span>
+          </div>
+          <div class="kpi-impact-content">
+            <h4 class="kpi-impact-title">{{ kpiData()!.almalaurea.impatto_studi_titolo }}</h4>
+            <div class="kpi-impact-main">
+              <span class="kpi-impact-value">{{ kpiData()!.almalaurea.impatto_studi_valore }}</span>
+              <span class="kpi-impact-desc">{{ kpiData()!.almalaurea.impatto_studi_descrizione }}</span>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 

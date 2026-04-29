@@ -1129,6 +1129,137 @@
   animation: spinSlow 0.8s linear infinite;
 }
 
+/* Progressione negli Anni */
+.kpi-progression {
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px dashed rgba(11, 134, 134, 0.15);
+}
+
+.kpi-progression-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #1a1a2e;
+  margin: 0 0 16px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.kpi-progression-timeline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 12px;
+  padding: 16px;
+  border: 1px solid rgba(0, 0, 0, 0.04);
+}
+
+.kpi-timeline-step {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+}
+
+.kpi-timeline-step:last-child {
+  align-items: flex-end;
+  text-align: right;
+}
+
+.kpi-timeline-divider {
+  height: 2px;
+  flex: 1;
+  background: linear-gradient(90deg, rgba(11,134,134,0.1) 0%, rgba(11,134,134,0.4) 50%, rgba(11,134,134,0.1) 100%);
+  margin: 0 16px;
+}
+
+.kpi-timeline-year {
+  font-size: 11px;
+  font-weight: 700;
+  color: #8b8fa3;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+
+.kpi-timeline-stat {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1a1a2e;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.kpi-timeline-stat--highlight {
+  color: #0b8686;
+  font-weight: 700;
+}
+
+.kpi-timeline-icon {
+  font-size: 14px;
+}
+
+/* Impatto Fattori */
+.kpi-impact-card {
+  margin-top: 20px;
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  background: linear-gradient(135deg, #f0faf5 0%, #e6f7ef 100%);
+  border: 1px solid #a8e6c3;
+  border-radius: 14px;
+  padding: 16px;
+}
+
+.kpi-impact-icon-wrapper {
+  background: #fff;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(15, 110, 61, 0.1);
+  flex-shrink: 0;
+}
+
+.kpi-impact-icon {
+  font-size: 20px;
+}
+
+.kpi-impact-content {
+  flex: 1;
+}
+
+.kpi-impact-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: #0f6e3d;
+  margin: 0 0 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.kpi-impact-main {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.kpi-impact-value {
+  font-size: 18px;
+  font-weight: 800;
+  color: #1a1a2e;
+}
+
+.kpi-impact-desc {
+  font-size: 12px;
+  color: #4a5568;
+  line-height: 1.4;
+}
+
 /* ─── RESPONSIVE ─────────────────────────────────────────────── */
 @media (max-width: 600px) {
   .advisor-container {
