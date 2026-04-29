@@ -40,12 +40,12 @@ Il tuo scopo è guidare futuri studenti, iscritti, docenti e visitatori. Devi fo
 - INFOGRAFICHE: Se l'utente richiede un'infografica o se suggerisci un corso di ingegneria, informalo che può visualizzarle tramite i bottoni presenti sotto al tuo messaggio. NON GENERARE MAI nell'output LLM markdown di immagini e NON INCORPORARE MAI testi come "[Mostra Infografica]". L'interfaccia UI si occupa di far comparire i pulsanti automatici per te.
 
 # [ANALISI QUANTITATIVA — DATI OPIS E ALMALAUREA]
-Quando consigli o descrivi un corso di laurea, DEVI includere una sezione "📊 Dati alla mano" che citi cifre esatte estratte dai report ufficiali OPIS (Opinione Studenti) e AlmaLaurea (Condizione Occupazionale), se disponibili nei documenti forniti.
+Quando consigli o descrivi un corso di laurea, DEVI includere una sezione "📊 Dati alla mano" che citi cifre esatte estratte dai documenti Markdown forniti (report OPIS e AlmaLaurea).
 In particolare:
-- OPIS: Cita punteggi su chiarezza espositiva dei docenti, stimolo dell'interesse, coerenza del carico di studio e reperibilità del docente.
-- AlmaLaurea: Cita il tasso di occupazione a 1 anno dalla laurea, la retribuzione mensile netta media e la soddisfazione complessiva per il corso.
-- GIUDIZIO COMPARATIVO: Se il tasso di occupazione è superiore alla media di Ateneo (68.5%), evidenzialo come punto di forza ("sopra la media di Ateneo"). Se inferiore, segnalalo come aspetto da considerare.
-- Esempio di output atteso: "I dati AlmaLaurea 2024 mostrano un'ottima retribuzione media di 1.314€ netti. Dai rapporti OPIS, i docenti stimolano molto l'interesse (7.7/10), con un'ottima reperibilità (8.4/10)."
+- OPIS: I dati sono espressi come "% Giudizi Negativi" per varie aree (chiarezza docenti, stimolo interesse, carico studio, reperibilità). Una percentuale bassa di giudizi negativi indica un buon risultato.
+- AlmaLaurea: Cita il tasso di occupazione a 1 anno dalla laurea, la retribuzione mensile netta media, la soddisfazione complessiva e i dati di progressione a 5 anni se disponibili.
+- GIUDIZIO COMPARATIVO: Confronta i dati del corso con la media di Ateneo (80.5% occupazione triennale, ~91% magistrale) evidenziando punti di forza e aspetti da considerare.
+- Esempio: "Dai rapporti OPIS, solo il 7.3% degli studenti esprime giudizi negativi sullo stimolo all'interesse, un dato eccellente. AlmaLaurea 2025 registra un tasso di occupazione del 97.5% a un anno."
 
 # [GUIDA E NAVIGAZIONE DEL CAMPUS]
 Agisci come una guida esperta del Campus del Politecnico di Bari.
@@ -92,23 +92,33 @@ def get_percorso_from_mysql(chiave_cercata):
     return percorso
 
 # =============================================================================
-# CARICAMENTO PDF CONOSCENZA AUTENTICA E INIZIALIZZAZIONE MODELLO
+# CARICAMENTO KNOWLEDGE BASE (PDF + MD) E INIZIALIZZAZIONE MODELLO
 # =============================================================================
 print("Inizializzazione Gemini e caricamento conoscenza...")
 uploaded_files = []
+markdown_context_parts = []
 try:
     if API_KEY:
         knowledge_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "knowledge")
         if os.path.exists(knowledge_dir):
-            for filename in os.listdir(knowledge_dir):
-                if filename.lower().endswith(".pdf"):
-                    pdf_path = os.path.join(knowledge_dir, filename)
-                    print(f"Caricamento {filename}...")
-                    file_ref = genai.upload_file(pdf_path)
-                    uploaded_files.append(file_ref)
-                    print(f"-> Caricato come URI: {file_ref.uri}")
+            for root, dirs, files in os.walk(knowledge_dir):
+                for filename in sorted(files):
+                    filepath = os.path.join(root, filename)
+                    rel_path = os.path.relpath(filepath, knowledge_dir)
+                    if filename.lower().endswith(".pdf"):
+                        print(f"Caricamento PDF: {rel_path}...")
+                        file_ref = genai.upload_file(filepath)
+                        uploaded_files.append(file_ref)
+                        print(f"-> Caricato come URI: {file_ref.uri}")
+                    elif filename.lower().endswith(".md"):
+                        print(f"Caricamento MD:  {rel_path}...")
+                        with open(filepath, "r", encoding="utf-8") as f:
+                            content = f.read()
+                        markdown_context_parts.append(f"--- DOCUMENTO: {rel_path} ---\n{content}\n--- FINE DOCUMENTO ---")
+                        print(f"-> Caricato come testo ({len(content)} caratteri)")
+        print(f"\nTotale: {len(uploaded_files)} PDF + {len(markdown_context_parts)} MD caricati.")
 except Exception as e:
-    print(f"Errore caricamento PDF: {e}")
+    print(f"Errore caricamento knowledge: {e}")
 
 modello_scelto = None
 chat_session = None
@@ -130,10 +140,16 @@ try:
             print(f"TROVATO: {modello_scelto}")
             
             initial_history = []
+            # Inject PDF files
             if uploaded_files:
-                parts = uploaded_files + ["Questi sono i documenti ufficiali del Politecnico di Bari. Usali come base di conoscenza primaria per rispondere a tutte le domande."]
+                parts = uploaded_files + ["Questi sono i documenti PDF ufficiali del Politecnico di Bari. Usali come base di conoscenza primaria."]
                 initial_history.append({"role": "user", "parts": parts})
-                initial_history.append({"role": "model", "parts": ["Certamente! Ho assimilato i documenti ufficiali e li utilizzerò come fonte principale per assistere l'utente in modo preciso."]})
+                initial_history.append({"role": "model", "parts": ["Ho assimilato i documenti PDF ufficiali."]})
+            # Inject Markdown knowledge base
+            if markdown_context_parts:
+                md_text = "\n\n".join(markdown_context_parts)
+                initial_history.append({"role": "user", "parts": [f"Ecco la knowledge base strutturata in formato Markdown con i dati OPIS, AlmaLaurea e la Guida dello Studente. Usa questi dati per rispondere con precisione citando cifre esatte.\n\n{md_text}"]})
+                initial_history.append({"role": "model", "parts": ["Perfetto! Ho assimilato tutti i dati strutturati Markdown: rapporti OPIS, dati AlmaLaurea e Guida dello Studente. Citerò cifre e percentuali esatte nelle risposte."]})
             
             try:
                 model = genai.GenerativeModel(
@@ -377,7 +393,7 @@ INFORMAZIONI CHIAVE SUL POLIBA:
 Rispondi SEMPRE in italiano con questo formato JSON esatto (SOLO il JSON, nessun testo aggiuntivo, nessun blocco markdown):
 {
   "corsoConsigliato": "Nome esatto del corso dalla lista sopra",
-  "dipartimento": "Codice dipartimento (ARCOD, DICATECh, DMMM, DEI o DIEI)",
+  "dipartimento": "Codice dipartimento (ARCOD, DICATECh, DMMM, DEI)",
   "motivazione": "2-3 frasi che spiegano perché questo corso è perfetto per lo studente, usando un tono entusiasmante e personale",
   "puntiForza": ["punto 1", "punto 2", "punto 3"],
   "sbocchiLavorativi": ["sbocco 1", "sbocco 2", "sbocco 3"],
