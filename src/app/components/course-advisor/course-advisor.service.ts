@@ -22,6 +22,11 @@ export interface GiudizioComparativo {
   delta_occupazione: number;
 }
 
+export interface RecensioneData {
+  parametro: string;
+  valore: string;
+}
+
 export interface CourseKPI {
   nome: string;
   classe: string;
@@ -31,6 +36,7 @@ export interface CourseKPI {
   source_almalaurea: string | null;
   almalaurea: AlmaLaureaData;
   giudizio_comparativo: GiudizioComparativo;
+  recensioni: RecensioneData[];
   note: string;
 }
 

@@ -373,13 +373,13 @@ Ecco i corsi disponibili al Poliba (A.A. 2024-2025):
 - Ingegneria dei Sistemi Aerospaziali (Triennale, L8, Dipartimento: DEI)
 - Ingegneria dei Sistemi Medicali (Triennale, L8, Dipartimento: DEI)
 - Energy Engineering (Magistrale, LM30, Dipartimento: DEI, in inglese)
-- Automation and Robotics Engineering (Magistrale, LM32, Dipartimento: DIEI, in inglese)
-- Computer Engineering (Magistrale, LM32, Dipartimento: DIEI, in inglese)
-- Electronics Engineering (Magistrale, LM29, Dipartimento: DIEI, in inglese)
-- Telecommunication and Internet Technologies Engineering (Magistrale, LM27, Dipartimento: DIEI, in inglese)
-- Ingegneria Informatica e dell'Automazione (Triennale, L8, Dipartimento: DIEI)
-- Ingegneria Elettronica e delle Tecnologie Internet (Triennale, L8, Dipartimento: DIEI)
-- Ingegneria della Creatività Digitale (Triennale, L8, Dipartimento: DIEI, NUOVO)
+- Automation and Robotics Engineering (Magistrale, LM32, Dipartimento: DEI, in inglese)
+- Computer Engineering (Magistrale, LM32, Dipartimento: DEI, in inglese)
+- Electronics Engineering (Magistrale, LM29, Dipartimento: DEI, in inglese)
+- Telecommunication and Internet Technologies Engineering (Magistrale, LM27, Dipartimento: DEI, in inglese)
+- Ingegneria Informatica e dell'Automazione (Triennale, L8, Dipartimento: DEI)
+- Ingegneria Elettronica e delle Tecnologie Internet (Triennale, L8, Dipartimento: DEI)
+- Ingegneria della Creatività Digitale (Triennale, L8, Dipartimento: DEI, NUOVO)
 
 INFORMAZIONI CHIAVE SUL POLIBA:
 - 11.000 studenti, 93.8% occupati a 3 anni dalla laurea magistrale
@@ -388,7 +388,7 @@ INFORMAZIONI CHIAVE SUL POLIBA:
 - 6 corsi magistrali in inglese, Erasmus+ con 40+ università
 - #9 top 10 italiano per Architettura & Design (QS Rankings 2024)
 - Career Service con 500+ aziende partner, Career Fair annuale
-- 5 dipartimenti: ARCOD (Architettura), DICATECh (Civile/Chimica), DMMM (Meccanica/Management), DEI (Elettrica/Aerospaziale), DIEI (Informatica/Elettronica)
+- 5 dipartimenti: ARCOD (Architettura), DICATECh (Civile/Chimica), DMMM (Meccanica/Management), DEI (Elettrica/Aerospaziale), DEI (Informatica/Elettronica)
 
 Rispondi SEMPRE in italiano con questo formato JSON esatto (SOLO il JSON, nessun testo aggiuntivo, nessun blocco markdown):
 {

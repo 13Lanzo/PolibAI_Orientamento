@@ -296,8 +296,26 @@
             </div>
           </div>
         </div>
+      </div>
 
-        <!-- Impatto Fattori -->
+      <!-- OPIS: Recensioni Studenti -->
+      <div class="kpi-block" *ngIf="kpiData()!.recensioni && kpiData()!.recensioni.length > 0">
+        <div class="kpi-block-label">
+          <span class="kpi-block-icon">🎓</span>
+          Punti di Forza (OPIS)
+        </div>
+        <div class="kpi-recensioni-list">
+          <div class="kpi-recensione-item" *ngFor="let r of kpiData()!.recensioni">
+            <div class="kpi-recensione-icon">✅</div>
+            <div class="kpi-recensione-content">
+              <span class="kpi-recensione-param">{{ r.parametro }}</span>
+              <span class="kpi-recensione-valore">{{ r.valore }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Impatto Fattori -->
         <div class="kpi-impact-card">
           <div class="kpi-impact-icon-wrapper">
             <span class="kpi-impact-icon">🚀</span>
@@ -310,7 +328,6 @@
             </div>
           </div>
         </div>
-      </div>
     </div>
 
     <!-- KPI Loading state -->

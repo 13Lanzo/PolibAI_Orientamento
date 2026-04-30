@@ -31,13 +31,13 @@ const POLIBA_COURSES: PolibaCourse[] = [
   { id: 14, nome: "Ingegneria dei Sistemi Aerospaziali", tipo: "Triennale", dipartimento: "DEI", classe: "L8", en: false, aree: ["aerospazio", "aeronautica", "velivoli", "satelliti", "difesa"] },
   { id: 15, nome: "Ingegneria dei Sistemi Medicali", tipo: "Triennale", dipartimento: "DEI", classe: "L8", en: false, aree: ["biomedica", "medicina", "dispositivi medici", "sanità", "salute"] },
   { id: 16, nome: "Energy Engineering", tipo: "Magistrale", dipartimento: "DEI", classe: "LM30", en: true, aree: ["energia", "rinnovabili", "sostenibilità", "internazionale", "green"] },
-  { id: 17, nome: "Automation and Robotics Engineering", tipo: "Magistrale", dipartimento: "DIEI", classe: "LM32", en: true, aree: ["robotica", "automazione", "AI", "controllo", "industria 4.0"] },
-  { id: 18, nome: "Computer Engineering", tipo: "Magistrale", dipartimento: "DIEI", classe: "LM32", en: true, aree: ["informatica", "software", "AI", "cloud", "cybersecurity", "programmazione"] },
-  { id: 19, nome: "Electronics Engineering", tipo: "Magistrale", dipartimento: "DIEI", classe: "LM29", en: true, aree: ["elettronica", "circuiti", "embedded", "IoT", "segnali"] },
-  { id: 20, nome: "Telecommunication and Internet Technologies Engineering", tipo: "Magistrale", dipartimento: "DIEI", classe: "LM27", en: true, aree: ["telecomunicazioni", "reti", "internet", "5G", "wireless"] },
-  { id: 21, nome: "Ingegneria Informatica e dell'Automazione", tipo: "Triennale", dipartimento: "DIEI", classe: "L8", en: false, aree: ["informatica", "programmazione", "reti", "sistemi", "automazione"] },
-  { id: 22, nome: "Ingegneria Elettronica e delle Tecnologie Internet", tipo: "Triennale", dipartimento: "DIEI", classe: "L8", en: false, aree: ["elettronica", "internet", "reti", "telecomunicazioni", "IoT"] },
-  { id: 23, nome: "Ingegneria della Creatività Digitale", tipo: "Triennale", dipartimento: "DIEI", classe: "L8", en: false, nuovo: true, aree: ["digitale", "creatività", "media", "app", "UX", "gaming"] },
+  { id: 17, nome: "Automation and Robotics Engineering", tipo: "Magistrale", dipartimento: "DEI", classe: "LM32", en: true, aree: ["robotica", "automazione", "AI", "controllo", "industria 4.0"] },
+  { id: 18, nome: "Computer Engineering", tipo: "Magistrale", dipartimento: "DEI", classe: "LM32", en: true, aree: ["informatica", "software", "AI", "cloud", "cybersecurity", "programmazione"] },
+  { id: 19, nome: "Electronics Engineering", tipo: "Magistrale", dipartimento: "DEI", classe: "LM29", en: true, aree: ["elettronica", "circuiti", "embedded", "IoT", "segnali"] },
+  { id: 20, nome: "Telecommunication and Internet Technologies Engineering", tipo: "Magistrale", dipartimento: "DEI", classe: "LM27", en: true, aree: ["telecomunicazioni", "reti", "internet", "5G", "wireless"] },
+  { id: 21, nome: "Ingegneria Informatica e dell'Automazione", tipo: "Triennale", dipartimento: "DEI", classe: "L8", en: false, aree: ["informatica", "programmazione", "reti", "sistemi", "automazione"] },
+  { id: 22, nome: "Ingegneria Elettronica e delle Tecnologie Internet", tipo: "Triennale", dipartimento: "DEI", classe: "L8", en: false, aree: ["elettronica", "internet", "reti", "telecomunicazioni", "IoT"] },
+  { id: 23, nome: "Ingegneria della Creatività Digitale", tipo: "Triennale", dipartimento: "DEI", classe: "L8", en: false, nuovo: true, aree: ["digitale", "creatività", "media", "app", "UX", "gaming"] },
 ];
 
 const DEPT_COLORS: Record<string, { bg: string; text: string; border: string }> = {
@@ -45,7 +45,6 @@ const DEPT_COLORS: Record<string, { bg: string; text: string; border: string }> 
   DICATECh: { bg: "#e1f5ee", text: "#0f6e56", border: "#9fe1cb" },
   DMMM: { bg: "#e6f1fb", text: "#185fa5", border: "#b5d4f4" },
   DEI: { bg: "#faeeda", text: "#854f0b", border: "#fac775" },
-  DIEI: { bg: "#fbeaf0", text: "#993556", border: "#f4c0d1" },
 };
 
 const INTEREST_SUGGESTIONS = [
@@ -105,7 +104,7 @@ export class CourseAdvisor {
   );
   canSubmit = computed(() => this.materie().length > 0 || this.aspirazioni().length > 0);
 
-  constructor(private advisorService: CourseAdvisorService) {}
+  constructor(private advisorService: CourseAdvisorService) { }
 
   // --- Tag management ---
   addMateria() {
