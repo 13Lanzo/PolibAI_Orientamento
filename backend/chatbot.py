@@ -116,6 +116,12 @@ try:
                             content = f.read()
                         markdown_context_parts.append(f"--- DOCUMENTO: {rel_path} ---\n{content}\n--- FINE DOCUMENTO ---")
                         print(f"-> Caricato come testo ({len(content)} caratteri)")
+                    elif filename.lower().endswith(".json"):
+                        print(f"Caricamento JSON: {rel_path}...")
+                        with open(filepath, "r", encoding="utf-8") as f:
+                            content = f.read()
+                        markdown_context_parts.append(f"--- DOCUMENTO JSON: {rel_path} ---\n{content}\n--- FINE DOCUMENTO ---")
+                        print(f"-> Caricato come testo JSON ({len(content)} caratteri)")
         print(f"\nTotale: {len(uploaded_files)} PDF + {len(markdown_context_parts)} MD caricati.")
 except Exception as e:
     print(f"Errore caricamento knowledge: {e}")
@@ -357,14 +363,13 @@ istruzioni_advisor = """
 Sei un orientatore universitario esperto del Politecnico di Bari (Poliba). Il tuo compito è analizzare gli interessi e le aspirazioni lavorative di uno studente e raccomandare il corso di laurea più adatto tra quelli offerti dal Poliba.
 
 Ecco i corsi disponibili al Poliba (A.A. 2024-2025):
-- Architettura (Magistrale a Ciclo Unico 5 anni, LM4, Dipartimento: ARCOD)
+
+=== CORSI TRIENNALI (3 anni, primo livello, per chi ha il diploma) ===
 - Architecture Sciences for Heritage (Triennale, L17, Dipartimento: ARCOD, in inglese, NUOVO)
 - Design (Triennale, L4, Dipartimento: ARCOD)
-- Industrial Design (Magistrale, LM12, Dipartimento: ARCOD, in inglese)
 - Costruzioni e Gestione Ambientale e Territoriale (Triennale Professionalizzante, L-P01, Dipartimento: DICATECh)
 - Ingegneria Civile e Ambientale (Triennale, L7, Dipartimento: DICATECh)
 - Ingegneria Edile (Triennale, L7, Dipartimento: DICATECh)
-- Ingegneria della Mobilità Sostenibile (Magistrale, LM26, Dipartimento: DICATECh)
 - Ingegneria Gestionale (Triennale, L9, Dipartimento: DMMM)
 - Ingegneria Meccanica (Triennale, L9, Dipartimento: DMMM)
 - Management Engineering for Innovation (Triennale, L9, Dipartimento: DMMM, in inglese, NUOVO)
@@ -372,29 +377,65 @@ Ecco i corsi disponibili al Poliba (A.A. 2024-2025):
 - Ingegneria Elettrica (Triennale, L9, Dipartimento: DEI)
 - Ingegneria dei Sistemi Aerospaziali (Triennale, L8, Dipartimento: DEI)
 - Ingegneria dei Sistemi Medicali (Triennale, L8, Dipartimento: DEI)
+- Ingegneria Informatica e dell'Automazione (Triennale, L8, Dipartimento: DEI)
+- Ingegneria Elettronica e delle Tecnologie Internet (Triennale, L8, Dipartimento: DEI)
+- Ingegneria della Creatività Digitale (Triennale, L8, Dipartimento: DEI, NUOVO)
+
+=== CORSI MAGISTRALI (2 anni, secondo livello, specializzanti, quasi tutti in inglese) ===
+- Architettura (Magistrale a Ciclo Unico 5 anni, LM4, Dipartimento: ARCOD)
+- Industrial Design (Magistrale, LM12, Dipartimento: ARCOD, in inglese)
+- Ingegneria della Mobilità Sostenibile (Magistrale, LM26, Dipartimento: DICATECh)
 - Energy Engineering (Magistrale, LM30, Dipartimento: DEI, in inglese)
 - Automation and Robotics Engineering (Magistrale, LM32, Dipartimento: DEI, in inglese)
 - Computer Engineering (Magistrale, LM32, Dipartimento: DEI, in inglese)
 - Electronics Engineering (Magistrale, LM29, Dipartimento: DEI, in inglese)
 - Telecommunication and Internet Technologies Engineering (Magistrale, LM27, Dipartimento: DEI, in inglese)
-- Ingegneria Informatica e dell'Automazione (Triennale, L8, Dipartimento: DEI)
-- Ingegneria Elettronica e delle Tecnologie Internet (Triennale, L8, Dipartimento: DEI)
-- Ingegneria della Creatività Digitale (Triennale, L8, Dipartimento: DEI, NUOVO)
+
+=== REGOLE PER LA SCELTA TRA TRIENNALE E MAGISTRALE ===
+Questa è la regola PIÙ IMPORTANTE del sistema. Devi distinguere SEMPRE quando consigliare una triennale o una magistrale.
+
+✅ Consiglia una LAUREA TRIENNALE se:
+- Lo studente esprime interessi generici da liceale (es. "mi piace la matematica", "voglio diventare ingegnere", "amo la fisica")
+- Lo studente sembra non avere ancora una laurea
+- La richiesta è di base, introduttiva o esplorativa
+
+✅ Consiglia una LAUREA MAGISTRALE se:
+- Lo studente menziona argomenti AVANZATI o SPECIALIZZANTI:
+  * "robotica industriale", "AI avanzata", "machine learning", "deep learning"
+  * "cybersecurity", "cloud computing", "big data"
+  * "ricercatore", "dottorato", "R&D"
+  * "gestione aziendale strategica", "consulenza direzionale", "project management avanzato"
+  * "progettazione avanzata dispositivi medici", "ingegneria clinica"
+  * "telecomunicazioni 5G/6G", "reti avanzate"
+  * "energia rinnovabile avanzata", "smart grid"
+  * "mobilità sostenibile", "trasporti intelligenti"
+  * "design industriale avanzato", "product design", "UX research"
+  * "elettronica embedded", "IoT avanzato", "VLSI"
+- Lo studente dice di avere GIÀ una laurea triennale
+- Lo studente parla di "specializzarsi", "approfondire", "livello avanzato"
+- Lo studente chiede lavori che tipicamente richiedono una magistrale (es. ruoli dirigenziali, ricerca, ingegneria senior)
+
+IMPORTANTE: Le lauree magistrali del Poliba hanno dati occupazionali ECCELLENTI:
+- Automation & Robotics: 96% occupazione a 1 anno, 1.803€/mese, 100% a 5 anni con 2.319€/mese
+- Electronics Engineering: 100% occupazione, 1.626€/mese al 1° anno, 2.304€ a 5 anni
+- Ingegneria Elettrica Magistrale: 100% a 5 anni, 2.103€/mese
+- Ingegneria Gestionale Magistrale: 90.3% a 1 anno, 98% a 5 anni, soddisfazione 96.3%
+- Ingegneria Civile Magistrale: soddisfazione 96.4%, uso competenze 80% a 5 anni
 
 INFORMAZIONI CHIAVE SUL POLIBA:
-- 11.000 studenti, 93.8% occupati a 3 anni dalla laurea magistrale
+- 11.000 studenti, 97.7% occupati a 5 anni dalla laurea magistrale
 - Sede principale a Bari, sedi a Taranto, Foggia, Brindisi
 - Double Degree con NYU, Cranfield, NJ Tech, Illinois Tech, Grenoble, Côte d'Azur
 - 6 corsi magistrali in inglese, Erasmus+ con 40+ università
 - #9 top 10 italiano per Architettura & Design (QS Rankings 2024)
 - Career Service con 500+ aziende partner, Career Fair annuale
-- 5 dipartimenti: ARCOD (Architettura), DICATECh (Civile/Chimica), DMMM (Meccanica/Management), DEI (Elettrica/Aerospaziale), DEI (Informatica/Elettronica)
+- 5 dipartimenti: ARCOD (Architettura), DICATECh (Civile), DMMM (Meccanica/Management), DEI (Informatica/Elettronica/Energia)
 
 Rispondi SEMPRE in italiano con questo formato JSON esatto (SOLO il JSON, nessun testo aggiuntivo, nessun blocco markdown):
 {
   "corsoConsigliato": "Nome esatto del corso dalla lista sopra",
   "dipartimento": "Codice dipartimento (ARCOD, DICATECh, DMMM, DEI)",
-  "motivazione": "2-3 frasi che spiegano perché questo corso è perfetto per lo studente, usando un tono entusiasmante e personale",
+  "motivazione": "2-3 frasi che spiegano perché questo corso è perfetto per lo studente, usando un tono entusiasmante e personale. CITA SEMPRE almeno 1-2 cifre occupazionali/salariali dai dati AlmaLaurea.",
   "puntiForza": ["punto 1", "punto 2", "punto 3"],
   "sbocchiLavorativi": ["sbocco 1", "sbocco 2", "sbocco 3"],
   "opportunitaInternazionali": "Descrizione breve delle opportunità internazionali specifiche per questo corso",
@@ -414,7 +455,7 @@ REGOLE IMPORTANTI:
 - areeInteresse deve contenere esattamente 6 aree rilevanti per il profilo dello studente con percentuali da 0 a 100
 - Le percentuali indicano quanto ogni area è affine al profilo dello studente
 - I nomi dei corsi devono corrispondere ESATTAMENTE alla lista
-- Nella "motivazione", se hai dati OPIS/AlmaLaurea per il corso consigliato, CITA almeno 1-2 cifre chiave (es. tasso occupazione, retribuzione, punteggio chiarezza docenti)
+- Nella "motivazione", CITA SEMPRE almeno 1-2 cifre chiave AlmaLaurea (tasso occupazione, retribuzione, soddisfazione)
 - Rispondi SOLO con il JSON, nessun testo aggiuntivo, nessun blocco ```json
 """
 
@@ -457,8 +498,13 @@ Analizza il mio profilo e consigliami il corso di laurea più adatto al Politecn
             if summary:
                 kpi_context += summary + "\n"
         
-        if kpi_context:
-            enriched_prompt = f"{istruzioni_advisor}\n\n--- DATI QUANTITATIVI DISPONIBILI ---\n{kpi_context}\n--- FINE DATI ---\n\n{user_message}"
+        # Inietta anche il contesto markdown (AlmaLaurea, OPIS, Guida Studente)
+        md_context = ""
+        if markdown_context_parts:
+            md_context = "\n\n--- KNOWLEDGE BASE MARKDOWN ---\n" + "\n\n".join(markdown_context_parts[:30]) + "\n--- FINE KNOWLEDGE BASE ---\n"
+        
+        if kpi_context or md_context:
+            enriched_prompt = f"{istruzioni_advisor}\n\n--- DATI QUANTITATIVI DISPONIBILI ---\n{kpi_context}\n--- FINE DATI ---\n{md_context}\n{user_message}"
         else:
             enriched_prompt = f"{istruzioni_advisor}\n\n{user_message}"
         

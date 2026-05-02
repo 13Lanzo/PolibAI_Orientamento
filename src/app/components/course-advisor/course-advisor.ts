@@ -317,9 +317,47 @@ export class CourseAdvisor {
    * Mapping nomi corsi → course_id per il fallback KPI lookup.
    */
   private readonly NOME_TO_KPI_ID: Record<string, string> = {
+    // Triennali
     "ingegneria informatica e dell'automazione": 'IIA',
+    "ingegneria informatica": 'IIA',
     "ingegneria dei sistemi medicali": 'IMED',
     "ingegneria biomedica": 'IMED',
+    "ingegneria meccanica": 'IMEC',
+    "ingegneria gestionale": 'IGEST',
+    "management engineering for innovation": 'IGEST',
+    "ingegneria elettronica e delle tecnologie internet": 'IETI',
+    "ingegneria elettronica": 'IETI',
+    "ingegneria dei sistemi aerospaziali": 'IAERO',
+    "ingegneria aerospaziale": 'IAERO',
+    "ingegneria civile e ambientale": 'ICIVAMB',
+    "ingegneria civile": 'ICIVAMB',
+    "ingegneria elettrica": 'IELE',
+    "ingegneria dell'energia elettrica": 'IELE',
+    "ingegneria edile": 'IEDILE',
+    "ingegneria industriale e dei sistemi navali": 'INAVAL',
+    "design": 'LDES',
+    "costruzioni e gestione ambientale e territoriale": 'LPOL',
+    "ingegneria della creatività digitale": 'ICD',
+    "architecture sciences for heritage": 'ICD',
+    // Magistrali
+    "architettura": 'LMARCH',
+    "computer science": 'LMCS',
+    "computer engineering": 'LMCS',
+    "ingegneria civile magistrale": 'LMCIV',
+    "ingegneria dei sistemi edilizi": 'LMEDILE',
+    "ingegneria elettrica magistrale": 'LMELE',
+    "energy engineering": 'LMENER',
+    "ingegneria gestionale magistrale": 'LMGEST',
+    "mechanical engineering": 'LMMECC',
+    "ingegneria meccanica magistrale": 'LMMECC',
+    "ingegneria dei sistemi medicali magistrale": 'LMMED',
+    "telecommunication and internet technologies engineering": 'LMTEL',
+    "trasformazione digitale": 'LMDIG',
+    "automation and robotics engineering": 'LMAUTO',
+    "electronics engineering": 'LMELEC',
+    "ingegneria per l'ambiente e il territorio": 'LMAMB',
+    "ingegneria della mobilità sostenibile": 'LMAMB',
+    "industrial design": 'LDES',
   };
 
   findCourseKpiId(nomecorso: string): string | null {
