@@ -97,7 +97,8 @@
 }
 
 .welcome-titles h2 span {
-  color: #0b3469; /* Poliba Blue */
+  color: #0b3469;
+  /* Poliba Blue */
 }
 
 .welcome-titles p {
@@ -132,13 +133,13 @@
   cursor: pointer;
   text-align: left;
   transition: all 0.2s ease;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
 }
 
 .suggestion-card:hover {
   background: #f8f9fa;
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
 .card-icon {
@@ -223,8 +224,8 @@
 }
 
 /* Stili per il Markdown compilato */
-.markdown-content h1, 
-.markdown-content h2, 
+.markdown-content h1,
+.markdown-content h2,
 .markdown-content h3 {
   color: #0b3469;
   margin-top: 0;
@@ -232,9 +233,17 @@
   font-weight: 600;
 }
 
-.markdown-content h1 { font-size: 1.4rem; }
-.markdown-content h2 { font-size: 1.2rem; }
-.markdown-content h3 { font-size: 1.1rem; }
+.markdown-content h1 {
+  font-size: 1.4rem;
+}
+
+.markdown-content h2 {
+  font-size: 1.2rem;
+}
+
+.markdown-content h3 {
+  font-size: 1.1rem;
+}
 
 .markdown-content p {
   margin: 0 0 1rem 0;
@@ -250,7 +259,8 @@
   font-weight: 700;
 }
 
-.markdown-content ul, .markdown-content ol {
+.markdown-content ul,
+.markdown-content ol {
   margin: 0 0 1rem 0;
   padding-left: 1.5rem;
 }
@@ -261,8 +271,15 @@
 
 /* Animazione per l'ingresso dei messaggi */
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .message-row {
@@ -286,12 +303,25 @@
   animation: bounce 1.4s infinite ease-in-out both;
 }
 
-.dot:nth-child(1) { animation-delay: -0.32s; }
-.dot:nth-child(2) { animation-delay: -0.16s; }
+.dot:nth-child(1) {
+  animation-delay: -0.32s;
+}
+
+.dot:nth-child(2) {
+  animation-delay: -0.16s;
+}
 
 @keyframes bounce {
-  0%, 80%, 100% { transform: scale(0); }
-  40% { transform: scale(1); }
+
+  0%,
+  80%,
+  100% {
+    transform: scale(0);
+  }
+
+  40% {
+    transform: scale(1);
+  }
 }
 
 /* Options */
@@ -330,7 +360,7 @@
   overflow: hidden;
   border-radius: 12px;
   cursor: pointer;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   margin-bottom: 10px;
 }
 
@@ -344,7 +374,7 @@
   bottom: 0;
   left: 0;
   width: 100%;
-  background: rgba(0,0,0,0.6);
+  background: rgba(0, 0, 0, 0.6);
   color: white;
   text-align: center;
   padding: 8px;
@@ -375,7 +405,7 @@
   background: #f1f3f4;
   border-radius: 30px;
   padding: 6px 8px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
 }
 
 .input-container input {
@@ -437,8 +467,9 @@
   max-height: 400px;
   object-fit: contain;
   border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-  background: white; /* Per grafiche con trasparenze o bordi scuri */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  background: white;
+  /* Per grafiche con trasparenze o bordi scuri */
 }
 
 .download-button {

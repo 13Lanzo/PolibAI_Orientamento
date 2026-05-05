@@ -1399,3 +1399,13 @@
   color: #00875A;
   font-size: 0.95rem;
 }
+
+.advisor-footer {
+  text-align: center;
+  padding: 40px 0 20px;
+  font-size: 11px;
+  color: #9aa0a6;
+  letter-spacing: 0.8px;
+  font-weight: 500;
+  opacity: 0.8;
+}

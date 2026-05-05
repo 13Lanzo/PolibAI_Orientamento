@@ -136,9 +136,11 @@
           </div>
 
           <div *ngIf="msg.type === 'image'" class="infographic-container">
-            <div *ngIf="msg.text || msg.htmlText" class="msg-text markdown-content" [innerHTML]="msg.htmlText || msg.text"></div>
+            <div *ngIf="msg.text || msg.htmlText" class="msg-text markdown-content"
+              [innerHTML]="msg.htmlText || msg.text"></div>
             <img *ngIf="msg.mapUrl" [src]="msg.mapUrl" alt="Infografica Corso" class="generated-infographic">
-            <a *ngIf="msg.mapUrl" [href]="msg.mapUrl" download="infografica.png" class="download-button" target="_blank">
+            <a *ngIf="msg.mapUrl" [href]="msg.mapUrl" download="infografica.png" class="download-button"
+              target="_blank">
               ⬇️ Scarica Infografica
             </a>
             <div *ngIf="msg.options && msg.options.length > 0" class="options-flex" style="margin-top: 15px;">
@@ -169,7 +171,7 @@
   <footer class="gemini-footer">
     <div class="input-container">
       <input type="text" [ngModel]="currentInput()" (ngModelChange)="currentInput.set($event)"
-        (keyup.enter)="sendMessage()" placeholder="Chiedi informazioni o carica una pagella...">
+        (keyup.enter)="sendMessage()" placeholder="chiedi informazioni o parlami delle tue passioni...">
       <button class="send-action-btn" (click)="sendMessage()" [disabled]="!currentInput().trim() || isLoading()">
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
           stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -179,7 +181,7 @@
       </button>
     </div>
     <div class="footer-disclaimer">
-      Politecnico di Bari • Orientamento Universitario PRO
+      POLITECNICO DI BARI • ORIENTAMENTO UNIVERSITARIO PRO
     </div>
   </footer>
 </div>
