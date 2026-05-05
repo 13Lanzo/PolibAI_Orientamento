@@ -1,7 +1,8 @@
 
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-import google.generativeai as genai
+from google import genai
+from google.genai import types
 import mysql.connector
 import os
 import traceback
@@ -17,7 +18,7 @@ CORS(app, resources={r"/*": {"origins": "*"}})
 # --- CONFIGURAZIONE CHIAVE API ---
 API_KEY = os.getenv("GOOGLE_API_KEY")
 if API_KEY:
-    genai.configure(api_key=API_KEY)
+    client = genai.Client(api_key=API_KEY)
 else:
     print("ERRORE: Chiave API mancante nel file .env")
 
@@ -107,22 +108,28 @@ try:
                     rel_path = os.path.relpath(filepath, knowledge_dir)
                     if filename.lower().endswith(".pdf"):
                         print(f"Caricamento PDF: {rel_path}...")
-                        file_ref = genai.upload_file(filepath)
+                        import urllib.parse
+                        safe_name = urllib.parse.quote(filename)
+                        file_ref = client.files.upload(file=filepath, config={'display_name': safe_name})
                         uploaded_files.append(file_ref)
                         print(f"-> Caricato come URI: {file_ref.uri}")
-                    elif filename.lower().endswith(".md"):
-                        print(f"Caricamento MD:  {rel_path}...")
-                        with open(filepath, "r", encoding="utf-8") as f:
-                            content = f.read()
-                        markdown_context_parts.append(f"--- DOCUMENTO: {rel_path} ---\n{content}\n--- FINE DOCUMENTO ---")
-                        print(f"-> Caricato come testo ({len(content)} caratteri)")
-                    elif filename.lower().endswith(".json"):
-                        print(f"Caricamento JSON: {rel_path}...")
-                        with open(filepath, "r", encoding="utf-8") as f:
-                            content = f.read()
-                        markdown_context_parts.append(f"--- DOCUMENTO JSON: {rel_path} ---\n{content}\n--- FINE DOCUMENTO ---")
-                        print(f"-> Caricato come testo JSON ({len(content)} caratteri)")
-        print(f"\nTotale: {len(uploaded_files)} PDF + {len(markdown_context_parts)} MD caricati.")
+                    elif filename.lower().endswith((".md", ".json")):
+                        ext = "MD" if filename.lower().endswith(".md") else "JSON"
+                        mime = "text/plain" if filename.lower().endswith(".md") else "application/json"
+                        print(f"Caricamento {ext}: {rel_path}...")
+                        try:
+                            import urllib.parse
+                            safe_name = urllib.parse.quote(filename)
+                            file_ref = client.files.upload(file=filepath, config={'mime_type': mime, 'display_name': safe_name})
+                            uploaded_files.append(file_ref)
+                            print(f"-> Caricato come file API: {file_ref.uri}")
+                        except Exception as upload_err:
+                            print(f"-> Upload file fallito ({upload_err}), caricamento come testo...")
+                            with open(filepath, "r", encoding="utf-8") as f:
+                                content = f.read()
+                            markdown_context_parts.append(f"--- DOCUMENTO {ext}: {rel_path} ---\n{content}\n--- FINE DOCUMENTO ---")
+                            print(f"-> Caricato come testo ({len(content)} caratteri)")
+        print(f"\nTotale: {len(uploaded_files)} file caricati via API + {len(markdown_context_parts)} testi fallback.")
 except Exception as e:
     print(f"Errore caricamento knowledge: {e}")
 
@@ -131,8 +138,8 @@ chat_session = None
 
 try:
     if API_KEY:
-        for m in genai.list_models():
-            if 'generateContent' in m.supported_generation_methods:
+        for m in client.models.list():
+            if 'generateContent' in m.supported_actions:
                 if 'gemini-3.1-flash-lite' in m.name:
                     modello_scelto = m.name
                     break
@@ -146,33 +153,32 @@ try:
             print(f"TROVATO: {modello_scelto}")
             
             initial_history = []
-            # Inject PDF files
             if uploaded_files:
-                parts = uploaded_files + ["Questi sono i documenti PDF ufficiali del Politecnico di Bari. Usali come base di conoscenza primaria."]
-                initial_history.append({"role": "user", "parts": parts})
-                initial_history.append({"role": "model", "parts": ["Ho assimilato i documenti PDF ufficiali."]})
-            # Inject Markdown knowledge base
+                parts = uploaded_files + ["Questi sono i documenti ufficiali del Politecnico di Bari (PDF, rapporti OPIS, dati AlmaLaurea, Guida dello Studente). Usali come base di conoscenza primaria per rispondere con precisione citando cifre esatte."]
+                parts_converted = [types.Part.from_text(text=p) if isinstance(p, str) else types.Part.from_uri(file_uri=p.uri, mime_type=p.mime_type) for p in parts]
+                initial_history.append(types.Content(role="user", parts=parts_converted))
+                initial_history.append(types.Content(role="model", parts=[types.Part.from_text(text="Ho assimilato tutti i documenti: PDF ufficiali, rapporti OPIS, dati AlmaLaurea e Guida dello Studente. Citerò cifre e percentuali esatte nelle risposte.")]))
+            
+            # Inject Markdown knowledge base (only fallback ones now)
             if markdown_context_parts:
                 md_text = "\n\n".join(markdown_context_parts)
-                initial_history.append({"role": "user", "parts": [f"Ecco la knowledge base strutturata in formato Markdown con i dati OPIS, AlmaLaurea e la Guida dello Studente. Usa questi dati per rispondere con precisione citando cifre esatte.\n\n{md_text}"]})
-                initial_history.append({"role": "model", "parts": ["Perfetto! Ho assimilato tutti i dati strutturati Markdown: rapporti OPIS, dati AlmaLaurea e Guida dello Studente. Citerò cifre e percentuali esatte nelle risposte."]})
+                initial_history.append(types.Content(role="user", parts=[types.Part.from_text(text=f"Ecco ulteriori dati testuali da usare come contesto:\n\n{md_text}")]))
+                initial_history.append(types.Content(role="model", parts=[types.Part.from_text(text="Perfetto! Ho assimilato i dati testuali aggiuntivi.")]))
             
             try:
-                model = genai.GenerativeModel(
-                    model_name=modello_scelto,
+                config = types.GenerateContentConfig(
                     system_instruction=istruzioni_poliba,
-                    tools=[{"google_search_retrieval": {}}]
+                    tools=[{"google_search": {}}]
                 )
+                chat_session = client.chats.create(model=modello_scelto, config=config, history=initial_history)
             except Exception as e:
                 print("Supporto system_instruction/tools assente. Fallback standard.")
-                model = genai.GenerativeModel(
-                    model_name=modello_scelto,
-                    tools=[{"google_search_retrieval": {}}]
+                config = types.GenerateContentConfig(
+                    tools=[{"google_search": {}}]
                 )
-                initial_history.insert(0, {"role": "user", "parts": [istruzioni_poliba]})
-                initial_history.insert(1, {"role": "model", "parts": ["Ricevuto. Seguirò queste istruzioni alla lettera."]})
-
-            chat_session = model.start_chat(history=initial_history)
+                initial_history.insert(0, types.Content(role="user", parts=[types.Part.from_text(text=istruzioni_poliba)]))
+                initial_history.insert(1, types.Content(role="model", parts=[types.Part.from_text(text="Ricevuto. Seguirò queste istruzioni alla lettera.")]))
+                chat_session = client.chats.create(model=modello_scelto, config=config, history=initial_history)
         else:
             print("NESSUN MODELLO TROVATO.")
 except Exception as e:
@@ -281,7 +287,7 @@ def chat_endpoint():
 
     try:
         prompt = f"{istruzioni_poliba}\n\nUtente: {messaggio_utente}"
-        response = chat_session.send_message(prompt)
+        response = chat_session.send_message(message=prompt)
         testo_risposta = response.text
 
         # =============================================================================
@@ -483,13 +489,11 @@ Analizza il mio profilo e consigliami il corso di laurea più adatto al Politecn
     try:
         import json as json_module
 
-        # Use a fresh model call (not the chat session) for advisor
-        advisor_model = genai.GenerativeModel(model_name=modello_scelto)
-        
         # Build parts with knowledge files if available
         parts = []
         if uploaded_files:
-            parts.extend(uploaded_files)
+            for p in uploaded_files:
+                parts.append(types.Part.from_uri(file_uri=p.uri, mime_type=p.mime_type))
         
         # Arricchisci il prompt con i dati KPI disponibili
         kpi_context = ""
@@ -508,9 +512,9 @@ Analizza il mio profilo e consigliami il corso di laurea più adatto al Politecn
         else:
             enriched_prompt = f"{istruzioni_advisor}\n\n{user_message}"
         
-        parts.append(enriched_prompt)
+        parts.append(types.Part.from_text(text=enriched_prompt))
 
-        response = advisor_model.generate_content(parts)
+        response = client.models.generate_content(model=modello_scelto, contents=parts)
         response_text = response.text.strip()
         
         # Clean up response - remove markdown code blocks if present
