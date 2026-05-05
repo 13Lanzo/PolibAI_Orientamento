@@ -4,9 +4,24 @@ from flask_cors import CORS
 import google.generativeai as genai
 import mysql.connector
 import os
+import time
 import traceback
 from dotenv import load_dotenv
 from kpi_data import get_kpi, get_all_course_ids, get_kpi_summary_for_prompt, find_course_id_by_name, COURSE_KPI
+
+# --- RETRY HELPER PER ERRORI 429 ---
+def retry_with_backoff(func, max_retries=3, initial_delay=2):
+    """Esegue func() con retry automatico e backoff esponenziale per errori 429."""
+    for attempt in range(max_retries + 1):
+        try:
+            return func()
+        except Exception as e:
+            if "429" in str(e) and attempt < max_retries:
+                delay = initial_delay * (2 ** attempt)
+                print(f"  ⏳ Rate limit (429). Retry {attempt + 1}/{max_retries} tra {delay}s...")
+                time.sleep(delay)
+            else:
+                raise
 
 # Carica variabili d'ambiente
 load_dotenv()
@@ -96,7 +111,7 @@ def get_percorso_from_mysql(chiave_cercata):
 # =============================================================================
 print("Inizializzazione Gemini e caricamento conoscenza...")
 uploaded_files = []
-markdown_context_parts = []
+markdown_context_parts = []  # Mantenuto per l'endpoint /recommend
 try:
     if API_KEY:
         knowledge_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "knowledge")
@@ -110,19 +125,24 @@ try:
                         file_ref = genai.upload_file(filepath)
                         uploaded_files.append(file_ref)
                         print(f"-> Caricato come URI: {file_ref.uri}")
-                    elif filename.lower().endswith(".md"):
-                        print(f"Caricamento MD:  {rel_path}...")
-                        with open(filepath, "r", encoding="utf-8") as f:
-                            content = f.read()
-                        markdown_context_parts.append(f"--- DOCUMENTO: {rel_path} ---\n{content}\n--- FINE DOCUMENTO ---")
-                        print(f"-> Caricato come testo ({len(content)} caratteri)")
-                    elif filename.lower().endswith(".json"):
-                        print(f"Caricamento JSON: {rel_path}...")
-                        with open(filepath, "r", encoding="utf-8") as f:
-                            content = f.read()
-                        markdown_context_parts.append(f"--- DOCUMENTO JSON: {rel_path} ---\n{content}\n--- FINE DOCUMENTO ---")
-                        print(f"-> Caricato come testo JSON ({len(content)} caratteri)")
-        print(f"\nTotale: {len(uploaded_files)} PDF + {len(markdown_context_parts)} MD caricati.")
+                    elif filename.lower().endswith((".md", ".json")):
+                        ext = "MD" if filename.lower().endswith(".md") else "JSON"
+                        mime = "text/plain" if filename.lower().endswith(".md") else "application/json"
+                        print(f"Caricamento {ext}: {rel_path}...")
+                        # Carica come file via API (non come testo nella history)
+                        # Questo evita di ri-inviare centinaia di migliaia di token ad ogni richiesta
+                        try:
+                            file_ref = genai.upload_file(filepath, mime_type=mime)
+                            uploaded_files.append(file_ref)
+                            print(f"-> Caricato come file API: {file_ref.uri}")
+                        except Exception as upload_err:
+                            # Fallback: leggi come testo (solo per /recommend)
+                            print(f"-> Upload file fallito ({upload_err}), caricamento come testo...")
+                            with open(filepath, "r", encoding="utf-8") as f:
+                                content = f.read()
+                            markdown_context_parts.append(f"--- DOCUMENTO {ext}: {rel_path} ---\n{content}\n--- FINE DOCUMENTO ---")
+                            print(f"-> Caricato come testo ({len(content)} caratteri)")
+        print(f"\nTotale: {len(uploaded_files)} file caricati via API + {len(markdown_context_parts)} testi fallback.")
 except Exception as e:
     print(f"Errore caricamento knowledge: {e}")
 
@@ -131,31 +151,33 @@ chat_session = None
 
 try:
     if API_KEY:
+        # Priorità modelli: quelli con quota gratuita più generosa prima
+        modelli_disponibili = []
         for m in genai.list_models():
             if 'generateContent' in m.supported_generation_methods:
-                if 'gemini-3.1-flash-lite' in m.name:
-                    modello_scelto = m.name
+                modelli_disponibili.append(m.name)
+        
+        print(f"Modelli disponibili: {[m for m in modelli_disponibili if 'gemini' in m]}")
+        
+        # Ordine di preferenza: modelli con limiti gratuiti più alti
+        preferenza = ['gemini-2.0-flash-lite', 'gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-3.1-flash-lite']
+        for pref in preferenza:
+            for m_name in modelli_disponibili:
+                if pref in m_name:
+                    modello_scelto = m_name
                     break
-                elif 'gemini-2.5-flash' in m.name:
-                    modello_scelto = m.name
-                elif 'gemini-1.5-flash' in m.name:
-                    if not modello_scelto:
-                        modello_scelto = m.name
+            if modello_scelto:
+                break
 
         if modello_scelto:
             print(f"TROVATO: {modello_scelto}")
             
             initial_history = []
-            # Inject PDF files
+            # Inject tutti i file caricati via API (PDF + MD + JSON)
             if uploaded_files:
-                parts = uploaded_files + ["Questi sono i documenti PDF ufficiali del Politecnico di Bari. Usali come base di conoscenza primaria."]
+                parts = uploaded_files + ["Questi sono i documenti ufficiali del Politecnico di Bari (PDF, rapporti OPIS, dati AlmaLaurea, Guida dello Studente). Usali come base di conoscenza primaria per rispondere con precisione citando cifre esatte."]
                 initial_history.append({"role": "user", "parts": parts})
-                initial_history.append({"role": "model", "parts": ["Ho assimilato i documenti PDF ufficiali."]})
-            # Inject Markdown knowledge base
-            if markdown_context_parts:
-                md_text = "\n\n".join(markdown_context_parts)
-                initial_history.append({"role": "user", "parts": [f"Ecco la knowledge base strutturata in formato Markdown con i dati OPIS, AlmaLaurea e la Guida dello Studente. Usa questi dati per rispondere con precisione citando cifre esatte.\n\n{md_text}"]})
-                initial_history.append({"role": "model", "parts": ["Perfetto! Ho assimilato tutti i dati strutturati Markdown: rapporti OPIS, dati AlmaLaurea e Guida dello Studente. Citerò cifre e percentuali esatte nelle risposte."]})
+                initial_history.append({"role": "model", "parts": ["Ho assimilato tutti i documenti: PDF ufficiali, rapporti OPIS, dati AlmaLaurea e Guida dello Studente. Citerò cifre e percentuali esatte nelle risposte."]})
             
             try:
                 model = genai.GenerativeModel(
@@ -280,8 +302,9 @@ def chat_endpoint():
         return jsonify({"error": "Errore AI: Modello non disponibile"}), 500
 
     try:
-        prompt = f"{istruzioni_poliba}\n\nUtente: {messaggio_utente}"
-        response = chat_session.send_message(prompt)
+        # Non ri-iniettare istruzioni_poliba: è già nel system_instruction del modello
+        prompt = messaggio_utente
+        response = retry_with_backoff(lambda: chat_session.send_message(prompt))
         testo_risposta = response.text
 
         # =============================================================================
@@ -326,7 +349,7 @@ def chat_endpoint():
         errore = str(e)
         print(f"Errore AI: {errore}")
         if "429" in errore:
-            return jsonify({"response": "Troppe richieste. Riprova tra poco.", "type": "text"}), 200
+            return jsonify({"response": "⚠️ Il servizio AI è temporaneamente sovraccarico. Riprova tra qualche secondo.", "type": "text"}), 200
         return jsonify({"response": "Errore AI generico.", "type": "text"}), 500
 
 
@@ -510,7 +533,7 @@ Analizza il mio profilo e consigliami il corso di laurea più adatto al Politecn
         
         parts.append(enriched_prompt)
 
-        response = advisor_model.generate_content(parts)
+        response = retry_with_backoff(lambda: advisor_model.generate_content(parts))
         response_text = response.text.strip()
         
         # Clean up response - remove markdown code blocks if present
