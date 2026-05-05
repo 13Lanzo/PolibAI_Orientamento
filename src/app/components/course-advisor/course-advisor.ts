@@ -41,10 +41,10 @@ const POLIBA_COURSES: PolibaCourse[] = [
 ];
 
 const DEPT_COLORS: Record<string, { bg: string; text: string; border: string }> = {
-  ARCOD: { bg: "#fff0f2", text: "#C8102E", border: "#f7c4cc" },
+  ARCOD: { bg: "#e0f2f1", text: "#00796b", border: "#b2dfdb" },
   DICATECh: { bg: "#e1f5ee", text: "#0f6e56", border: "#9fe1cb" },
   DMMM: { bg: "#e6f1fb", text: "#185fa5", border: "#b5d4f4" },
-  DEI: { bg: "#faeeda", text: "#854f0b", border: "#fac775" },
+  DEI: { bg: "#e1f5fe", text: "#0277bd", border: "#b3e5fc" },
 };
 
 const INTEREST_SUGGESTIONS = [
