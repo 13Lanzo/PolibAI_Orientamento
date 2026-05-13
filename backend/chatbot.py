@@ -140,12 +140,12 @@ try:
     if API_KEY:
         for m in client.models.list():
             if 'generateContent' in m.supported_actions:
-                if 'gemini-3.1-flash-lite' in m.name:
+                if 'gemini-3.1-flash' in m.name:
                     modello_scelto = m.name
                     break
                 elif 'gemini-2.5-flash' in m.name:
                     modello_scelto = m.name
-                elif 'gemini-1.5-flash' in m.name:
+                elif 'gemini-3-flash-preview' in m.name:
                     if not modello_scelto:
                         modello_scelto = m.name
 
