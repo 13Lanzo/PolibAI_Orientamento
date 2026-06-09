@@ -6,8 +6,10 @@
   <header class="advisor-header">
     <div class="header-brand">
       <div class="brand-icon">
-        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/>
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path
+            d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z" />
         </svg>
       </div>
       <div>
@@ -32,7 +34,7 @@
       <p class="intro-desc">
         Raccontaci le tue materie preferite e i tuoi sogni lavorativi.
         L'AI analizzerà il tuo profilo e ti consiglierà il corso di laurea
-        perfetto tra i 23 offerti dal Politecnico di Bari.
+        perfetto tra i 34 offerti dal Politecnico di Bari.
       </p>
     </div>
 
@@ -49,14 +51,17 @@
       </div>
       <div class="feature-card">
         <div class="feature-icon">📚</div>
-        <div class="feature-label">23 corsi</div>
+        <div class="feature-label">34 corsi</div>
         <div class="feature-desc">Tutta l'offerta Poliba 2025-26</div>
       </div>
     </div>
 
     <button class="btn-primary btn-full" (click)="goToForm()">
       Inizia il quiz
-      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="m9 18 6-6-6-6" />
+      </svg>
     </button>
   </div>
 
@@ -79,23 +84,14 @@
       </div>
 
       <div class="input-row">
-        <input
-          type="text"
-          [ngModel]="materiInput()"
-          (ngModelChange)="materiInput.set($event)"
-          (keydown)="onMateriaKeydown($event)"
-          placeholder="Es. Matematica, Fisica, Arte…"
-          class="text-input"
-        />
+        <input type="text" [ngModel]="materiInput()" (ngModelChange)="materiInput.set($event)"
+          (keydown)="onMateriaKeydown($event)" placeholder="Es. Matematica, Fisica, Arte…" class="text-input" />
         <button class="btn-secondary" (click)="addMateria()">Aggiungi</button>
       </div>
 
       <div class="suggestions-row">
-        <span
-          class="suggestion-chip"
-          *ngFor="let s of filteredInterests()"
-          (click)="addMateriaFromSuggestion(s)"
-        >+ {{ s }}</span>
+        <span class="suggestion-chip" *ngFor="let s of filteredInterests()" (click)="addMateriaFromSuggestion(s)">+ {{ s
+          }}</span>
       </div>
     </div>
 
@@ -113,36 +109,23 @@
       </div>
 
       <div class="input-row">
-        <input
-          type="text"
-          [ngModel]="aspInput()"
-          (ngModelChange)="aspInput.set($event)"
-          (keydown)="onAspKeydown($event)"
-          placeholder="Es. Ingegnere AI, Architetto, Designer…"
-          class="text-input"
-        />
+        <input type="text" [ngModel]="aspInput()" (ngModelChange)="aspInput.set($event)"
+          (keydown)="onAspKeydown($event)" placeholder="Es. Ingegnere AI, Architetto, Designer…" class="text-input" />
         <button class="btn-secondary" (click)="addAspirazione()">Aggiungi</button>
       </div>
 
       <div class="suggestions-row">
-        <span
-          class="suggestion-chip"
-          *ngFor="let s of filteredJobs()"
-          (click)="addAspirazioneFromSuggestion(s)"
-        >+ {{ s }}</span>
+        <span class="suggestion-chip" *ngFor="let s of filteredJobs()" (click)="addAspirazioneFromSuggestion(s)">+ {{ s
+          }}</span>
       </div>
     </div>
 
     <!-- Note -->
     <div class="form-section">
       <label class="note-label">Vuoi aggiungere qualcosa? (facoltativo)</label>
-      <textarea
-        [ngModel]="note()"
-        (ngModelChange)="note.set($event)"
+      <textarea [ngModel]="note()" (ngModelChange)="note.set($event)"
         placeholder="Es. Mi piace lavorare in team, vorrei vivere all'estero, sono creativo ma anche analitico…"
-        rows="3"
-        class="text-area"
-      ></textarea>
+        rows="3" class="text-area"></textarea>
     </div>
 
     <!-- Error -->
@@ -151,17 +134,19 @@
     <!-- Actions -->
     <div class="form-actions">
       <button class="btn-ghost" (click)="goToIntro()">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="m15 18-6-6 6-6" />
+        </svg>
         Indietro
       </button>
-      <button
-        class="btn-primary"
-        [class.btn-disabled]="!canSubmit()"
-        [disabled]="!canSubmit()"
-        (click)="getRecommendation()"
-      >
+      <button class="btn-primary" [class.btn-disabled]="!canSubmit()" [disabled]="!canSubmit()"
+        (click)="getRecommendation()">
         Analizza il mio profilo con AI
-        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="m9 18 6-6-6-6" />
+        </svg>
       </button>
     </div>
   </div>
@@ -172,13 +157,15 @@
   <div class="step-content loading-content" *ngIf="step() === 'loading'">
     <div class="loading-icon-wrap">
       <div class="loading-icon">
-        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/>
+        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path
+            d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z" />
         </svg>
       </div>
     </div>
     <h2 class="loading-title">L'AI sta analizzando il tuo profilo…</h2>
-    <p class="loading-sub">Confrontando i tuoi interessi con i 23 corsi del Poliba</p>
+    <p class="loading-sub">Confrontando i tuoi interessi con i 34 corsi del Poliba</p>
     <div class="progress-bar">
       <div class="progress-fill" [style.width.%]="getLoadingPercent()"></div>
     </div>
@@ -202,13 +189,10 @@
     <div class="course-card">
       <div class="course-card-top">
         <div class="course-info">
-          <span
-            class="dept-badge"
-            *ngIf="result()!.courseData"
+          <span class="dept-badge" *ngIf="result()!.courseData"
             [style.background]="getDeptColor(result()!.dipartimento).bg"
             [style.color]="getDeptColor(result()!.dipartimento).text"
-            [style.borderColor]="getDeptColor(result()!.dipartimento).border"
-          >{{ result()!.dipartimento }}</span>
+            [style.borderColor]="getDeptColor(result()!.dipartimento).border">{{ result()!.dipartimento }}</span>
           <h3 class="course-name">{{ result()!.corsoConsigliato }}</h3>
           <div class="course-meta" *ngIf="result()!.courseData">
             <span>{{ result()!.courseData!.tipo }}</span>
@@ -252,7 +236,8 @@
               [class.kpi-badge--neutral]="kpiData()!.giudizio_comparativo.occupazione_vs_media === 'nella media'">
               <span *ngIf="kpiData()!.giudizio_comparativo.delta_occupazione > 0">▲</span>
               <span *ngIf="kpiData()!.giudizio_comparativo.delta_occupazione < 0">▼</span>
-              {{ kpiData()!.giudizio_comparativo.delta_occupazione > 0 ? '+' : '' }}{{ kpiData()!.giudizio_comparativo.delta_occupazione }}% vs media Ateneo
+              {{ kpiData()!.giudizio_comparativo.delta_occupazione > 0 ? '+' : '' }}{{
+              kpiData()!.giudizio_comparativo.delta_occupazione }}% vs media Ateneo
             </div>
           </div>
 
@@ -279,19 +264,21 @@
                 <span class="kpi-timeline-icon">💼</span> {{ kpiData()!.almalaurea.tasso_occupazione_3_anni }}%
               </div>
               <div class="kpi-timeline-stat">
-                <span class="kpi-timeline-icon">💰</span> {{ formatRetribuzione(kpiData()!.almalaurea.retribuzione_netta_media_3_anni || 0) }}€
+                <span class="kpi-timeline-icon">💰</span> {{
+                formatRetribuzione(kpiData()!.almalaurea.retribuzione_netta_media_3_anni || 0) }}€
               </div>
             </div>
-            
+
             <div class="kpi-timeline-divider"></div>
-            
+
             <div class="kpi-timeline-step">
               <div class="kpi-timeline-year">5 Anni</div>
               <div class="kpi-timeline-stat kpi-timeline-stat--highlight">
                 <span class="kpi-timeline-icon">💼</span> {{ kpiData()!.almalaurea.tasso_occupazione_5_anni }}%
               </div>
               <div class="kpi-timeline-stat kpi-timeline-stat--highlight">
-                <span class="kpi-timeline-icon">💰</span> {{ formatRetribuzione(kpiData()!.almalaurea.retribuzione_netta_media_5_anni || 0) }}€
+                <span class="kpi-timeline-icon">💰</span> {{
+                formatRetribuzione(kpiData()!.almalaurea.retribuzione_netta_media_5_anni || 0) }}€
               </div>
             </div>
           </div>
@@ -316,18 +303,18 @@
       </div>
 
       <!-- Impatto Fattori -->
-        <div class="kpi-impact-card">
-          <div class="kpi-impact-icon-wrapper">
-            <span class="kpi-impact-icon">🚀</span>
-          </div>
-          <div class="kpi-impact-content">
-            <h4 class="kpi-impact-title">{{ kpiData()!.almalaurea.impatto_studi_titolo }}</h4>
-            <div class="kpi-impact-main">
-              <span class="kpi-impact-value">{{ kpiData()!.almalaurea.impatto_studi_valore }}</span>
-              <span class="kpi-impact-desc">{{ kpiData()!.almalaurea.impatto_studi_descrizione }}</span>
-            </div>
+      <div class="kpi-impact-card">
+        <div class="kpi-impact-icon-wrapper">
+          <span class="kpi-impact-icon">🚀</span>
+        </div>
+        <div class="kpi-impact-content">
+          <h4 class="kpi-impact-title">{{ kpiData()!.almalaurea.impatto_studi_titolo }}</h4>
+          <div class="kpi-impact-main">
+            <span class="kpi-impact-value">{{ kpiData()!.almalaurea.impatto_studi_valore }}</span>
+            <span class="kpi-impact-desc">{{ kpiData()!.almalaurea.impatto_studi_descrizione }}</span>
           </div>
         </div>
+      </div>
     </div>
 
     <!-- KPI Loading state -->
@@ -376,44 +363,31 @@
       <div class="radar-chart-wrapper">
         <svg viewBox="0 0 300 300" class="radar-svg">
           <!-- Grid circles -->
-          <polygon [attr.points]="getRadarGridPoints(25)" class="radar-grid"/>
-          <polygon [attr.points]="getRadarGridPoints(50)" class="radar-grid"/>
-          <polygon [attr.points]="getRadarGridPoints(75)" class="radar-grid"/>
-          <polygon [attr.points]="getRadarGridPoints(100)" class="radar-grid"/>
+          <polygon [attr.points]="getRadarGridPoints(25)" class="radar-grid" />
+          <polygon [attr.points]="getRadarGridPoints(50)" class="radar-grid" />
+          <polygon [attr.points]="getRadarGridPoints(75)" class="radar-grid" />
+          <polygon [attr.points]="getRadarGridPoints(100)" class="radar-grid" />
 
           <!-- Axes -->
-          <line *ngFor="let area of result()!.areeInteresse; let i = index"
-            x1="150" y1="150"
-            [attr.x2]="getRadarAxisEndX(i)"
-            [attr.y2]="getRadarAxisEndY(i)"
-            class="radar-axis"
-          />
+          <line *ngFor="let area of result()!.areeInteresse; let i = index" x1="150" y1="150"
+            [attr.x2]="getRadarAxisEndX(i)" [attr.y2]="getRadarAxisEndY(i)" class="radar-axis" />
 
           <!-- Data polygon -->
-          <polygon
-            [attr.points]="getRadarPoints(result()!.areeInteresse, chartAnimated())"
-            class="radar-data"
-            [class.radar-data--animated]="chartAnimated()"
-          />
+          <polygon [attr.points]="getRadarPoints(result()!.areeInteresse, chartAnimated())" class="radar-data"
+            [class.radar-data--animated]="chartAnimated()" />
 
           <!-- Data points -->
           <ng-container *ngIf="chartAnimated()">
             <circle *ngFor="let area of result()!.areeInteresse; let i = index"
               [attr.cx]="getRadarAxisEndX(i) * (area.percentuale / 100) + 150 * (1 - area.percentuale / 100)"
-              [attr.cy]="getRadarAxisEndY(i) * (area.percentuale / 100) + 150 * (1 - area.percentuale / 100)"
-              r="4"
-              class="radar-point"
-            />
+              [attr.cy]="getRadarAxisEndY(i) * (area.percentuale / 100) + 150 * (1 - area.percentuale / 100)" r="4"
+              class="radar-point" />
           </ng-container>
 
           <!-- Labels -->
-          <text *ngFor="let area of result()!.areeInteresse; let i = index"
-            [attr.x]="getRadarLabelX(i)"
-            [attr.y]="getRadarLabelY(i)"
-            class="radar-label"
-            text-anchor="middle"
-            dominant-baseline="central"
-          >{{ area.nome }}</text>
+          <text *ngFor="let area of result()!.areeInteresse; let i = index" [attr.x]="getRadarLabelX(i)"
+            [attr.y]="getRadarLabelY(i)" class="radar-label" text-anchor="middle" dominant-baseline="central">{{
+            area.nome }}</text>
         </svg>
       </div>
 
@@ -425,10 +399,7 @@
             <span class="radar-bar-pct">{{ area.percentuale }}%</span>
           </div>
           <div class="radar-bar-track">
-            <div
-              class="radar-bar-fill"
-              [style.width.%]="chartAnimated() ? area.percentuale : 0"
-            ></div>
+            <div class="radar-bar-fill" [style.width.%]="chartAnimated() ? area.percentuale : 0"></div>
           </div>
         </div>
       </div>
@@ -447,12 +418,14 @@
       <button class="btn-ghost btn-half" (click)="reset()">Ricomincia</button>
       <button class="btn-primary btn-half" (click)="openPoliba()">
         Scopri su poliba.it
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" x2="21" y1="14" y2="3"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+          <polyline points="15 3 21 3 21 9" />
+          <line x1="10" x2="21" y1="14" y2="3" />
+        </svg>
       </button>
     </div>
   </div>
 
-  <footer class="advisor-footer">
-    POLITECNICO DI BARI • ORIENTAMENTO UNIVERSITARIO PRO
-  </footer>
 </div>

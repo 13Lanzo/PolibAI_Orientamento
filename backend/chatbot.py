@@ -2,6 +2,7 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from google import genai
+# pyrefly: ignore [missing-import]
 from google.genai import types
 import mysql.connector
 import os
@@ -100,36 +101,58 @@ uploaded_files = []
 markdown_context_parts = []
 try:
     if API_KEY:
+        # Recupera file già caricati su Gemini per evitare caricamenti duplicati e velocizzare l'avvio
+        print("Recupero lista file già caricati su Gemini...")
+        existing_files = {}
+        try:
+            for f in client.files.list():
+                existing_files[f.display_name] = f
+            print(f"Trovati {len(existing_files)} file già caricati su Gemini File API.")
+        except Exception as list_err:
+            print(f"Errore nel recupero della lista file da Gemini API: {list_err}")
+            existing_files = {}
+
         knowledge_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "knowledge")
         if os.path.exists(knowledge_dir):
             for root, dirs, files in os.walk(knowledge_dir):
                 for filename in sorted(files):
                     filepath = os.path.join(root, filename)
                     rel_path = os.path.relpath(filepath, knowledge_dir)
+                    import urllib.parse
+                    safe_name = urllib.parse.quote(filename)
+
                     if filename.lower().endswith(".pdf"):
-                        print(f"Caricamento PDF: {rel_path}...")
-                        import urllib.parse
-                        safe_name = urllib.parse.quote(filename)
-                        file_ref = client.files.upload(file=filepath, config={'display_name': safe_name})
-                        uploaded_files.append(file_ref)
-                        print(f"-> Caricato come URI: {file_ref.uri}")
+                        if safe_name in existing_files:
+                            print(f"PDF già presente su Gemini: {rel_path} (riutilizzo)...")
+                            uploaded_files.append(existing_files[safe_name])
+                        else:
+                            print(f"Caricamento PDF: {rel_path}...")
+                            try:
+                                file_ref = client.files.upload(file=filepath, config={'display_name': safe_name})
+                                uploaded_files.append(file_ref)
+                                print(f"-> Caricato come URI: {file_ref.uri}")
+                            except Exception as upload_err:
+                                print(f"-> Upload PDF fallito ({upload_err}). Il file non sarà disponibile nella knowledge base.")
                     elif filename.lower().endswith((".md", ".json")):
                         ext = "MD" if filename.lower().endswith(".md") else "JSON"
                         mime = "text/plain" if filename.lower().endswith(".md") else "application/json"
-                        print(f"Caricamento {ext}: {rel_path}...")
-                        try:
-                            import urllib.parse
-                            safe_name = urllib.parse.quote(filename)
-                            file_ref = client.files.upload(file=filepath, config={'mime_type': mime, 'display_name': safe_name})
-                            uploaded_files.append(file_ref)
-                            print(f"-> Caricato come file API: {file_ref.uri}")
-                        except Exception as upload_err:
-                            print(f"-> Upload file fallito ({upload_err}), caricamento come testo...")
-                            with open(filepath, "r", encoding="utf-8") as f:
-                                content = f.read()
-                            markdown_context_parts.append(f"--- DOCUMENTO {ext}: {rel_path} ---\n{content}\n--- FINE DOCUMENTO ---")
-                            print(f"-> Caricato come testo ({len(content)} caratteri)")
-        print(f"\nTotale: {len(uploaded_files)} file caricati via API + {len(markdown_context_parts)} testi fallback.")
+                        
+                        if safe_name in existing_files:
+                            print(f"File {ext} già presente su Gemini: {rel_path} (riutilizzo)...")
+                            uploaded_files.append(existing_files[safe_name])
+                        else:
+                            print(f"Caricamento {ext}: {rel_path}...")
+                            try:
+                                file_ref = client.files.upload(file=filepath, config={'mime_type': mime, 'display_name': safe_name})
+                                uploaded_files.append(file_ref)
+                                print(f"-> Caricato come file API: {file_ref.uri}")
+                            except Exception as upload_err:
+                                print(f"-> Upload file fallito ({upload_err}), caricamento come testo...")
+                                with open(filepath, "r", encoding="utf-8") as f:
+                                    content = f.read()
+                                markdown_context_parts.append(f"--- DOCUMENTO {ext}: {rel_path} ---\n{content}\n--- FINE DOCUMENTO ---")
+                                print(f"-> Caricato come testo ({len(content)} caratteri)")
+        print(f"\nTotale: {len(uploaded_files)} file pronti via API + {len(markdown_context_parts)} testi fallback.")
 except Exception as e:
     print(f"Errore caricamento knowledge: {e}")
 
@@ -149,21 +172,28 @@ try:
                     if not modello_scelto:
                         modello_scelto = m.name
 
-        if modello_scelto:
-            print(f"TROVATO: {modello_scelto}")
+        if not modello_scelto:
+            modello_scelto = "gemini-2.5-flash"
+            print(f"Nessun modello specifico trovato, fallback su: {modello_scelto}")
+        else:
+            print(f"TROVATO E SELEZIONATO: {modello_scelto}")
             
-            initial_history = []
-            if uploaded_files:
-                parts = uploaded_files + ["Questi sono i documenti ufficiali del Politecnico di Bari (PDF, rapporti OPIS, dati AlmaLaurea, Guida dello Studente). Usali come base di conoscenza primaria per rispondere con precisione citando cifre esatte."]
-                parts_converted = [types.Part.from_text(text=p) if isinstance(p, str) else types.Part.from_uri(file_uri=p.uri, mime_type=p.mime_type) for p in parts]
-                initial_history.append(types.Content(role="user", parts=parts_converted))
-                initial_history.append(types.Content(role="model", parts=[types.Part.from_text(text="Ho assimilato tutti i documenti: PDF ufficiali, rapporti OPIS, dati AlmaLaurea e Guida dello Studente. Citerò cifre e percentuali esatte nelle risposte.")]))
-            
-            # Inject Markdown knowledge base (only fallback ones now)
-            if markdown_context_parts:
-                md_text = "\n\n".join(markdown_context_parts)
-                initial_history.append(types.Content(role="user", parts=[types.Part.from_text(text=f"Ecco ulteriori dati testuali da usare come contesto:\n\n{md_text}")]))
-                initial_history.append(types.Content(role="model", parts=[types.Part.from_text(text="Perfetto! Ho assimilato i dati testuali aggiuntivi.")]))
+        initial_history = []
+        if uploaded_files:
+            parts = uploaded_files + ["Questi sono i documenti ufficiali del Politecnico di Bari (PDF, rapporti OPIS, dati AlmaLaurea, Guida dello Studente). Usali come base di conoscenza primaria per rispondere con precisione citando cifre esatte."]
+            parts_converted = [
+                types.Part.from_text(text=p) if isinstance(p, str) 
+                else types.Part(file_data=types.FileData(file_uri=p.uri, mime_type=p.mime_type)) 
+                for p in parts
+            ]
+            initial_history.append(types.Content(role="user", parts=parts_converted))
+            initial_history.append(types.Content(role="model", parts=[types.Part.from_text(text="Ho assimilato tutti i documenti: PDF ufficiali, rapporti OPIS, dati AlmaLaurea e Guida dello Studente. Citerò cifre e percentuali esatte nelle risposte.")]))
+        
+        # Inject Markdown knowledge base (only fallback ones now)
+        if markdown_context_parts:
+            md_text = "\n\n".join(markdown_context_parts)
+            initial_history.append(types.Content(role="user", parts=[types.Part.from_text(text=f"Ecco ulteriori dati testuali da usare come contesto:\n\n{md_text}")]))
+            initial_history.append(types.Content(role="model", parts=[types.Part.from_text(text="Perfetto! Ho assimilato i dati testuali aggiuntivi.")]))
             
             try:
                 config = types.GenerateContentConfig(
@@ -189,6 +219,7 @@ contesto_utente = {"destinazione_pendente": None}
 
 @app.route('/chat', methods=['POST'])
 def chat_endpoint():
+    global contesto_utente
     data = request.json
     messaggio_utente = data.get('message', '')
     if not messaggio_utente: return jsonify({"error": "Messaggio vuoto"}), 400
@@ -213,7 +244,6 @@ def chat_endpoint():
             destinazione = "LabDDV"
             
         if destinazione:
-            global contesto_utente
             contesto_utente = destinazione
             
             return jsonify({
@@ -258,7 +288,7 @@ def chat_endpoint():
         
         percorso_data = get_percorso_from_mysql(chiave_db)
         
-        # Reset contesto (usando global per modificarla correttamente)
+        # Reset contesto
         contesto_utente = None 
         
         if percorso_data:
@@ -286,7 +316,7 @@ def chat_endpoint():
         return jsonify({"error": "Errore AI: Modello non disponibile"}), 500
 
     try:
-        prompt = f"{istruzioni_poliba}\n\nUtente: {messaggio_utente}"
+        prompt = messaggio_utente
         response = chat_session.send_message(message=prompt)
         testo_risposta = response.text
 
@@ -493,7 +523,7 @@ Analizza il mio profilo e consigliami il corso di laurea più adatto al Politecn
         parts = []
         if uploaded_files:
             for p in uploaded_files:
-                parts.append(types.Part.from_uri(file_uri=p.uri, mime_type=p.mime_type))
+                parts.append(types.Part(file_data=types.FileData(file_uri=p.uri, mime_type=p.mime_type)))
         
         # Arricchisci il prompt con i dati KPI disponibili
         kpi_context = ""
