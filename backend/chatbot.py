@@ -9,6 +9,7 @@ import json
 import logging
 import os
 import re
+import unicodedata
 import urllib.parse
 
 try:
@@ -195,9 +196,26 @@ def infer_knowledge_tags(rel_path):
     return tags
 
 
+def safe_display_name(name: str) -> str:
+    """Restituisce un display_name ASCII sicuro per Gemini File API."""
+    normalized = name.replace(os.sep, "/").replace("\\", "/")
+    normalized = unicodedata.normalize("NFKD", normalized)
+    normalized = normalized.encode("ascii", "ignore").decode("ascii")
+    normalized = normalized.replace("/", "__")
+    stem, ext = os.path.splitext(normalized)
+    safe_stem = re.sub(r"[^A-Za-z0-9._-]+", "_", stem)
+    safe_stem = re.sub(r"_+", "_", safe_stem).strip("._-") or "knowledge_file"
+    safe_ext = re.sub(r"[^A-Za-z0-9.]+", "_", ext)
+
+    max_len = 120
+    max_stem_len = max(1, max_len - len(safe_ext))
+    safe_stem = safe_stem[:max_stem_len].rstrip("._-") or "knowledge_file"
+    return f"{safe_stem}{safe_ext}"
+
+
 def stable_display_names(rel_path, filename):
     normalized = rel_path.replace(os.sep, "/")
-    return urllib.parse.quote(normalized, safe=""), urllib.parse.quote(filename)
+    return safe_display_name(normalized), urllib.parse.quote(filename)
 
 
 def load_knowledge_base():
@@ -216,6 +234,7 @@ def load_knowledge_base():
             display_name = getattr(file_obj, "display_name", None)
             if display_name:
                 existing_files[display_name] = file_obj
+                existing_files[safe_display_name(display_name)] = file_obj
         logger.info("File API: trovati %s file gia disponibili.", len(existing_files))
     except Exception as exc:
         logger.warning("File API list non disponibile: %s", exc)
@@ -237,6 +256,8 @@ def load_knowledge_base():
             mime = "text/plain" if lower_name.endswith(".md") else None
             if lower_name.endswith(".json"):
                 mime = "application/json"
+            elif lower_name.endswith(".pdf"):
+                mime = "application/pdf"
 
             try:
                 file_ref = existing_files.get(primary_name) or existing_files.get(legacy_name)
@@ -245,7 +266,8 @@ def load_knowledge_base():
                     if mime:
                         config["mime_type"] = mime
                     logger.info("Upload File API: %s", rel_path)
-                    file_ref = client.files.upload(file=filepath, config=config)
+                    with open(filepath, "rb") as upload_file:
+                        file_ref = client.files.upload(file=upload_file, config=config)
 
                 uploaded_files.append(file_ref)
                 knowledge_items.append({
@@ -684,4 +706,4 @@ Restituisci il JSON valido della raccomandazione."""
 
 
 if __name__ == "__main__":
-    app.run(debug=True, port=5000)
+    app.run(debug=True, port=5000, use_reloader=False)
