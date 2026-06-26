@@ -254,6 +254,8 @@ export class CourseAdvisor {
   }
 
   // --- Radar Chart SVG ---
+  // Le percentuali arrivano dal JSON generato dal modello AI: sono stime visuali
+  // di affinita per il radar chart, non uno scoring deterministico del sistema.
   getRadarPoints(aree: { nome: string; percentuale: number }[], animated: boolean): string {
     if (!aree || aree.length === 0) return '';
     const cx = 150, cy = 150, maxR = 120;

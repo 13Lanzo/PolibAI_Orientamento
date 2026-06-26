@@ -1,482 +1,536 @@
-
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from google import genai
-# pyrefly: ignore [missing-import]
 from google.genai import types
-import mysql.connector
-import os
-import traceback
 from dotenv import load_dotenv
-from kpi_data import get_kpi, get_all_course_ids, get_kpi_summary_for_prompt, find_course_id_by_name, COURSE_KPI
+from kpi_data import get_kpi, get_all_course_ids, get_kpi_summary_for_prompt, find_course_id_by_name
 
-# Carica variabili d'ambiente
+import json
+import logging
+import os
+import re
+import urllib.parse
+
+try:
+    import mysql.connector
+except ImportError:
+    mysql = None
+
+
 load_dotenv()
+
+logging.basicConfig(
+    level=os.getenv("LOG_LEVEL", "INFO").upper(),
+    format="%(asctime)s %(levelname)s [%(name)s] %(message)s",
+)
+logger = logging.getLogger("poliba-orientamento")
 
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}})
 
-# --- CONFIGURAZIONE CHIAVE API ---
 API_KEY = os.getenv("GOOGLE_API_KEY")
-if API_KEY:
-    client = genai.Client(api_key=API_KEY)
-else:
-    print("ERRORE: Chiave API mancante nel file .env")
+client = genai.Client(api_key=API_KEY) if API_KEY else None
+if not client:
+    logger.warning("GOOGLE_API_KEY assente: /chat e /recommend risponderanno con errore controllato.")
+
 
 istruzioni_poliba = """
-# [RUOLO E IDENTITÀ]
-Sei "Poliba Orientamento AI PRO", l'Assistente Virtuale Ufficiale e Raccomandatore dell'Offerta Formativa del Politecnico di Bari (POLIBA). 
-Sei un'Intelligenza Artificiale di nuova generazione: esperta, accogliente, empatica e dotata di capacità avanzate (visione, ricerca in tempo reale, generazione di immagini). 
+Sei Poliba Orientamento AI PRO, assistente locale dimostrativo per orientamento al Politecnico di Bari.
 
-# [OBIETTIVO PRINCIPALE]
-Il tuo scopo è guidare futuri studenti, iscritti, docenti e visitatori. Devi fornire informazioni precisissime su didattica (inclusa la Guida agli Studi 2024/2025 e i nuovi corsi come Ingegneria della Creatività Digitale), servizi, logistica, eventi, tasse ed Erasmus, aiutando gli utenti a prendere decisioni consapevoli sul loro futuro accademico.
-
-# [REGOLE FONDAMENTALI E LIMITI DI DOMINIO]
-1. DOMINIO STRETTO: Rispondi ESCLUSIVAMENTE a domande relative al mondo universitario e al Politecnico di Bari. Se l'utente devia su argomenti esterni, declina con cortesia ed empatia, riportando la conversazione sull'orientamento universitario.
-2. FONTI E DOCUMENTI (RAG): Basa SEMPRE le tue risposte sui documenti ufficiali forniti nel contesto (Guida dello Studente, Regolamenti, Bandi). Estrai con precisione regole, requisiti, CFU ed esami.
-3. ZERO ALLUCINAZIONI E RICERCA WEB: Non inventare MAI scadenze, date o requisiti. Se un'informazione (es. scadenze TOLC-I, avvisi recenti) non è nei tuoi documenti, utilizza l'integrazione Google Search per cercare aggiornamenti in tempo reale sul sito ufficiale "poliba.it". Se ancora non trovi la risposta, invita l'utente a contattare la Segreteria Studenti.
-
-# [UTILIZZO DELLE FUNZIONALITÀ AVANZATE MULTIMODALI]
-- ANALISI PAGELLE/DIPLOMI (Vision): Se l'utente carica l'immagine di una pagella o un documento, analizza i voti, individua le materie in cui eccelle (es. Matematica, Fisica, Disegno) e le sue attitudini. Basandoti su questo, suggerisci 2-3 corsi di laurea del Poliba altamente compatibili, motivando la tua scelta in modo incoraggiante.
-- LETTURA GRAFICI: Se l'utente carica brochure o grafici del Poliba, estrai i dati salienti e spiegali in linguaggio semplice e accessibile.
-- INFOGRAFICHE: Se l'utente richiede un'infografica o se suggerisci un corso di ingegneria, informalo che può visualizzarle tramite i bottoni presenti sotto al tuo messaggio. NON GENERARE MAI nell'output LLM markdown di immagini e NON INCORPORARE MAI testi come "[Mostra Infografica]". L'interfaccia UI si occupa di far comparire i pulsanti automatici per te.
-
-# [ANALISI QUANTITATIVA — DATI OPIS E ALMALAUREA]
-Quando consigli o descrivi un corso di laurea, DEVI includere una sezione "📊 Dati alla mano" che citi cifre esatte estratte dai documenti Markdown forniti (report OPIS e AlmaLaurea).
-In particolare:
-- OPIS: I dati sono espressi come "% Giudizi Negativi" per varie aree (chiarezza docenti, stimolo interesse, carico studio, reperibilità). Una percentuale bassa di giudizi negativi indica un buon risultato.
-- AlmaLaurea: Cita il tasso di occupazione a 1 anno dalla laurea, la retribuzione mensile netta media, la soddisfazione complessiva e i dati di progressione a 5 anni se disponibili.
-- GIUDIZIO COMPARATIVO: Confronta i dati del corso con la media di Ateneo (80.5% occupazione triennale, ~91% magistrale) evidenziando punti di forza e aspetti da considerare.
-- Esempio: "Dai rapporti OPIS, solo il 7.3% degli studenti esprime giudizi negativi sullo stimolo all'interesse, un dato eccellente. AlmaLaurea 2025 registra un tasso di occupazione del 97.5% a un anno."
-
-# [GUIDA E NAVIGAZIONE DEL CAMPUS]
-Agisci come una guida esperta del Campus del Politecnico di Bari.
-- Quando riconosci intenti legati alla navigazione ("dov'è...", "come raggiungo..."), identifica chiaramente la destinazione.
-- Fornisci indicazioni descrittive, logiche e passo-passo (es. "Entrando dall'ingresso principale di Via Orabona...").
-- Specifica SEMPRE l'Edificio (es. "Edificio Q01"), il Dipartimento e, se noto, il Piano o i punti di riferimento vicini (es. Bar, Biblioteca).
-
-# [STILE DI COMUNICAZIONE E FORMATTAZIONE]
-- Tono: Cordiale, istituzionale ma giovanile, ispiratore e amichevole. Dai sempre del "tu" allo studente.
-- Formattazione (Markdown): 
-  * Usa il **grassetto** per evidenziare parole chiave, nomi dei corsi, scadenze e luoghi.
-  * Usa elenchi puntati o numerati per spezzare procedure, requisiti o elenchi di materie.
-  * Mantieni i paragrafi brevi e ariosi per facilitare la lettura, specialmente per chi usa l'interfaccia vocale.
-  * Inserisci emoji coerenti (es. 🎓, 📍, 💡, 📅) per rendere l'interfaccia visivamente più accattivante, senza esagerare.
+Regole principali:
+1. Rispondi solo su Poliba, universita, orientamento, didattica, servizi e logistica del campus.
+2. Usa i documenti forniti tramite Gemini File API come fonte primaria. Questo progetto non usa RAG classica:
+   non ci sono embedding, retriever o vector database.
+3. Non inventare date, bandi, requisiti o scadenze. Se serve informazione aggiornata, usa Google Search e
+   preferisci fonti ufficiali poliba.it. Se l'informazione resta incerta, invita a verificare con gli uffici.
+4. Quando parli di corsi, cita se possibile KPI OPIS/AlmaLaurea dai documenti o da kpi_data.py.
+5. Le mappe del campus sono un modulo legacy opzionale: se non hai dati mappa, rispondi comunque con testo utile.
+6. Rispondi in italiano, con tono chiaro, istituzionale e amichevole.
 """
 
-# =============================================================================
-# DATABASE MYSQL (XAMPP)
-# =============================================================================
-def get_db_connection():
-    try:
-        conn = mysql.connector.connect(
-            host="localhost", user="root", password="", database="poliba_chatbot"
-        )
-        return conn
-    except mysql.connector.Error as err:
-        print(f"Errore MySQL: {err}")
-        return None
-
-def get_percorso_from_mysql(chiave_cercata):
-    conn = get_db_connection()
-    percorso = None
-    if conn:
-        try:
-            cursor = conn.cursor(dictionary=True)
-            cursor.execute("SELECT immagine_url, descrizione FROM mappe WHERE chiave = %s", (chiave_cercata,))
-            row = cursor.fetchone()
-            if row:
-                percorso = {"img": row["immagine_url"], "desc": row["descrizione"]}
-            cursor.close()
-            conn.close()
-        except Exception as e:
-            print(f"Errore Query: {e}")
-    return percorso
 
 # =============================================================================
-# CARICAMENTO KNOWLEDGE BASE (PDF + MD) E INIZIALIZZAZIONE MODELLO
+# MAPPE LEGACY / MYSQL OPZIONALE
 # =============================================================================
-print("Inizializzazione Gemini e caricamento conoscenza...")
-uploaded_files = []
-markdown_context_parts = []
-try:
-    if API_KEY:
-        # Recupera file già caricati su Gemini per evitare caricamenti duplicati e velocizzare l'avvio
-        print("Recupero lista file già caricati su Gemini...")
-        existing_files = {}
-        try:
-            for f in client.files.list():
-                existing_files[f.display_name] = f
-            print(f"Trovati {len(existing_files)} file già caricati su Gemini File API.")
-        except Exception as list_err:
-            print(f"Errore nel recupero della lista file da Gemini API: {list_err}")
-            existing_files = {}
+MAPS_ENABLED = os.getenv("ENABLE_LEGACY_MAPS", "1").lower() not in ("0", "false", "no")
 
-        knowledge_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "knowledge")
-        if os.path.exists(knowledge_dir):
-            for root, dirs, files in os.walk(knowledge_dir):
-                for filename in sorted(files):
-                    filepath = os.path.join(root, filename)
-                    rel_path = os.path.relpath(filepath, knowledge_dir)
-                    import urllib.parse
-                    safe_name = urllib.parse.quote(filename)
+INGRESSI = {
+    "orabona1": "Orabona1",
+    "orabona principale": "Orabona1",
+    "via orabona principale": "Orabona1",
+    "orabona2": "Orabona2",
+    "orabona pedoni": "Orabona2",
+    "via orabona pedoni": "Orabona2",
+    "redavid": "reDavid",
+    "re david": "reDavid",
+    "via re david": "reDavid",
+    "ulpiani": "ulpiani",
+    "celso ulpiani": "ulpiani",
+}
 
-                    if filename.lower().endswith(".pdf"):
-                        if safe_name in existing_files:
-                            print(f"PDF già presente su Gemini: {rel_path} (riutilizzo)...")
-                            uploaded_files.append(existing_files[safe_name])
-                        else:
-                            print(f"Caricamento PDF: {rel_path}...")
-                            try:
-                                file_ref = client.files.upload(file=filepath, config={'display_name': safe_name})
-                                uploaded_files.append(file_ref)
-                                print(f"-> Caricato come URI: {file_ref.uri}")
-                            except Exception as upload_err:
-                                print(f"-> Upload PDF fallito ({upload_err}). Il file non sarà disponibile nella knowledge base.")
-                    elif filename.lower().endswith((".md", ".json")):
-                        ext = "MD" if filename.lower().endswith(".md") else "JSON"
-                        mime = "text/plain" if filename.lower().endswith(".md") else "application/json"
-                        
-                        if safe_name in existing_files:
-                            print(f"File {ext} già presente su Gemini: {rel_path} (riutilizzo)...")
-                            uploaded_files.append(existing_files[safe_name])
-                        else:
-                            print(f"Caricamento {ext}: {rel_path}...")
-                            try:
-                                file_ref = client.files.upload(file=filepath, config={'mime_type': mime, 'display_name': safe_name})
-                                uploaded_files.append(file_ref)
-                                print(f"-> Caricato come file API: {file_ref.uri}")
-                            except Exception as upload_err:
-                                print(f"-> Upload file fallito ({upload_err}), caricamento come testo...")
-                                with open(filepath, "r", encoding="utf-8") as f:
-                                    content = f.read()
-                                markdown_context_parts.append(f"--- DOCUMENTO {ext}: {rel_path} ---\n{content}\n--- FINE DOCUMENTO ---")
-                                print(f"-> Caricato come testo ({len(content)} caratteri)")
-        print(f"\nTotale: {len(uploaded_files)} file pronti via API + {len(markdown_context_parts)} testi fallback.")
-except Exception as e:
-    print(f"Errore caricamento knowledge: {e}")
-
-modello_scelto = None
-chat_session = None
-
-try:
-    if API_KEY:
-        for m in client.models.list():
-            if 'generateContent' in m.supported_actions:
-                if 'gemini-3.1-flash' in m.name:
-                    modello_scelto = m.name
-                    break
-                elif 'gemini-2.5-flash' in m.name:
-                    modello_scelto = m.name
-                elif 'gemini-3-flash-preview' in m.name:
-                    if not modello_scelto:
-                        modello_scelto = m.name
-
-        if not modello_scelto:
-            modello_scelto = "gemini-2.5-flash"
-            print(f"Nessun modello specifico trovato, fallback su: {modello_scelto}")
-        else:
-            print(f"TROVATO E SELEZIONATO: {modello_scelto}")
-            
-        initial_history = []
-        if uploaded_files:
-            parts = uploaded_files + ["Questi sono i documenti ufficiali del Politecnico di Bari (PDF, rapporti OPIS, dati AlmaLaurea, Guida dello Studente). Usali come base di conoscenza primaria per rispondere con precisione citando cifre esatte."]
-            parts_converted = [
-                types.Part.from_text(text=p) if isinstance(p, str) 
-                else types.Part(file_data=types.FileData(file_uri=p.uri, mime_type=p.mime_type)) 
-                for p in parts
-            ]
-            initial_history.append(types.Content(role="user", parts=parts_converted))
-            initial_history.append(types.Content(role="model", parts=[types.Part.from_text(text="Ho assimilato tutti i documenti: PDF ufficiali, rapporti OPIS, dati AlmaLaurea e Guida dello Studente. Citerò cifre e percentuali esatte nelle risposte.")]))
-        
-        # Inject Markdown knowledge base (only fallback ones now)
-        if markdown_context_parts:
-            md_text = "\n\n".join(markdown_context_parts)
-            initial_history.append(types.Content(role="user", parts=[types.Part.from_text(text=f"Ecco ulteriori dati testuali da usare come contesto:\n\n{md_text}")]))
-            initial_history.append(types.Content(role="model", parts=[types.Part.from_text(text="Perfetto! Ho assimilato i dati testuali aggiuntivi.")]))
-            
-            try:
-                config = types.GenerateContentConfig(
-                    system_instruction=istruzioni_poliba,
-                    tools=[{"google_search": {}}]
-                )
-                chat_session = client.chats.create(model=modello_scelto, config=config, history=initial_history)
-            except Exception as e:
-                print("Supporto system_instruction/tools assente. Fallback standard.")
-                config = types.GenerateContentConfig(
-                    tools=[{"google_search": {}}]
-                )
-                initial_history.insert(0, types.Content(role="user", parts=[types.Part.from_text(text=istruzioni_poliba)]))
-                initial_history.insert(1, types.Content(role="model", parts=[types.Part.from_text(text="Ricevuto. Seguirò queste istruzioni alla lettera.")]))
-                chat_session = client.chats.create(model=modello_scelto, config=config, history=initial_history)
-        else:
-            print("NESSUN MODELLO TROVATO.")
-except Exception as e:
-    print(f"Errore ricerca modelli: {e}")
+MAP_KEY_ALIASES = {
+    "ufficio_mongiello_Orabona": "ufficio_mongiello_Orabona1",
+    "ufficio_mongiello_orabona1": "ufficio_mongiello_Orabona1",
+}
 
 contesto_utente = {"destinazione_pendente": None}
 
 
-@app.route('/chat', methods=['POST'])
-def chat_endpoint():
-    global contesto_utente
-    data = request.json
-    messaggio_utente = data.get('message', '')
-    if not messaggio_utente: return jsonify({"error": "Messaggio vuoto"}), 400
+def get_db_connection():
+    """Connessione al database mappe legacy.
 
-    print(f"Domanda: {messaggio_utente}")
+    Chatbot e Course Advisor non dipendono da MySQL: se XAMPP non e' attivo,
+    il modulo mappe fallisce in modo controllato senza bloccare gli endpoint AI.
+    """
+    if not MAPS_ENABLED:
+        return None
+    if mysql is None:
+        logger.warning("mysql-connector-python non installato: mappe legacy disattivate.")
+        return None
+    try:
+        return mysql.connector.connect(
+            host=os.getenv("MYSQL_HOST", "localhost"),
+            user=os.getenv("MYSQL_USER", "root"),
+            password=os.getenv("MYSQL_PASSWORD", ""),
+            database=os.getenv("MYSQL_DATABASE", "poliba_chatbot"),
+        )
+    except mysql.connector.Error as err:
+        logger.warning("MySQL mappe non disponibile: %s", err)
+        return None
+
+
+def get_percorso_from_mysql(chiave_cercata):
+    """Legge un percorso legacy senza propagare errori al flusso principale."""
+    key = MAP_KEY_ALIASES.get(chiave_cercata, chiave_cercata)
+    conn = get_db_connection()
+    if not conn:
+        return None
+
+    try:
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("SELECT immagine_url, descrizione FROM mappe WHERE chiave = %s", (key,))
+        row = cursor.fetchone()
+        cursor.close()
+        conn.close()
+        if row:
+            return {"img": row["immagine_url"], "desc": row["descrizione"]}
+    except Exception as exc:
+        logger.exception("Errore query mappe legacy per chiave %s: %s", key, exc)
+    return None
+
+
+def parse_destination(text):
+    lower = text.lower()
+    if any(k in lower for k in ["biblioteca", "library", "polilibrary"]):
+        return "poliLibrary"
+    if "mongiello" in lower:
+        return "mongiello"
+    if any(k in lower for k in ["elettronica", "de venuto", "labddv", "laboratorio ddv"]):
+        return "LabDDV"
+    return None
+
+
+def parse_ingresso(text):
+    normalized = text.lower().replace("_", " ").replace("-", " ")
+    compact = normalized.replace(" ", "")
+    for needle, value in INGRESSI.items():
+        if needle in normalized or needle.replace(" ", "") in compact:
+            return value
+    return None
+
+
+def build_map_key(dest, start):
+    if dest == "poliLibrary":
+        if start in ("Orabona1", "Orabona2"):
+            return "mappa_campus_poliLibrary_Orabona"
+        if start == "reDavid":
+            return "mappa_campus_poliLibrary_reDavid"
+        return "mappa_campus_poliLibrary"
+    if dest == "mongiello":
+        return f"ufficio_mongiello_{start}"
+    if dest == "LabDDV":
+        return f"immagine_campus_LabDDV_{start}"
+    return None
+
+
+# =============================================================================
+# KNOWLEDGE BASE VIA GEMINI FILE API
+# =============================================================================
+uploaded_files = []
+markdown_context_parts = []
+knowledge_items = []
+
+COURSE_HINTS = {
+    "informatica": ["informatica", "automazione", "computer"],
+    "automazione": ["automazione", "robotics", "robotica"],
+    "elettronica": ["elettronica", "electronics", "telecomunicazioni"],
+    "gestionale": ["gestionale", "management"],
+    "meccanica": ["meccanica", "mechanical"],
+    "civile": ["civile", "ambientale", "costruzioni"],
+    "edile": ["edile"],
+    "elettrica": ["elettrica", "energy"],
+    "design": ["design", "creativita", "creativita digitale"],
+    "architettura": ["architettura", "architecture"],
+    "aerospaziale": ["aerospaziale", "aereospaziale"],
+    "medicali": ["medicali", "biomedica", "biomedical"],
+}
+
+
+def infer_knowledge_tags(rel_path):
+    lower = rel_path.lower()
+    tags = set()
+    if "guida" in lower:
+        tags.add("guide")
+    if "almalaurea" in lower or "occupazionale" in lower:
+        tags.add("almalaurea")
+    if "opis" in lower or "recensioni" in lower:
+        tags.add("opis")
+    if "triennale" in lower:
+        tags.add("triennale")
+    if "magistrale" in lower:
+        tags.add("magistrale")
+    for tag, hints in COURSE_HINTS.items():
+        if any(h in lower for h in hints):
+            tags.add(tag)
+    return tags
+
+
+def stable_display_names(rel_path, filename):
+    normalized = rel_path.replace(os.sep, "/")
+    return urllib.parse.quote(normalized, safe=""), urllib.parse.quote(filename)
+
+
+def load_knowledge_base():
+    """Carica o riusa documenti via Gemini File API.
+
+    Architettura: document-grounded generation con File API. I file vengono
+    referenziati direttamente nelle richieste al modello; non ci sono embedding,
+    chunk retrieval o vector database.
+    """
+    if not client:
+        return
+
+    existing_files = {}
+    try:
+        for file_obj in client.files.list():
+            display_name = getattr(file_obj, "display_name", None)
+            if display_name:
+                existing_files[display_name] = file_obj
+        logger.info("File API: trovati %s file gia disponibili.", len(existing_files))
+    except Exception as exc:
+        logger.warning("File API list non disponibile: %s", exc)
+
+    knowledge_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "knowledge")
+    if not os.path.exists(knowledge_dir):
+        logger.warning("Cartella knowledge non trovata: %s", knowledge_dir)
+        return
+
+    for root, _dirs, files in os.walk(knowledge_dir):
+        for filename in sorted(files):
+            if not filename.lower().endswith((".pdf", ".md", ".json")):
+                continue
+
+            filepath = os.path.join(root, filename)
+            rel_path = os.path.relpath(filepath, knowledge_dir)
+            primary_name, legacy_name = stable_display_names(rel_path, filename)
+            lower_name = filename.lower()
+            mime = "text/plain" if lower_name.endswith(".md") else None
+            if lower_name.endswith(".json"):
+                mime = "application/json"
+
+            try:
+                file_ref = existing_files.get(primary_name) or existing_files.get(legacy_name)
+                if not file_ref:
+                    config = {"display_name": primary_name}
+                    if mime:
+                        config["mime_type"] = mime
+                    logger.info("Upload File API: %s", rel_path)
+                    file_ref = client.files.upload(file=filepath, config=config)
+
+                uploaded_files.append(file_ref)
+                knowledge_items.append({
+                    "rel_path": rel_path,
+                    "tags": infer_knowledge_tags(rel_path),
+                    "file_ref": file_ref,
+                    "fallback_text": None,
+                })
+            except Exception as exc:
+                logger.warning("Upload File API fallito per %s: %s", rel_path, exc)
+                if lower_name.endswith((".md", ".json")):
+                    try:
+                        with open(filepath, "r", encoding="utf-8") as handle:
+                            content = handle.read()
+                        fallback = f"--- DOCUMENTO: {rel_path} ---\n{content}\n--- FINE DOCUMENTO ---"
+                        markdown_context_parts.append(fallback)
+                        knowledge_items.append({
+                            "rel_path": rel_path,
+                            "tags": infer_knowledge_tags(rel_path),
+                            "file_ref": None,
+                            "fallback_text": fallback,
+                        })
+                    except Exception as read_exc:
+                        logger.warning("Fallback testuale fallito per %s: %s", rel_path, read_exc)
+
+    logger.info(
+        "Knowledge pronta: %s file File API, %s fallback testuali.",
+        len(uploaded_files),
+        len(markdown_context_parts),
+    )
+
+
+def select_knowledge_items(message, purpose="chat", limit=10):
+    """Intent routing leggero.
+
+    Questa euristica sceglie pochi documenti utili per ridurre latenza e contesto.
+    Non e' RAG classica: non calcola embedding e non interroga un vector database.
+    """
+    if not knowledge_items:
+        return []
+
+    text = (message or "").lower()
+    wanted_tags = set()
+    if any(k in text for k in ["tolc", "iscrizion", "tass", "cfu", "bando", "erasmus", "segreteria", "guida"]):
+        wanted_tags.add("guide")
+    if any(k in text for k in ["lavor", "occupazione", "stipend", "almalaurea", "retribuzione"]):
+        wanted_tags.add("almalaurea")
+    if any(k in text for k in ["opinione", "opis", "studenti", "soddisfazione", "docenti"]):
+        wanted_tags.add("opis")
+    if any(k in text for k in ["magistrale", "specializz", "gia laureato"]):
+        wanted_tags.add("magistrale")
+    if any(k in text for k in ["triennale", "diploma", "liceo", "scuola"]):
+        wanted_tags.add("triennale")
+    if purpose == "recommend":
+        wanted_tags.update({"almalaurea", "opis"})
+
+    for tag, hints in COURSE_HINTS.items():
+        if any(h in text for h in hints):
+            wanted_tags.add(tag)
+
+    tokens = [token for token in re.findall(r"[a-zA-Z0-9]+", text) if len(token) > 3]
+    scored = []
+    for item in knowledge_items:
+        rel_lower = item["rel_path"].lower()
+        score = len(item["tags"] & wanted_tags) * 5
+        score += sum(1 for token in tokens if token in rel_lower)
+        if "guide" in item["tags"]:
+            score += 1
+        if purpose == "recommend" and ("almalaurea" in item["tags"] or "opis" in item["tags"]):
+            score += 2
+        scored.append((score, item))
+
+    selected = [item for score, item in sorted(scored, key=lambda row: row[0], reverse=True) if score > 0]
+    if not selected:
+        selected = [item for item in knowledge_items if "guide" in item["tags"]][:2]
+    return selected[:limit]
+
+
+def build_context_parts(message, purpose="chat", limit=10):
+    parts = []
+    selected = select_knowledge_items(message, purpose=purpose, limit=limit)
+    for item in selected:
+        file_ref = item.get("file_ref")
+        if file_ref:
+            parts.append(types.Part(file_data=types.FileData(file_uri=file_ref.uri, mime_type=file_ref.mime_type)))
+        elif item.get("fallback_text"):
+            parts.append(types.Part.from_text(text=item["fallback_text"]))
+    logger.info("Contesto %s: %s documenti selezionati.", purpose, len(selected))
+    return parts
+
+
+def select_model():
+    if not client:
+        return None
+    selected = None
+    try:
+        for model in client.models.list():
+            if "generateContent" not in model.supported_actions:
+                continue
+            if "gemini-3.1-flash" in model.name:
+                return model.name
+            if "gemini-2.5-flash" in model.name:
+                selected = model.name
+            elif "gemini-3-flash-preview" in model.name and not selected:
+                selected = model.name
+    except Exception as exc:
+        logger.warning("Lista modelli Gemini non disponibile: %s", exc)
+    return selected or ("gemini-2.5-flash" if client else None)
+
+
+def generate_with_gemini(user_prompt, system_instruction, purpose="chat", context_limit=10, use_search=True):
+    """Generazione stateless con documenti File API selezionati per richiesta."""
+    if not client or not modello_scelto:
+        raise RuntimeError("Modello Gemini non disponibile")
+
+    parts = build_context_parts(user_prompt, purpose=purpose, limit=context_limit)
+    parts.append(types.Part.from_text(text=user_prompt))
+
+    config_kwargs = {"system_instruction": system_instruction}
+    if use_search:
+        config_kwargs["tools"] = [{"google_search": {}}]
+
+    try:
+        config = types.GenerateContentConfig(**config_kwargs)
+        return client.models.generate_content(model=modello_scelto, contents=parts, config=config)
+    except TypeError:
+        logger.warning("GenerateContentConfig non supporta tutti i parametri: fallback senza tool.")
+        return client.models.generate_content(model=modello_scelto, contents=parts)
+
+
+load_knowledge_base()
+modello_scelto = select_model()
+if modello_scelto:
+    logger.info("Modello Gemini selezionato: %s", modello_scelto)
+else:
+    logger.warning("Nessun modello Gemini disponibile.")
+
+
+# =============================================================================
+# CHATBOT
+# =============================================================================
+INFOGRAFICA_KEYWORDS = [
+    (["informatica", "automazione"], "IIA"),
+    (["creativita digitale"], "ICD"),
+    (["elettronica", "tecnologie internet"], "IETI"),
+    (["civile", "ambientale e territoriale"], "ICIVAMB"),
+    (["edile"], "IEDILE"),
+    (["elettrica"], "IELE"),
+    (["gestionale"], "IGEST"),
+    (["meccanica"], "IMEC"),
+    (["sistemi navali", "industriale"], "INAVAL"),
+    (["medical", "sistemi medici", "lm-21", "lm21"], "IMED"),
+    (["aerospazial", "sistemi aerospaziali"], "IAERO"),
+    (["architettura", "lm-4", "lm4"], "ARCH"),
+    (["design", "l4", "l-4"], "LDES"),
+    (["costruzioni", "l-p01", "lp01", "laurea politecnica"], "LPOL"),
+]
+
+
+@app.route("/chat", methods=["POST"])
+def chat_endpoint():
+    data = request.get_json(silent=True) or {}
+    messaggio_utente = (data.get("message") or "").strip()
+    if not messaggio_utente:
+        return jsonify({"error": "Messaggio vuoto"}), 400
+
+    logger.info("[CHAT] Domanda ricevuta: %s", messaggio_utente[:200])
     messaggio_lower = messaggio_utente.lower()
 
-
-    # =============================================================================
-    # LOGICA MAPPE SPECIALIZZATA
-    # =============================================================================
-    
-    # A. IDENTIFICAZIONE LUOGO
-    if "dove" in messaggio_lower or "dov'è" in messaggio_lower or "posizione" in messaggio_lower or "come arrivo" in messaggio_lower:
-        destinazione = None
-        
-        if "biblioteca" in messaggio_lower or "library" in messaggio_lower:
-            destinazione = "poliLibrary"
-        elif "mongiello" in messaggio_lower:
-            destinazione = "mongiello"
-        elif "elettronica" in messaggio_lower or "de venuto" in messaggio_lower or "labddv" in messaggio_lower:
-            destinazione = "LabDDV"
-            
+    if any(k in messaggio_lower for k in ["dove", "dov'e", "dov'e'", "posizione", "come arrivo", "raggiungo"]):
+        destinazione = parse_destination(messaggio_utente)
         if destinazione:
-            contesto_utente = destinazione
-            
+            contesto_utente["destinazione_pendente"] = destinazione
             return jsonify({
                 "response": f"Per raggiungere {destinazione}, da quale ingresso accedi?",
-                "type": "options", 
+                "type": "options",
                 "options": [
-                    {"label": "📍 Via Orabona (Principale)", "value": "Orabona1"},
-                    {"label": "📍 Via Orabona (Pedoni)", "value": "Orabona2"},
-                    {"label": "📍 Via Re David", "value": "reDavid"},
-                    {"label": "📍 Via Celso Ulpiani", "value": "ulpiani"}
-                ]
+                    {"label": "Via Orabona (Principale)", "value": "Orabona1"},
+                    {"label": "Via Orabona (Pedoni)", "value": "Orabona2"},
+                    {"label": "Via Re David", "value": "reDavid"},
+                    {"label": "Via Celso Ulpiani", "value": "ulpiani"},
+                ],
             })
 
-    # B. GESTIONE RISPOSTA BOTTONI
-    ingressi_noti = ["Orabona1", "Orabona2", "reDavid", "ulpiani"]
-    
-    # Cerca se nel messaggio c'è un valore noto (es. value del bottone)
-    # Nota: Angular manda il 'value' (es. Orabona1), quindi cerchiamo quello
-    ingresso_trovato = next((i for i in ingressi_noti if i.lower() in messaggio_lower), None)
-
-    # Verifica se 'contesto_utente' è una stringa (la destinazione)
-    destinazione_salvata = contesto_utente if isinstance(contesto_utente, str) else None
-
+    ingresso_trovato = parse_ingresso(messaggio_utente)
+    destinazione_salvata = contesto_utente.get("destinazione_pendente")
     if ingresso_trovato and destinazione_salvata:
-        start = ingresso_trovato
-        dest = destinazione_salvata
-        chiave_db = ""
+        chiave_db = build_map_key(destinazione_salvata, ingresso_trovato)
+        logger.info("[MAPPE] Cerco chiave legacy: %s", chiave_db)
+        contesto_utente["destinazione_pendente"] = None
 
-        # --- COSTRUZIONE CHIAVI ---
-        if dest == "poliLibrary":
-            if "Orabona" in start: chiave_db = "mappa_campus_poliLibrary_Orabona"
-            elif "reDavid" in start: chiave_db = "mappa_campus_poliLibrary_reDavid"
-            else: chiave_db = "mappa_campus_poliLibrary" # Fallback
-
-        elif dest == "mongiello":
-            chiave_db = f"ufficio_mongiello_{start}"
-
-        elif dest == "LabDDV":
-            chiave_db = f"immagine_campus_LabDDV_{start}"
-
-        print(f"Cerco chiave: {chiave_db}")
-        
-        percorso_data = get_percorso_from_mysql(chiave_db)
-        
-        # Reset contesto
-        contesto_utente = None 
-        
+        percorso_data = get_percorso_from_mysql(chiave_db) if chiave_db else None
         if percorso_data:
             return jsonify({
                 "response": percorso_data["desc"],
                 "type": "map",
                 "mapUrl": percorso_data["img"],
-                "mapTitle": f"Percorso per {dest}"
+                "mapTitle": f"Percorso per {destinazione_salvata}",
             })
-        else:
-            return jsonify({
-                "response": f"Non ho una mappa specifica per questo percorso ({start} -> {dest}). Prova un altro ingresso.", 
-                "type": "text"
-            })
-
-    # =============================================================================
-    # LOGICA AI 
-    # =============================================================================
-    if messaggio_lower.strip() in ["mostra infografica", "infografica", "mostrami l'infografica", "voglio vedere l'infografica"]:
         return jsonify({
-            "response": "Per poterti mostrare l'infografica esatta, ho bisogno di sapere a quale **Corso di Laurea** ti riferisci. Inserisci il nome del corso (es. 'Mostra infografica Ingegneria Gestionale').",
-            "type": "text"
+            "response": (
+                "Non ho trovato una mappa legacy funzionante per questo percorso. "
+                "Il chatbot resta disponibile: posso comunque darti indicazioni testuali sul campus."
+            ),
+            "type": "text",
         })
-    if not modello_scelto or not chat_session:
-        return jsonify({"error": "Errore AI: Modello non disponibile"}), 500
+
+    if messaggio_lower in ["mostra infografica", "infografica", "mostrami l'infografica", "voglio vedere l'infografica"]:
+        return jsonify({
+            "response": "Dimmi il nome del corso, per esempio: Mostra infografica Ingegneria Gestionale.",
+            "type": "text",
+        })
+
+    if not modello_scelto:
+        return jsonify({"error": "Errore AI: modello non disponibile"}), 500
 
     try:
-        prompt = messaggio_utente
-        response = chat_session.send_message(message=prompt)
-        testo_risposta = response.text
-
-        # =============================================================================
-        # AGGIUNTA ID INFOGRAFICA ALLA RISPOSTA
-        # =============================================================================
+        response = generate_with_gemini(messaggio_utente, istruzioni_poliba, purpose="chat", context_limit=8)
+        testo_risposta = (response.text or "").strip()
         testo_lower = testo_risposta.lower()
-        
-        mapping_keywords = [
-            (["informatica", "automazione"], "IIA"),
-            (["creatività digitale", "creativita digitale"], "ICD"),
-            (["elettronica", "tecnologie internet"], "IETI"),
-            (["civile", "ambientale e territoriale"], "ICIVAMB"),
-            (["edile"], "IEDILE"),
-            (["elettrica"], "IELE"),
-            (["gestionale"], "IGEST"),
-            (["meccanica"], "IMEC"),
-            (["sistemi navali", "industriale"], "INAVAL"),
-            (["medical", "sistemi medici", "lm-21", "lm21"], "IMED"),
-            (["aerospazial", "sistemi aerospaziali"], "IAERO"),
-            (["architettura", "lm-4", "lm4"], "ARCH"),
-            (["design", "l4", "l-4"], "LDES"),
-            (["costruzioni", "ambientale", "l-p01", "lp01", "laurea politecnica"], "LPOL")
-        ]
-        
-        infografica_selezionata = None
-        for kws, infografica_id in mapping_keywords:
-            if any(kw in testo_lower for kw in kws):
-                infografica_selezionata = infografica_id
+        infografica_id = None
+        for keywords, candidate_id in INFOGRAFICA_KEYWORDS:
+            if any(keyword in testo_lower for keyword in keywords):
+                infografica_id = candidate_id
                 break
 
-        print(f"Risposta AI inviata. Infografica ID: {infografica_selezionata}")
-        risposta_json = {
+        payload = {
             "response": testo_risposta,
             "type": "text",
-            "options": []
+            "options": [],
         }
-        if infografica_selezionata:
-            risposta_json["infograficaId"] = infografica_selezionata
-            
-        return jsonify(risposta_json)
-    except Exception as e:
-        errore = str(e)
-        print(f"Errore AI: {errore}")
+        if infografica_id:
+            payload["infograficaId"] = infografica_id
+        return jsonify(payload)
+    except Exception as exc:
+        errore = str(exc)
+        logger.exception("[CHAT] Errore AI: %s", errore)
         if "429" in errore:
             return jsonify({"response": "Troppe richieste. Riprova tra poco.", "type": "text"}), 200
-        return jsonify({"response": "Errore AI generico.", "type": "text"}), 500
+        return jsonify({"response": "Errore AI durante la generazione della risposta.", "type": "text"}), 500
 
 
 # =============================================================================
-# ENDPOINT: ANALISI KPI CORSO (/analysis)
+# ANALISI KPI
 # =============================================================================
-
-@app.route('/analysis', methods=['GET'])
+@app.route("/analysis", methods=["GET"])
 def analysis_endpoint():
-    """Restituisce i KPI strutturati per un dato course_id."""
-    course_id = request.args.get('course_id', '').strip().upper()
-
+    """Restituisce i KPI strutturati per un dato course_id da kpi_data.py."""
+    course_id = request.args.get("course_id", "").strip().upper()
     if not course_id:
         return jsonify({
             "error": "Parametro 'course_id' mancante.",
-            "available_ids": get_all_course_ids()
+            "available_ids": get_all_course_ids(),
         }), 400
 
     data = get_kpi(course_id)
     if not data:
         return jsonify({
             "error": f"Corso '{course_id}' non trovato nel database KPI.",
-            "available_ids": get_all_course_ids()
+            "available_ids": get_all_course_ids(),
         }), 404
-
     return jsonify(data)
 
 
 # =============================================================================
-# ENDPOINT: RACCOMANDAZIONE CORSO (Course Advisor AI)
+# COURSE ADVISOR
 # =============================================================================
-
 istruzioni_advisor = """
-Sei un orientatore universitario esperto del Politecnico di Bari (Poliba). Il tuo compito è analizzare gli interessi e le aspirazioni lavorative di uno studente e raccomandare il corso di laurea più adatto tra quelli offerti dal Poliba.
+Sei un orientatore universitario esperto del Politecnico di Bari.
+Raccomanda un solo corso tra quelli del Poliba, distinguendo con attenzione triennale e magistrale.
 
-Ecco i corsi disponibili al Poliba (A.A. 2024-2025):
+Usa kpi_data.py e i documenti File API come contesto quantitativo. Le percentuali in areeInteresse servono
+solo per il radar chart UI: sono stime generate dal modello sull'affinita percepita, non uno scoring
+deterministico e non una misura ufficiale.
 
-=== CORSI TRIENNALI (3 anni, primo livello, per chi ha il diploma) ===
-- Architecture Sciences for Heritage (Triennale, L17, Dipartimento: ARCOD, in inglese, NUOVO)
-- Design (Triennale, L4, Dipartimento: ARCOD)
-- Costruzioni e Gestione Ambientale e Territoriale (Triennale Professionalizzante, L-P01, Dipartimento: DICATECh)
-- Ingegneria Civile e Ambientale (Triennale, L7, Dipartimento: DICATECh)
-- Ingegneria Edile (Triennale, L7, Dipartimento: DICATECh)
-- Ingegneria Gestionale (Triennale, L9, Dipartimento: DMMM)
-- Ingegneria Meccanica (Triennale, L9, Dipartimento: DMMM)
-- Management Engineering for Innovation (Triennale, L9, Dipartimento: DMMM, in inglese, NUOVO)
-- Ingegneria Industriale e dei Sistemi Navali (Triennale, L9, Dipartimento: DMMM)
-- Ingegneria Elettrica (Triennale, L9, Dipartimento: DEI)
-- Ingegneria dei Sistemi Aerospaziali (Triennale, L8, Dipartimento: DEI)
-- Ingegneria dei Sistemi Medicali (Triennale, L8, Dipartimento: DEI)
-- Ingegneria Informatica e dell'Automazione (Triennale, L8, Dipartimento: DEI)
-- Ingegneria Elettronica e delle Tecnologie Internet (Triennale, L8, Dipartimento: DEI)
-- Ingegneria della Creatività Digitale (Triennale, L8, Dipartimento: DEI, NUOVO)
-
-=== CORSI MAGISTRALI (2 anni, secondo livello, specializzanti, quasi tutti in inglese) ===
-- Architettura (Magistrale a Ciclo Unico 5 anni, LM4, Dipartimento: ARCOD)
-- Industrial Design (Magistrale, LM12, Dipartimento: ARCOD, in inglese)
-- Ingegneria della Mobilità Sostenibile (Magistrale, LM26, Dipartimento: DICATECh)
-- Energy Engineering (Magistrale, LM30, Dipartimento: DEI, in inglese)
-- Automation and Robotics Engineering (Magistrale, LM32, Dipartimento: DEI, in inglese)
-- Computer Engineering (Magistrale, LM32, Dipartimento: DEI, in inglese)
-- Electronics Engineering (Magistrale, LM29, Dipartimento: DEI, in inglese)
-- Telecommunication and Internet Technologies Engineering (Magistrale, LM27, Dipartimento: DEI, in inglese)
-
-=== REGOLE PER LA SCELTA TRA TRIENNALE E MAGISTRALE ===
-Questa è la regola PIÙ IMPORTANTE del sistema. Devi distinguere SEMPRE quando consigliare una triennale o una magistrale.
-
-✅ Consiglia una LAUREA TRIENNALE se:
-- Lo studente esprime interessi generici da liceale (es. "mi piace la matematica", "voglio diventare ingegnere", "amo la fisica")
-- Lo studente sembra non avere ancora una laurea
-- La richiesta è di base, introduttiva o esplorativa
-
-✅ Consiglia una LAUREA MAGISTRALE se:
-- Lo studente menziona argomenti AVANZATI o SPECIALIZZANTI:
-  * "robotica industriale", "AI avanzata", "machine learning", "deep learning"
-  * "cybersecurity", "cloud computing", "big data"
-  * "ricercatore", "dottorato", "R&D"
-  * "gestione aziendale strategica", "consulenza direzionale", "project management avanzato"
-  * "progettazione avanzata dispositivi medici", "ingegneria clinica"
-  * "telecomunicazioni 5G/6G", "reti avanzate"
-  * "energia rinnovabile avanzata", "smart grid"
-  * "mobilità sostenibile", "trasporti intelligenti"
-  * "design industriale avanzato", "product design", "UX research"
-  * "elettronica embedded", "IoT avanzato", "VLSI"
-- Lo studente dice di avere GIÀ una laurea triennale
-- Lo studente parla di "specializzarsi", "approfondire", "livello avanzato"
-- Lo studente chiede lavori che tipicamente richiedono una magistrale (es. ruoli dirigenziali, ricerca, ingegneria senior)
-
-IMPORTANTE: Le lauree magistrali del Poliba hanno dati occupazionali ECCELLENTI:
-- Automation & Robotics: 96% occupazione a 1 anno, 1.803€/mese, 100% a 5 anni con 2.319€/mese
-- Electronics Engineering: 100% occupazione, 1.626€/mese al 1° anno, 2.304€ a 5 anni
-- Ingegneria Elettrica Magistrale: 100% a 5 anni, 2.103€/mese
-- Ingegneria Gestionale Magistrale: 90.3% a 1 anno, 98% a 5 anni, soddisfazione 96.3%
-- Ingegneria Civile Magistrale: soddisfazione 96.4%, uso competenze 80% a 5 anni
-
-INFORMAZIONI CHIAVE SUL POLIBA:
-- 11.000 studenti, 97.7% occupati a 5 anni dalla laurea magistrale
-- Sede principale a Bari, sedi a Taranto, Foggia, Brindisi
-- Double Degree con NYU, Cranfield, NJ Tech, Illinois Tech, Grenoble, Côte d'Azur
-- 6 corsi magistrali in inglese, Erasmus+ con 40+ università
-- #9 top 10 italiano per Architettura & Design (QS Rankings 2024)
-- Career Service con 500+ aziende partner, Career Fair annuale
-- 5 dipartimenti: ARCOD (Architettura), DICATECh (Civile), DMMM (Meccanica/Management), DEI (Informatica/Elettronica/Energia)
-
-Rispondi SEMPRE in italiano con questo formato JSON esatto (SOLO il JSON, nessun testo aggiuntivo, nessun blocco markdown):
+Rispondi solo con JSON valido, senza markdown, con questo schema:
 {
-  "corsoConsigliato": "Nome esatto del corso dalla lista sopra",
-  "dipartimento": "Codice dipartimento (ARCOD, DICATECh, DMMM, DEI)",
-  "motivazione": "2-3 frasi che spiegano perché questo corso è perfetto per lo studente, usando un tono entusiasmante e personale. CITA SEMPRE almeno 1-2 cifre occupazionali/salariali dai dati AlmaLaurea.",
+  "corsoConsigliato": "Nome corso",
+  "dipartimento": "ARCOD|DICATECh|DMMM|DEI",
+  "motivazione": "2-3 frasi con almeno un dato KPI se disponibile",
   "puntiForza": ["punto 1", "punto 2", "punto 3"],
   "sbocchiLavorativi": ["sbocco 1", "sbocco 2", "sbocco 3"],
-  "opportunitaInternazionali": "Descrizione breve delle opportunità internazionali specifiche per questo corso",
-  "corsiAlternativi": ["Corso alternativo 1", "Corso alternativo 2"],
-  "consiglio": "Un consiglio personale e motivazionale per lo studente (1-2 frasi)",
+  "opportunitaInternazionali": "testo breve",
+  "corsiAlternativi": ["corso 1", "corso 2"],
+  "consiglio": "testo breve",
   "areeInteresse": [
     {"nome": "Area 1", "percentuale": 85},
     {"nome": "Area 2", "percentuale": 70},
@@ -486,100 +540,147 @@ Rispondi SEMPRE in italiano con questo formato JSON esatto (SOLO il JSON, nessun
     {"nome": "Area 6", "percentuale": 30}
   ]
 }
-
-REGOLE IMPORTANTI:
-- areeInteresse deve contenere esattamente 6 aree rilevanti per il profilo dello studente con percentuali da 0 a 100
-- Le percentuali indicano quanto ogni area è affine al profilo dello studente
-- I nomi dei corsi devono corrispondere ESATTAMENTE alla lista
-- Nella "motivazione", CITA SEMPRE almeno 1-2 cifre chiave AlmaLaurea (tasso occupazione, retribuzione, soddisfazione)
-- Rispondi SOLO con il JSON, nessun testo aggiuntivo, nessun blocco ```json
 """
 
-@app.route('/recommend', methods=['POST'])
+
+def extract_json_object(response_text):
+    """Estrae JSON anche se il modello aggiunge accidentalmente fence markdown o testo."""
+    text = (response_text or "").strip()
+    fence_match = re.search(r"```(?:json)?\s*(.*?)```", text, flags=re.IGNORECASE | re.DOTALL)
+    if fence_match:
+        text = fence_match.group(1).strip()
+
+    try:
+        return json.loads(text)
+    except json.JSONDecodeError:
+        start = text.find("{")
+        end = text.rfind("}")
+        if start != -1 and end != -1 and end > start:
+            return json.loads(text[start:end + 1])
+        raise
+
+
+def normalize_advisor_payload(parsed):
+    required = [
+        "corsoConsigliato",
+        "dipartimento",
+        "motivazione",
+        "puntiForza",
+        "sbocchiLavorativi",
+        "opportunitaInternazionali",
+        "corsiAlternativi",
+        "consiglio",
+        "areeInteresse",
+    ]
+    missing = [key for key in required if key not in parsed]
+    if missing:
+        raise ValueError(f"Campi JSON mancanti: {', '.join(missing)}")
+
+    areas = parsed.get("areeInteresse")
+    if not isinstance(areas, list) or not areas:
+        raise ValueError("areeInteresse deve essere una lista non vuota")
+
+    normalized_areas = []
+    for area in areas[:6]:
+        nome = str(area.get("nome", "Area")).strip() or "Area"
+        try:
+            percentuale = int(float(area.get("percentuale", 0)))
+        except (TypeError, ValueError):
+            percentuale = 0
+        normalized_areas.append({
+            "nome": nome,
+            "percentuale": max(0, min(100, percentuale)),
+        })
+
+    while len(normalized_areas) < 6:
+        normalized_areas.append({"nome": f"Area {len(normalized_areas) + 1}", "percentuale": 0})
+
+    parsed["areeInteresse"] = normalized_areas
+    parsed["radarChartNote"] = "Percentuali generate dal modello; non scoring deterministico."
+    return parsed
+
+
+def advisor_parse_error(message, raw_text=""):
+    return jsonify({
+        "error": "La risposta AI non era JSON valido per il Course Advisor.",
+        "detail": message,
+        "rawResponsePreview": (raw_text or "")[:700],
+        "expectedShape": [
+            "corsoConsigliato",
+            "dipartimento",
+            "motivazione",
+            "puntiForza",
+            "sbocchiLavorativi",
+            "opportunitaInternazionali",
+            "corsiAlternativi",
+            "consiglio",
+            "areeInteresse",
+        ],
+    }), 502
+
+
+@app.route("/recommend", methods=["POST"])
 def recommend_endpoint():
-    data = request.json
-    materie = data.get('materie', [])
-    aspirazioni = data.get('aspirazioni', [])
-    note = data.get('note', '')
+    data = request.get_json(silent=True) or {}
+    materie = data.get("materie", [])
+    aspirazioni = data.get("aspirazioni", [])
+    note = data.get("note", "")
 
     if not materie and not aspirazioni:
         return jsonify({"error": "Inserisci almeno una materia o un'aspirazione"}), 400
-
-    print(f"[ADVISOR] Materie: {materie}, Aspirazioni: {aspirazioni}, Note: {note}")
-
     if not modello_scelto:
         return jsonify({"error": "Modello AI non disponibile"}), 500
 
-    user_message = f"""Materie preferite: {', '.join(materie) if materie else 'non specificate'}
+    logger.info("[ADVISOR] Materie=%s Aspirazioni=%s", materie, aspirazioni)
+
+    kpi_context = ""
+    for course_id in get_all_course_ids():
+        summary = get_kpi_summary_for_prompt(course_id)
+        if summary:
+            kpi_context += summary + "\n"
+
+    user_profile = f"""Materie preferite: {', '.join(materie) if materie else 'non specificate'}
 Aspirazioni lavorative: {', '.join(aspirazioni) if aspirazioni else 'non specificate'}
-Note aggiuntive: {note if note else 'nessuna'}
+Note aggiuntive: {note if note else 'nessuna'}"""
 
-Analizza il mio profilo e consigliami il corso di laurea più adatto al Politecnico di Bari."""
+    prompt = f"""{istruzioni_advisor}
 
+--- KPI DISPONIBILI DA kpi_data.py ---
+{kpi_context}
+--- FINE KPI ---
+
+Profilo studente:
+{user_profile}
+
+Restituisci il JSON valido della raccomandazione."""
+
+    response_text = ""
     try:
-        import json as json_module
+        response = generate_with_gemini(prompt, istruzioni_advisor, purpose="recommend", context_limit=12, use_search=False)
+        response_text = (response.text or "").strip()
+        parsed = normalize_advisor_payload(extract_json_object(response_text))
 
-        # Build parts with knowledge files if available
-        parts = []
-        if uploaded_files:
-            for p in uploaded_files:
-                parts.append(types.Part(file_data=types.FileData(file_uri=p.uri, mime_type=p.mime_type)))
-        
-        # Arricchisci il prompt con i dati KPI disponibili
-        kpi_context = ""
-        for cid in get_all_course_ids():
-            summary = get_kpi_summary_for_prompt(cid)
-            if summary:
-                kpi_context += summary + "\n"
-        
-        # Inietta anche il contesto markdown (AlmaLaurea, OPIS, Guida Studente)
-        md_context = ""
-        if markdown_context_parts:
-            md_context = "\n\n--- KNOWLEDGE BASE MARKDOWN ---\n" + "\n\n".join(markdown_context_parts[:30]) + "\n--- FINE KNOWLEDGE BASE ---\n"
-        
-        if kpi_context or md_context:
-            enriched_prompt = f"{istruzioni_advisor}\n\n--- DATI QUANTITATIVI DISPONIBILI ---\n{kpi_context}\n--- FINE DATI ---\n{md_context}\n{user_message}"
-        else:
-            enriched_prompt = f"{istruzioni_advisor}\n\n{user_message}"
-        
-        parts.append(types.Part.from_text(text=enriched_prompt))
-
-        response = client.models.generate_content(model=modello_scelto, contents=parts)
-        response_text = response.text.strip()
-        
-        # Clean up response - remove markdown code blocks if present
-        if response_text.startswith("```"):
-            response_text = response_text.split("\n", 1)[1] if "\n" in response_text else response_text[3:]
-        if response_text.endswith("```"):
-            response_text = response_text[:-3]
-        response_text = response_text.strip()
-
-        parsed = json_module.loads(response_text)
-        corso_consigliato = parsed.get('corsoConsigliato', '')
-        print(f"[ADVISOR] Corso consigliato: {corso_consigliato}")
-        
-        # Cerca e allega i KPI del corso consigliato alla risposta
+        corso_consigliato = parsed.get("corsoConsigliato", "")
         course_id = find_course_id_by_name(corso_consigliato)
         if course_id:
             kpi = get_kpi(course_id)
             if kpi:
-                parsed['kpiData'] = kpi
-                parsed['courseKpiId'] = course_id
-                print(f"[ADVISOR] KPI allegati per: {course_id}")
-        
-        return jsonify(parsed)
+                parsed["kpiData"] = kpi
+                parsed["courseKpiId"] = course_id
 
-    except json_module.JSONDecodeError as je:
-        print(f"[ADVISOR] Errore parsing JSON: {je}")
-        print(f"[ADVISOR] Risposta raw: {response_text[:500]}")
-        return jsonify({"error": "Errore nel formato della risposta AI"}), 500
-    except Exception as e:
-        errore = str(e)
-        print(f"[ADVISOR] Errore: {errore}")
+        return jsonify(parsed)
+    except json.JSONDecodeError as exc:
+        logger.warning("[ADVISOR] JSON non valido: %s", exc)
+        return advisor_parse_error(str(exc), response_text)
+    except ValueError as exc:
+        logger.warning("[ADVISOR] JSON incompleto: %s", exc)
+        return advisor_parse_error(str(exc), response_text)
+    except Exception as exc:
+        errore = str(exc)
+        logger.exception("[ADVISOR] Errore: %s", errore)
         if "429" in errore:
             return jsonify({"error": "Troppe richieste. Riprova tra poco."}), 429
-        return jsonify({"error": "Errore nella raccomandazione AI"}), 500
-
+        return jsonify({"error": "Errore nella raccomandazione AI", "detail": errore[:300]}), 500
 
 
 if __name__ == "__main__":

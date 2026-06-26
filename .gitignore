@@ -4,9 +4,15 @@
 backend/.env
 .env
 
+# Ignora ambienti virtuali Python locali
+backend/venv/
+venv/
+.venv/
+
 # Ignora file inutili di Python
 __pycache__/
 *.pyc
+.pycache_test/
 
 # Ignora file di sistema
 .DS_Store

@@ -1,6 +1,8 @@
 import mysql.connector
 from mysql.connector import errorcode
 
+# Modulo legacy opzionale: serve solo per popolare le mappe fisiche del campus.
+# Il chatbot e il Course Advisor devono funzionare anche senza MySQL/XAMPP.
 def popola_database():
     print("Connessione a XAMPP (MySQL) per inserimento dati...")
 
@@ -32,7 +34,8 @@ def popola_database():
         print("Tabella 'mappe' verificata.")
 
         # 3. DATI DA INSERIRE
-        # I percorsi corrispondono alla tua cartella: src/assets/images/maps/
+        # I percorsi corrispondono agli asset Angular pubblici:
+        # public/assets/images/maps/
         dati_mappe = [
             (
                 "mappa_campus_poliLibrary_Orabona", 
