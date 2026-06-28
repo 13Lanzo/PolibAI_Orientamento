@@ -403,6 +403,26 @@ export class CourseAdvisor {
     return Array.from({ length: Math.max(0, empty) }, (_, i) => i);
   }
 
+  getPrimaryOccupationRate(kpi: CourseKPI | null): number | null {
+    const alma = kpi?.almalaurea;
+    if (!alma) return null;
+
+    if (typeof alma.tasso_occupazione_3_anni === 'number') return alma.tasso_occupazione_3_anni;
+    if (typeof alma.tasso_occupazione_5_anni === 'number') return alma.tasso_occupazione_5_anni;
+    if (typeof alma.tasso_occupazione_1_anno === 'number') return alma.tasso_occupazione_1_anno;
+    return null;
+  }
+
+  getPrimaryOccupationPeriod(kpi: CourseKPI | null): string {
+    const alma = kpi?.almalaurea;
+    if (!alma) return '';
+
+    if (typeof alma.tasso_occupazione_3_anni === 'number') return 'a 3 anni';
+    if (typeof alma.tasso_occupazione_5_anni === 'number') return 'a 5 anni';
+    if (typeof alma.tasso_occupazione_1_anno === 'number') return 'a 1 anno';
+    return '';
+  }
+
   /**
    * Formatta la retribuzione con separatore migliaia.
    * Es: 1314 → "1.314"

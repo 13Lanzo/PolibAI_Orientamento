@@ -201,21 +201,21 @@
             <span class="badge-new" *ngIf="result()!.courseData!.nuovo">★ Nuovo</span>
           </div>
         </div>
-        <div class="stat-box">
-          <div class="stat-number">93.8%</div>
-          <div class="stat-label">occupati<br>a 3 anni</div>
+        <div class="stat-box" *ngIf="getPrimaryOccupationRate(kpiData()) !== null">
+          <div class="stat-number">{{ getPrimaryOccupationRate(kpiData()) }}%</div>
+          <div class="stat-label">occupati<br>{{ getPrimaryOccupationPeriod(kpiData()) }}</div>
         </div>
       </div>
       <p class="course-motivation">{{ result()!.motivazione }}</p>
     </div>
 
     <!-- ══════════════════════════════════════════ -->
-    <!-- DATI ALLA MANO — AlmaLaurea 2025           -->
+    <!-- DATI ALLA MANO — KPI verificati            -->
     <!-- ══════════════════════════════════════════ -->
     <div class="kpi-section" *ngIf="kpiData()">
       <div class="kpi-header">
         <h3 class="kpi-title">📊 Dati alla Mano</h3>
-        <div class="kpi-source">Fonte: AlmaLaurea 2025 · Politecnico di Bari</div>
+        <div class="kpi-source">Fonte: {{ kpiData()!.source_almalaurea || 'KPI/knowledge validata' }}</div>
       </div>
 
       <!-- AlmaLaurea: Condizione Occupazionale -->
