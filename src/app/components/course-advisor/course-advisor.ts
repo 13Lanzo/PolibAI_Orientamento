@@ -1,7 +1,7 @@
 import { Component, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { CourseAdvisorService, CourseRecommendation, CourseKPI } from './course-advisor.service';
+import { CourseAdvisorService, CourseRecommendation, CourseKPI, OpisIndicatore } from './course-advisor.service';
 
 interface PolibaCourse {
   id: number;
@@ -421,6 +421,17 @@ export class CourseAdvisor {
     if (typeof alma.tasso_occupazione_5_anni === 'number') return 'a 5 anni';
     if (typeof alma.tasso_occupazione_1_anno === 'number') return 'a 1 anno';
     return '';
+  }
+
+  getOpisIndicatori(kpi: CourseKPI | null): OpisIndicatore[] {
+    return (kpi?.opis?.indicatori || []).filter(indicatore =>
+      indicatore.giudizi_positivi !== null || indicatore.giudizi_negativi !== null
+    );
+  }
+
+  formatPercentuale(val: number | null): string {
+    if (val === null) return 'N/D';
+    return val.toLocaleString('it-IT', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
   }
 
   /**

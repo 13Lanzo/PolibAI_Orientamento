@@ -1399,3 +1399,31 @@
   color: #00875A;
   font-size: 0.95rem;
 }
+
+.kpi-source--opis {
+  margin-top: 0.25rem;
+  margin-bottom: 0.75rem;
+}
+
+.kpi-opis-values {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.kpi-opis-value {
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 0.25rem 0.55rem;
+}
+
+.kpi-opis-value--positive {
+  background: #e8f9f0;
+  color: #00875A;
+}
+
+.kpi-opis-value--negative {
+  background: #fef0ef;
+  color: #b42318;
+}

@@ -285,18 +285,29 @@
         </div>
       </div>
 
-      <!-- OPIS: Recensioni Studenti -->
-      <div class="kpi-block" *ngIf="kpiData()!.recensioni && kpiData()!.recensioni.length > 0">
+      <!-- OPIS: Indicatori Studenti -->
+      <div class="kpi-block" *ngIf="getOpisIndicatori(kpiData()).length > 0">
         <div class="kpi-block-label">
           <span class="kpi-block-icon">🎓</span>
-          Punti di Forza (OPIS)
+          Indicatori OPIS
+        </div>
+        <div class="kpi-source kpi-source--opis" *ngIf="kpiData()!.opis?.source || kpiData()!.opis?.anno">
+          Fonte: {{ kpiData()!.opis?.source || 'Rapporto OPIS' }}
+          <span *ngIf="kpiData()!.opis?.anno"> · {{ kpiData()!.opis?.anno }}</span>
         </div>
         <div class="kpi-recensioni-list">
-          <div class="kpi-recensione-item" *ngFor="let r of kpiData()!.recensioni">
-            <div class="kpi-recensione-icon">✅</div>
+          <div class="kpi-recensione-item" *ngFor="let indicatore of getOpisIndicatori(kpiData())">
+            <div class="kpi-recensione-icon">•</div>
             <div class="kpi-recensione-content">
-              <span class="kpi-recensione-param">{{ r.parametro }}</span>
-              <span class="kpi-recensione-valore">{{ r.valore }}</span>
+              <span class="kpi-recensione-param">{{ indicatore.parametro }}</span>
+              <div class="kpi-opis-values">
+                <span class="kpi-opis-value kpi-opis-value--positive">
+                  Giudizi positivi: {{ formatPercentuale(indicatore.giudizi_positivi) }}%
+                </span>
+                <span class="kpi-opis-value kpi-opis-value--negative">
+                  Giudizi negativi: {{ formatPercentuale(indicatore.giudizi_negativi) }}%
+                </span>
+              </div>
             </div>
           </div>
         </div>

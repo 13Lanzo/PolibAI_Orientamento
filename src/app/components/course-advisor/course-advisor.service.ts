@@ -27,6 +27,21 @@ export interface RecensioneData {
   valore: string;
 }
 
+export interface OpisIndicatore {
+  area?: string;
+  parametro: string;
+  giudizi_positivi: number | null;
+  giudizi_negativi: number | null;
+  tipo?: string;
+}
+
+export interface OpisData {
+  source?: string | null;
+  anno?: string | null;
+  indicatori: OpisIndicatore[];
+  note?: string;
+}
+
 export interface CourseKPI {
   nome: string;
   classe: string;
@@ -36,7 +51,8 @@ export interface CourseKPI {
   source_almalaurea: string | null;
   almalaurea: AlmaLaureaData;
   giudizio_comparativo: GiudizioComparativo;
-  recensioni: RecensioneData[];
+  opis?: OpisData;
+  recensioni?: RecensioneData[];
   note: string;
 }
 

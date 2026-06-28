@@ -1,3 +1,6 @@
+import re
+from pathlib import Path
+
 # =============================================================================
 # KPI DATA STORE — Dati estratti dai report OPIS e AlmaLaurea
 # =============================================================================
@@ -57,7 +60,7 @@ COURSE_KPI = {
             "impatto_studi_descrizione": "L'85.1% prosegue con la magistrale. Retribuzione triennale: 1.350€, +150€ vs media Ateneo."
         },
         "giudizio_comparativo": _calcola_giudizio(97.5, "triennale"),
-        "recensioni": [{"parametro": "Il carico di studio dell'insegnamento è proporzionato ai crediti assegnati?", "valore": "100%"}, {"parametro": "Le modalità di esame sono state definite in modo chiaro?", "valore": "100%"}],
+        "recensioni": [],
         "note": "Dati Dashboard AlmaLaurea 2024. 97.5% occupati su forze lavoro, 1.350€/mese."
     },
 
@@ -82,7 +85,7 @@ COURSE_KPI = {
             "impatto_studi_descrizione": "Il 93.1% prosegue con la magistrale. Soddisfazione globale 97.5%, la più alta tra le triennali DEI."
         },
         "giudizio_comparativo": _calcola_giudizio(78.6, "triennale"),
-        "recensioni": [{"parametro": "È interessato/a agli argomenti trattati nell'insegnamento?", "valore": "87.27%"}, {"parametro": "Le conoscenze preliminari possedute sono risultate sufficienti per la comprensione degli argomenti previsti nel programma d'esame?", "valore": "85.37%"}],
+        "recensioni": [],
         "note": "Dati Dashboard AlmaLaurea 2024. 78.6% occupati su forze lavoro, 1.314€/mese, 97.5% soddisfatti."
     },
 
@@ -107,7 +110,7 @@ COURSE_KPI = {
             "impatto_studi_descrizione": "Il 91.5% prosegue con la magistrale. Uso elevato competenze: 50%, superiore alla media Ateneo (43%)."
         },
         "giudizio_comparativo": _calcola_giudizio(88.9, "triennale"),
-        "recensioni": [{"parametro": "Ritiene che contenuti e metodi didattici del corso utilizzati dal docente siano adeguati alla modalità di erogazione della didattica a distanza?", "valore": "100%"}, {"parametro": "Si ritiene complessivamente soddisfatto dell'organizzazione del servizio di erogazione on-line della didattica?", "valore": "100%"}],
+        "recensioni": [],
         "note": "Dati Dashboard AlmaLaurea 2024. 88.9% occupati su forze lavoro, 1.064€/mese, soddisfazione 96.3%."
     },
 
@@ -132,7 +135,7 @@ COURSE_KPI = {
             "impatto_studi_descrizione": "Il 91.9% prosegue con la magistrale. Soddisfazione globale 98.1%, tra le più alte del Poliba."
         },
         "giudizio_comparativo": _calcola_giudizio(82.8, "triennale"),
-        "recensioni": [{"parametro": "I contenuti digitali resi disponibili in modalità asincrona sono risultati utili all'apprendimento della materia?", "valore": "84.25%"}, {"parametro": "Il materiale didattico (indicato e disponibile) è adeguato per lo studio della materia?", "valore": "79.21%"}],
+        "recensioni": [],
         "note": "Dati Dashboard AlmaLaurea 2024. 82.8% occupati su forze lavoro, 1.054€/mese, soddisfazione 98.1%."
     },
 
@@ -157,7 +160,7 @@ COURSE_KPI = {
             "impatto_studi_descrizione": "Il 92.1% prosegue con la magistrale. Retribuzione triennale record: 1.876€, la più alta tra le triennali."
         },
         "giudizio_comparativo": _calcola_giudizio(50.0, "triennale"),
-        "recensioni": [{"parametro": "Le modalità di esame sono state definite in modo chiaro?", "valore": "Positivo"}, {"parametro": "È interessato/a agli argomenti trattati nell'insegnamento?", "valore": "17.6%"}],
+        "recensioni": [],
         "note": "Dati Dashboard AlmaLaurea 2024. 50% occupati su forze lavoro (campione ridotto), 1.876€/mese."
     },
 
@@ -182,7 +185,7 @@ COURSE_KPI = {
             "impatto_studi_descrizione": "100% soddisfazione globale, 100% occupati su forze lavoro, retribuzione 1.627€ (+422€ vs Ateneo)."
         },
         "giudizio_comparativo": _calcola_giudizio(100.0, "triennale"),
-        "recensioni": [{"parametro": "Le modalità di esame sono state definite in modo chiaro?", "valore": "Positivo"}, {"parametro": "Gli orari di svolgimento di lezioni, esercitazioni e altre eventuali attività sono rispettati?", "valore": "Positivo"}],
+        "recensioni": [],
         "note": "Dati Dashboard AlmaLaurea 2024. 100% occupati su forze lavoro, 1.627€/mese, 100% soddisfatti."
     },
 
@@ -207,7 +210,7 @@ COURSE_KPI = {
             "impatto_studi_descrizione": "Il 94.1% prosegue con la magistrale. 100% soddisfazione globale, retribuzione 1.459€."
         },
         "giudizio_comparativo": _calcola_giudizio(75.0, "triennale"),
-        "recensioni": [{"parametro": "Il docente è reperibile per chiarimenti e spiegazioni?", "valore": "37.04%"}, {"parametro": "Le modalità di esame sono state definite in modo chiaro?", "valore": "22.03%"}],
+        "recensioni": [],
         "note": "Dati Dashboard AlmaLaurea 2024. 75% occupati su forze lavoro, 1.459€/mese, 100% soddisfatti."
     },
 
@@ -232,7 +235,7 @@ COURSE_KPI = {
             "impatto_studi_descrizione": "100% occupati su forze lavoro. 70% uso elevato competenze, top Ateneo. 100% rapporti docenti positivi."
         },
         "giudizio_comparativo": _calcola_giudizio(100.0, "triennale"),
-        "recensioni": [{"parametro": "Il docente è reperibile per chiarimenti e spiegazioni?", "valore": "Positivo"}],
+        "recensioni": [],
         "note": "Dati Dashboard AlmaLaurea 2024. 100% occupati su forze lavoro, 1.192€/mese, 100% rapporti docenti."
     },
 
@@ -257,7 +260,7 @@ COURSE_KPI = {
             "impatto_studi_descrizione": "Il 90.9% prosegue con la magistrale. 60% uso elevato competenze (top Ateneo), soddisfazione lavoro 8/10."
         },
         "giudizio_comparativo": _calcola_giudizio(83.3, "triennale"),
-        "recensioni": [{"parametro": "I contenuti digitali resi disponibili in modalità asincrona sono risultati utili all'apprendimento della materia?", "valore": "80.42%"}, {"parametro": "L'insegnamento è stato svolto in maniera coerente con quanto dichiarato sul sito Web?", "valore": "35.25%"}],
+        "recensioni": [],
         "note": "Dati Dashboard AlmaLaurea 2024. 83.3% occupati su forze lavoro, 1.176€/mese, soddisfazione 96.9%."
     },
 
@@ -282,7 +285,7 @@ COURSE_KPI = {
             "impatto_studi_descrizione": "Crescita salariale media a 5 anni per chi consegue la magistrale."
         },
         "giudizio_comparativo": _calcola_giudizio(85.0, "triennale"),
-        "recensioni": [{"parametro": "I contenuti digitali resi disponibili in modalità asincrona sono risultati utili all'apprendimento della materia?", "valore": "100%"}, {"parametro": "Gli orari di svolgimento di lezioni, esercitazioni e altre eventuali attività sono rispettati?", "valore": "63.76%"}],
+        "recensioni": [],
         "note": "Dati AlmaLaurea 2025. Occupazione 'Alta', retribuzione ~1.400€."
     },
 
@@ -307,7 +310,7 @@ COURSE_KPI = {
             "impatto_studi_descrizione": "Il 70.3% prosegue con la magistrale. Il 44.8% rifarebbe lo stesso corso ma in un altro Ateneo."
         },
         "giudizio_comparativo": _calcola_giudizio(85.7, "triennale"),
-        "recensioni": [{"parametro": "La modalità di erogazione a distanza consente di seguire le attività integrative in maniera appropriata ed efficace?", "valore": "100%"}, {"parametro": "I contenuti digitali resi disponibili in modalità asincrona sono risultati utili all'apprendimento della materia?", "valore": "100%"}],
+        "recensioni": [],
         "note": "Dati Dashboard AlmaLaurea 2024. 85.7% occupati su forze lavoro, 955€/mese."
     },
 
@@ -332,7 +335,7 @@ COURSE_KPI = {
             "impatto_studi_descrizione": "Tasso occupazione immediato elevato grazie al percorso professionalizzante."
         },
         "giudizio_comparativo": _calcola_giudizio(91.0, "triennale"),
-        "recensioni": [{"parametro": "Il carico di studio dell'insegnamento è proporzionato ai crediti assegnati?", "valore": "Positivo"}, {"parametro": "Le modalità di esame sono state definite in modo chiaro?", "valore": "Positivo"}],
+        "recensioni": [],
         "note": "Dati AlmaLaurea 2025. Corso professionalizzante con retribuzione di 1.876€."
     },
 
@@ -356,7 +359,7 @@ COURSE_KPI = {
             "impatto_studi_descrizione": "Da 1.131€ a 1.886€ in 5 anni. Tasso occupazione cresce dal 82% al 93.8%."
         },
         "giudizio_comparativo": {"occupazione_vs_media": "inferiore", "delta_occupazione": -2.4},
-        "recensioni": [{"parametro": "La modalità di erogazione a distanza consente di seguire le attività integrative in maniera appropriata ed efficace?", "valore": "100%"}, {"parametro": "I contenuti digitali resi disponibili in modalità asincrona sono risultati utili all'apprendimento della materia?", "valore": "100%"}],
+        "recensioni": [],
         "note": "Dati Dashboard AlmaLaurea 2024."
     },
 
@@ -383,16 +386,7 @@ COURSE_KPI = {
             "occupazione_vs_media": "superiore",
             "delta_occupazione": 4.0
         },
-        "recensioni": [
-            {
-                "parametro": "I contenuti digitali resi disponibili in modalità asincrona sono risultati utili all'apprendimento della materia?",
-                "valore": "100%"
-            },
-            {
-                "parametro": "Il materiale didattico (indicato e disponibile) è adeguato per lo studio della materia?",
-                "valore": "100%"
-            }
-        ],
+        "recensioni": [],
         "note": "Dati AlmaLaurea 2025."
     },
 
@@ -416,7 +410,7 @@ COURSE_KPI = {
             "impatto_studi_descrizione": "Da 1.551€ a 2.006€ in 5 anni. Soddisfazione globale 96.4%, uso competenze 80% a 5 anni."
         },
         "giudizio_comparativo": {"occupazione_vs_media": "superiore", "delta_occupazione": 0.4},
-        "recensioni": [{"parametro": "I contenuti digitali resi disponibili in modalità asincrona sono risultati utili all'apprendimento della materia?", "valore": "100%"}, {"parametro": "Gli orari di svolgimento di lezioni, esercitazioni e altre eventuali attività sono rispettati?", "valore": "95.6%"}],
+        "recensioni": [],
         "note": "Dati Dashboard AlmaLaurea 2024. Soddisfazione 96.4%, 2.006€ a 5 anni."
     },
 
@@ -440,7 +434,7 @@ COURSE_KPI = {
             "impatto_studi_descrizione": "Da 1.360€ a 2.013€ in 5 anni. 100% occupazione a 1 anno, soddisfazione 95.5%."
         },
         "giudizio_comparativo": {"occupazione_vs_media": "superiore", "delta_occupazione": 3.8},
-        "recensioni": [{"parametro": "La modalità di erogazione a distanza consente di seguire le attività integrative in maniera appropriata ed efficace?", "valore": "100%"}, {"parametro": "I contenuti digitali resi disponibili in modalità asincrona sono risultati utili all'apprendimento della materia?", "valore": "100%"}],
+        "recensioni": [],
         "note": "Dati Dashboard AlmaLaurea 2024. 100% occupazione a 1 anno, 86.4% si riscriverebbe."
     },
 
@@ -464,7 +458,7 @@ COURSE_KPI = {
             "impatto_studi_descrizione": "Da 1.722€ a 2.103€. 100% occupazione a 5 anni, 100% soddisfazione globale, ingresso in 1.3 mesi."
         },
         "giudizio_comparativo": {"occupazione_vs_media": "superiore", "delta_occupazione": 3.8},
-        "recensioni": [{"parametro": "Le lezioni in modalità a distanza per questo insegnamento consentono di seguire il corso in maniera appropriata ed efficace?", "valore": "100%"}, {"parametro": "I contenuti digitali resi disponibili in modalità asincrona sono risultati utili all'apprendimento della materia?", "valore": "100%"}],
+        "recensioni": [],
         "note": "Dati Dashboard AlmaLaurea 2024. 100% a 5 anni, 2.103€, soddisfazione 8.3/10."
     },
 
@@ -491,16 +485,7 @@ COURSE_KPI = {
             "occupazione_vs_media": "superiore",
             "delta_occupazione": 2.0
         },
-        "recensioni": [
-            {
-                "parametro": "I contenuti digitali resi disponibili in modalità asincrona sono risultati utili all'apprendimento della materia?",
-                "valore": "100%"
-            },
-            {
-                "parametro": "Le lezioni in modalità a distanza per questo insegnamento consentono di seguire il corso in maniera appropriata ed efficace?",
-                "valore": "43.4%"
-            }
-        ],
+        "recensioni": [],
         "note": "Dati AlmaLaurea 2025."
     },
 
@@ -524,7 +509,7 @@ COURSE_KPI = {
             "impatto_studi_descrizione": "Da 1.716€ a 1.956€. Soddisfazione 96.3%, 98% occupazione a 5 anni."
         },
         "giudizio_comparativo": {"occupazione_vs_media": "superiore", "delta_occupazione": 1.8},
-        "recensioni": [{"parametro": "Il docente è reperibile per chiarimenti e spiegazioni?", "valore": "100%"}, {"parametro": "Gli orari di svolgimento di lezioni, esercitazioni e altre eventuali attività sono rispettati?", "valore": "100%"}],
+        "recensioni": [],
         "note": "Dati Dashboard AlmaLaurea 2024. Soddisfazione 96.3%, 98% occupazione a 5 anni."
     },
 
@@ -548,7 +533,7 @@ COURSE_KPI = {
             "impatto_studi_descrizione": "Da 1.730€ a 1.970€. 100% su forze lavoro a 3 anni, soddisfazione lavoro 8.1/10."
         },
         "giudizio_comparativo": {"occupazione_vs_media": "nella media", "delta_occupazione": -0.2},
-        "recensioni": [{"parametro": "Ritiene che contenuti e metodi didattici del corso utilizzati dal docente siano adeguati alla modalità di erogazione della didattica a distanza?", "valore": "100%"}, {"parametro": "Si ritiene complessivamente soddisfatto dell'organizzazione del servizio di erogazione on-line della didattica?", "valore": "100%"}],
+        "recensioni": [],
         "note": "Dati Dashboard AlmaLaurea 2024. Retribuzione iniziale 1.730€, top tra le magistrali."
     },
 
@@ -572,7 +557,7 @@ COURSE_KPI = {
             "impatto_studi_descrizione": "Da 1.433€ a 1.836€ in 3 anni. 97.1% su forze lavoro a 1 anno, 100% a 3 anni. 70.5% si riscriverebbe."
         },
         "giudizio_comparativo": {"occupazione_vs_media": "superiore", "delta_occupazione": 2.1},
-        "recensioni": [{"parametro": "È interessato/a agli argomenti trattati nell'insegnamento?", "valore": "87.27%"}, {"parametro": "Le conoscenze preliminari possedute sono risultate sufficienti per la comprensione degli argomenti previsti nel programma d'esame?", "valore": "85.37%"}],
+        "recensioni": [],
         "note": "Dati Dashboard AlmaLaurea 2024. 100% su forze lavoro a 3 anni, 1.836€."
     },
 
@@ -599,16 +584,7 @@ COURSE_KPI = {
             "occupazione_vs_media": "superiore",
             "delta_occupazione": 2.0
         },
-        "recensioni": [
-            {
-                "parametro": "Ritiene che contenuti e metodi didattici del corso utilizzati dal docente siano adeguati alla modalità di erogazione della didattica a distanza?",
-                "valore": "100%"
-            },
-            {
-                "parametro": "I contenuti digitali resi disponibili in modalità asincrona sono risultati utili all'apprendimento della materia?",
-                "valore": "100%"
-            }
-        ],
+        "recensioni": [],
         "note": "Dati AlmaLaurea 2025."
     },
 
@@ -635,16 +611,7 @@ COURSE_KPI = {
             "occupazione_vs_media": "superiore",
             "delta_occupazione": 4.0
         },
-        "recensioni": [
-            {
-                "parametro": "La modalità di erogazione a distanza consente di seguire le attività integrative in maniera appropriata ed efficace?",
-                "valore": "100%"
-            },
-            {
-                "parametro": "Il docente ha garantito la possibilità di interazione con gli studenti?",
-                "valore": "100%"
-            }
-        ],
+        "recensioni": [],
         "note": "Dati AlmaLaurea 2025."
     },
 
@@ -669,7 +636,7 @@ COURSE_KPI = {
             "impatto_studi_descrizione": "Da 1.803€ a 2.319€. 100% occupazione a 5 anni, ingresso in 0.6 mesi, soddisfazione 8.6/10."
         },
         "giudizio_comparativo": {"occupazione_vs_media": "superiore", "delta_occupazione": 3.8},
-        "recensioni": [{"parametro": "I contenuti digitali sono risultati utili all'apprendimento della materia?", "valore": "100%"}],
+        "recensioni": [],
         "note": "Dati Dashboard AlmaLaurea 2024. 100% a 5 anni, 2.319€/mese, ingresso in 0.6 mesi."
     },
 
@@ -694,7 +661,7 @@ COURSE_KPI = {
             "impatto_studi_descrizione": "100% occupazione a 1, 3 e 5 anni. 100% soddisfazione globale. 100% si riscriverebbe."
         },
         "giudizio_comparativo": {"occupazione_vs_media": "superiore", "delta_occupazione": 3.8},
-        "recensioni": [{"parametro": "Soddisfazione complessiva del corso", "valore": "100%"}],
+        "recensioni": [],
         "note": "Dati Dashboard AlmaLaurea 2024. Record: 100% su tutti gli indicatori di soddisfazione."
     },
 
@@ -719,10 +686,143 @@ COURSE_KPI = {
             "impatto_studi_descrizione": "Da 1.626€ a 2.304€. 100% su forze lavoro a 1, 3 e 5 anni. Ingresso in 0.4 mesi (12 gg!)."
         },
         "giudizio_comparativo": {"occupazione_vs_media": "superiore", "delta_occupazione": 3.8},
-        "recensioni": [{"parametro": "Dati soddisfazione", "valore": "N/D (collettivo < 5)"}],
+        "recensioni": [],
         "note": "Dati Dashboard AlmaLaurea 2024. 2.304€ a 5 anni, 8.6/10 soddisfazione lavoro."
     }
 }
+
+
+OPIS_QUESTIONS = [
+    "Le conoscenze preliminari possedute sono risultate sufficienti per la comprensione degli argomenti previsti nel programma d'esame?",
+    "Il carico di studio dell'insegnamento è proporzionato ai crediti assegnati?",
+    "Il materiale didattico (indicato e disponibile) è adeguato per lo studio della materia?",
+    "Le modalità di esame sono state definite in modo chiaro?",
+]
+
+OPIS_SOURCE_BY_COURSE_ID = {
+    "IIA": "Recensioni Studenti/triennale/Rapporto OPIS 2024 - Informatica.md",
+    "IMED": "Recensioni Studenti/triennale/Rapporto OPIS 2024 - Biomedica.md",
+    "IMEC": "Recensioni Studenti/triennale/Rapporto OPIS 2023 - Meccanica.md",
+    "IGEST": "Recensioni Studenti/triennale/Rapporto OPIS 2024 - Gestionale.md",
+    "IETI": "Recensioni Studenti/triennale/Rapporto OPIS 2024 - Elettronica.md",
+    "IAERO": "Recensioni Studenti/triennale/Rapporto OPIS 2024 - Aerospaziale.md",
+    "ICIVAMB": "Recensioni Studenti/triennale/Rapporto OPIS 2024 - Civile e Ambientale.md",
+    "IELE": "Recensioni Studenti/triennale/Rapporto OPIS 2024 - Elettrica.md",
+    "IEDILE": "Recensioni Studenti/triennale/Rapporto OPIS 2024 - Edile.md",
+    "INAVAL": "Recensioni Studenti/triennale/Rapporto OPIS 2024 - Navale.md",
+    "LPOL": "Recensioni Studenti/triennale/Rapporto OPIS 2024 - Costruzioni.md",
+    "LMARCH": "Recensioni Studenti/magistrale/Rapporto OPIS 2023 - Architettura.md",
+    "LMCS": "Recensioni Studenti/magistrale/Rapporto OPIS 2024 - Computer Science.md",
+    "LMCIV": "Recensioni Studenti/magistrale/Rapporto OPIS 2024 - Civile Magistrale.md",
+    "LMEDILE": "Recensioni Studenti/magistrale/Rapporto OPIS 2024 - Edile Magistrale.md",
+    "LMELE": "Recensioni Studenti/magistrale/Rapporto OPIS 2024 - Elettrica Magistrale.md",
+    "LMENER": "Recensioni Studenti/magistrale/Rapporto OPIS 2024 - Energetica Magistrale.md",
+    "LMGEST": "Recensioni Studenti/magistrale/Rapporto OPIS 2024 - Gestionale Magistrale.md",
+    "LMMECC": "Recensioni Studenti/magistrale/Rapporto OPIS 2024 - Mechanical Engineering.md",
+    "LMMED": "Recensioni Studenti/magistrale/Rapporto OPIS 2024 - Sistemi Medicali Magistrale.md",
+    "LMTEL": "Recensioni Studenti/magistrale/Rapporto OPIS 2024 - Telecomunicazioni Magistrale.md",
+    "LMDIG": "Recensioni Studenti/magistrale/Rapporto OPIS 2024 - Trasformazione Digitale.md",
+    "LMELEC": "Recensioni Studenti/magistrale/Rapporto OPIS 2022 - Elettronica.md",
+}
+
+IIA_OPIS_INDICATORI = [
+    {
+        "area": "Insegnamento",
+        "parametro": "Le conoscenze preliminari possedute sono risultate sufficienti per la comprensione degli argomenti previsti nel programma d'esame?",
+        "giudizi_positivi": 71.18,
+        "giudizi_negativi": 28.82,
+        "tipo": "indicatore",
+    },
+    {
+        "area": "Insegnamento",
+        "parametro": "Il carico di studio dell'insegnamento è proporzionato ai crediti assegnati?",
+        "giudizi_positivi": 79.92,
+        "giudizi_negativi": 20.08,
+        "tipo": "indicatore",
+    },
+    {
+        "area": "Insegnamento",
+        "parametro": "Il materiale didattico (indicato e disponibile) è adeguato per lo studio della materia?",
+        "giudizi_positivi": 77.69,
+        "giudizi_negativi": 22.31,
+        "tipo": "indicatore",
+    },
+    {
+        "area": "Insegnamento",
+        "parametro": "Le modalità di esame sono state definite in modo chiaro?",
+        "giudizi_positivi": 83.46,
+        "giudizi_negativi": 16.54,
+        "tipo": "indicatore",
+    },
+]
+
+
+def _parse_percent(label, text):
+    match = re.search(rf"{label}:\s*\*\*([0-9]+(?:[.,][0-9]+)?)%\*\*", text, re.IGNORECASE)
+    if not match:
+        return None
+    return round(float(match.group(1).replace(",", ".")), 2)
+
+
+def _complete_pair(positivi, negativi):
+    if positivi is None and negativi is not None:
+        positivi = round(100 - negativi, 2)
+    if negativi is None and positivi is not None:
+        negativi = round(100 - positivi, 2)
+    return positivi, negativi
+
+
+def _extract_opis_indicatori(source_path):
+    path = Path(__file__).resolve().parent / "knowledge" / source_path
+    if not path.exists():
+        return []
+
+    indicatori = []
+    for line in path.read_text(encoding="utf-8").splitlines():
+        if not line.startswith("|"):
+            continue
+        for question in OPIS_QUESTIONS:
+            if question not in line:
+                continue
+            positivi = _parse_percent("Giudizi Positivi", line)
+            negativi = _parse_percent("Giudizi Negativi", line)
+            positivi, negativi = _complete_pair(positivi, negativi)
+            indicatori.append({
+                "area": "Insegnamento",
+                "parametro": question,
+                "giudizi_positivi": positivi,
+                "giudizi_negativi": negativi,
+                "tipo": "indicatore" if positivi is not None or negativi is not None else "non_disponibile",
+            })
+            break
+    return indicatori
+
+
+def _build_opis_data(course_id):
+    source = OPIS_SOURCE_BY_COURSE_ID.get(course_id)
+    if not source:
+        return {
+            "source": None,
+            "anno": None,
+            "indicatori": [],
+            "note": "Rapporto OPIS Markdown non disponibile o non associato al corso.",
+        }
+
+    indicatori = IIA_OPIS_INDICATORI if course_id == "IIA" else _extract_opis_indicatori(source)
+    return {
+        "source": Path(source).name,
+        "anno": "2024/2025" if "2024" in source else ("2023/2024" if "2023" in source else "2022/2023"),
+        "indicatori": indicatori,
+    }
+
+
+def _apply_opis_data():
+    for course_id, data in COURSE_KPI.items():
+        data["opis"] = _build_opis_data(course_id)
+        data["recensioni"] = []
+
+
+_apply_opis_data()
 
 
 # =============================================================================
@@ -775,6 +875,22 @@ def get_kpi_summary_for_prompt(course_id):
         f"  - Vantaggio: {alma['impatto_studi_valore']}",
         f"  - {alma['impatto_studi_descrizione']}",
     ])
+
+    opis = data.get("opis") or {}
+    indicatori_opis = [
+        item for item in opis.get("indicatori", [])
+        if item.get("giudizi_positivi") is not None and item.get("giudizi_negativi") is not None
+    ]
+    if indicatori_opis:
+        lines.extend([
+            f"",
+            f"OPIS {opis.get('anno', data['anno'])}:",
+        ])
+        for item in indicatori_opis:
+            lines.append(
+                f"  - {item['parametro']}: {item['giudizi_positivi']}% positivi, "
+                f"{item['giudizi_negativi']}% negativi"
+            )
     return "\n".join(lines)
 
 
