@@ -1,0 +1,34 @@
+% Richiede: \usepackage{tikz}
+%           \usetikzlibrary{arrows.meta,positioning,calc}
+\begin{tikzpicture}[
+  >=Latex,
+  node distance=11mm and 12mm,
+  block/.style={draw=black!70,rounded corners=2pt,minimum width=24mm,minimum height=12mm,align=center,font=\scriptsize},
+  normal/.style={block,fill=blue!9},
+  optimize/.style={block,fill=green!12},
+  flow/.style={->,thick,draw=black!60},
+  efficient/.style={->,very thick,draw=green!45!black},
+]
+\node[normal] (spa) {Angular SPA\\streaming};
+\node[optimize,right=of spa] (gateway) {API gateway\\auth + rate limit};
+\node[optimize,right=of gateway] (router) {Intent router\\instradamento};
+\node[normal,above right=7mm and 14mm of router] (local) {Servizi locali\\mappe / KPI};
+\node[optimize,right=14mm of router] (search) {File Search\\top-$k$ documenti};
+\node[optimize,below right=7mm and 14mm of router] (session) {Session store\\stato per utente};
+\node[normal,right=of search] (gemini) {Gemini\\prompt ridotto};
+\node[normal,below=17mm of router] (telemetry) {Telemetry\\latenza + token + errori};
+
+\draw[flow] (spa) -- (gateway);
+\draw[flow] (gateway) -- (router);
+\draw[flow] (router) -- (local);
+\draw[flow] (router) -- (search);
+\draw[flow] (router) -- (session);
+\draw[efficient] (search) -- (gemini);
+\draw[efficient] (session.east) -| (gemini.south);
+\draw[efficient] (gemini.north) |- (gateway.north);
+\draw[flow] (router) -- (telemetry);
+
+\node[below=18mm of telemetry,align=center,font=\footnotesize,text=black!65]
+  {Retrieval selettivo, isolamento delle sessioni e controllo del carico\\riducono latenza e rischio di saturazione.};
+\end{tikzpicture}
+

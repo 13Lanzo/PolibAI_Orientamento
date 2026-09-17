@@ -441,4 +441,52 @@ export class CourseAdvisor {
   formatRetribuzione(val: number): string {
     return val.toLocaleString('it-IT');
   }
+
+  getImpactTitle(kpi: CourseKPI | null): string {
+    if (!kpi?.almalaurea) return '';
+    return kpi.almalaurea.impatto_studi_titolo || 'Crescita a 5 Anni';
+  }
+
+  getImpactValue(kpi: CourseKPI | null): string {
+    if (!kpi?.almalaurea) return '';
+    const alm = kpi.almalaurea;
+    const s1 = alm.retribuzione_netta_media;
+    const s5 = alm.retribuzione_netta_media_5_anni;
+    // Calcolo variazione percentuale retribuzione ∆s = ((s5 - s1) / s1) * 100
+    if (s1 && s5 && s1 > 0) {
+      const delta = ((s5 - s1) / s1) * 100;
+      const sign = delta > 0 ? '+' : '';
+      return `${sign}${delta.toFixed(1)}%`;
+    }
+    const s3 = alm.retribuzione_netta_media_3_anni;
+    if (s1 && s3 && !s5 && kpi.livello === 'magistrale' && s1 > 0) {
+      const delta = ((s3 - s1) / s1) * 100;
+      const sign = delta > 0 ? '+' : '';
+      return `${sign}${delta.toFixed(1)}%`;
+    }
+    return alm.impatto_studi_valore || '';
+  }
+
+  getImpactDescription(kpi: CourseKPI | null): string {
+    if (!kpi?.almalaurea) return '';
+    const alm = kpi.almalaurea;
+    const s1 = alm.retribuzione_netta_media;
+    const s5 = alm.retribuzione_netta_media_5_anni;
+    if (s1 && s5 && s1 > 0) {
+      const delta = ((s5 - s1) / s1) * 100;
+      const sign = delta > 0 ? '+' : '';
+      const s1Fmt = this.formatRetribuzione(s1);
+      const s5Fmt = this.formatRetribuzione(s5);
+      return `Da ${s1Fmt}€ a ${s5Fmt}€ in 5 anni (${sign}${delta.toFixed(1)}%).`;
+    }
+    const s3 = alm.retribuzione_netta_media_3_anni;
+    if (s1 && s3 && !s5 && kpi.livello === 'magistrale' && s1 > 0) {
+      const delta = ((s3 - s1) / s1) * 100;
+      const sign = delta > 0 ? '+' : '';
+      const s1Fmt = this.formatRetribuzione(s1);
+      const s3Fmt = this.formatRetribuzione(s3);
+      return `Da ${s1Fmt}€ a ${s3Fmt}€ in 3 anni (${sign}${delta.toFixed(1)}%).`;
+    }
+    return alm.impatto_studi_descrizione || '';
+  }
 }

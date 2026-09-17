@@ -1,0 +1,35 @@
+% Richiede: \usepackage{pgfplots} \pgfplotsset{compat=1.18}
+\begin{tikzpicture}
+\definecolor{poliblue}{HTML}{0072B2}
+\definecolor{polired}{HTML}{D55E00}
+\begin{axis}[
+  width=0.98\linewidth,
+  height=7.2cm,
+  xmin=0,
+  xmax=17,
+  ymin=0,
+  ymax=4500000,
+  xlabel={Richieste AI al minuto},
+  ylabel={Token di input al minuto},
+  scaled y ticks=false,
+  ytick={0,1000000,2000000,3000000,4000000},
+  yticklabels={0,1 M,2 M,3 M,4 M},
+  xtick={0,2,...,16},
+  xmajorgrids=true,
+  ymajorgrids=true,
+  grid style={gray!25},
+  axis line style={black!70},
+  tick label style={font=\small},
+  label style={font=\small},
+  legend style={at={(0.02,0.98)},anchor=north west,draw=none,font=\small},
+]
+\addplot[poliblue,very thick,domain=0:17,samples=40] {263900*x};
+\addlegendentry{Consumo stimato}
+\addplot[polired,very thick,dashed,domain=0:17] {4000000};
+\addlegendentry{Limite TPM}
+\addplot[only marks,mark=*,mark size=2.5pt,polired] coordinates {(15.1573,4000000)};
+\node[anchor=north east,font=\small,text=polired] at (axis cs:15.1573,3900000)
+  {$\approx 15{,}2$ richieste/min};
+\end{axis}
+\end{tikzpicture}
+

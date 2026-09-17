@@ -1,0 +1,29 @@
+% Richiede: \usepackage{tikz}
+%           \usetikzlibrary{arrows.meta,positioning,calc}
+\begin{tikzpicture}[
+  >=Latex,
+  node distance=13mm and 15mm,
+  block/.style={draw=black!70,rounded corners=2pt,minimum width=28mm,minimum height=13mm,align=center,font=\small},
+  normal/.style={block,fill=blue!9},
+  risk/.style={block,fill=orange!14},
+  flow/.style={->,thick,draw=black!60},
+  bottleneck/.style={->,very thick,draw=red!70!black},
+]
+\node[normal] (spa) {Angular SPA\\chatbot / advisor};
+\node[normal,right=of spa] (api) {Flask API\\sincrona};
+\node[risk,right=20mm of api] (context) {Contesto completo\\$\approx244\,000$ token/richiesta};
+\node[normal,right=20mm of context] (gemini) {Gemini API\\sessione globale};
+\node[risk,above=of context] (kb) {Knowledge base\\53 documenti};
+\node[risk,below=of context] (history) {KPI + cronologia\\ripetuti nel prompt};
+
+\draw[flow] (spa) -- (api);
+\draw[flow] (api) -- (context);
+\draw[bottleneck] (context) -- node[above,font=\scriptsize,text=red!70!black]{TPM} (gemini);
+\draw[bottleneck] (kb) -- (context);
+\draw[bottleneck] (history) -- (context);
+\draw[flow,draw=green!50!black] (gemini.south) |- node[pos=0.25,right,font=\scriptsize]{risposta breve} (api.south);
+
+\node[below=19mm of history,align=center,font=\footnotesize,text=black!65]
+  {Il corpus è allegato quasi integralmente: il sistema usa long context\\più che retrieval selettivo.};
+\end{tikzpicture}
+

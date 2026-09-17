@@ -1,0 +1,39 @@
+% Richiede: \usepackage{tikz}
+%           \usetikzlibrary{arrows.meta,positioning,decorations.pathreplacing}
+\begin{tikzpicture}[
+  x=1cm,y=1cm,
+  event/.style={circle,fill=blue!65!black,inner sep=2.4pt},
+  label/.style={font=\scriptsize,align=center},
+]
+\draw[thick,-{Latex}] (0,0) -- (12.5,0);
+
+\foreach \x/\name/\where in {
+  0.4/{Invio UI}/above,
+  2.6/{Arrivo Flask}/below,
+  4.8/{Prompt pronto}/above,
+  7.5/{Risposta Gemini}/below,
+  9.9/{JSON pronto}/above,
+  12.0/{Render UI}/below
+}{
+  \node[event] at (\x,0) {};
+  \node[label,\where=4mm] at (\x,0) {\name};
+}
+
+\draw[line width=3.5pt,blue!65] (0.4,0) -- (2.6,0);
+\draw[line width=3.5pt,green!55!black] (2.6,0) -- (4.8,0);
+\draw[line width=3.5pt,orange!85!black] (4.8,0) -- (7.5,0);
+\draw[line width=3.5pt,purple!70] (7.5,0) -- (9.9,0);
+\draw[line width=3.5pt,cyan!60!black] (9.9,0) -- (12.0,0);
+
+\node[label,text=blue!65!black] at (1.5,-1.15) {rete locale};
+\node[label,text=green!45!black] at (3.7,-1.15) {pre-processing};
+\node[label,text=orange!75!black] at (6.15,-1.15) {inferenza / tool};
+\node[label,text=purple!70!black] at (8.7,-1.15) {post-processing};
+\node[label,text=cyan!55!black] at (10.95,-1.15) {rendering};
+
+\draw[decorate,decoration={brace,amplitude=5pt},thick] (0.4,1.0) -- (12.0,1.0)
+  node[midway,above=6pt,font=\small] {$T_{\mathrm{totale}}=t_5-t_0$};
+\node[font=\footnotesize,text=black!65] at (6.2,-1.75)
+  {Riportare p50, p95 e p99 per endpoint e livello di concorrenza.};
+\end{tikzpicture}
+

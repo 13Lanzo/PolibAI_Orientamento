@@ -1,0 +1,34 @@
+% Richiede: \usepackage{pgfplots} \pgfplotsset{compat=1.18}
+\begin{tikzpicture}
+\definecolor{poliblue}{HTML}{0072B2}
+\begin{axis}[
+  xbar,
+  xmode=log,
+  width=0.98\linewidth,
+  height=6.2cm,
+  xmin=0.001,
+  xmax=100,
+  symbolic y coords={RPD,TPM input,RPM},
+  ytick=data,
+  xlabel={Quota utilizzata (\%)},
+  xtick={0.001,0.01,0.1,1,10,100},
+  xticklabels={0{,}001,0{,}01,0{,}1,1,10,100},
+  xmajorgrids=true,
+  grid style={gray!25},
+  axis line style={black!70},
+  tick label style={font=\small},
+  label style={font=\small},
+  nodes near coords,
+  point meta=explicit symbolic,
+  every node near coord/.append style={font=\small,anchor=west},
+  bar width=11pt,
+  enlarge y limits=0.35,
+]
+\addplot[fill=poliblue,draw=none] coordinates {
+  (0.025,RPM) [0{,}025\%]
+  (6.5975,TPM input) [6{,}60\%]
+  (0.003333,RPD) [0{,}0033\%]
+};
+\end{axis}
+\end{tikzpicture}
+

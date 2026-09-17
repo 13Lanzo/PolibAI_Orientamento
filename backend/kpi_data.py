@@ -280,9 +280,9 @@ COURSE_KPI = {
             "retribuzione_netta_media_3_anni": None,
             "tasso_occupazione_5_anni": None,
             "retribuzione_netta_media_5_anni": None,
-            "impatto_studi_titolo": "Proseguimento con Magistrale Navale/Meccanica",
-            "impatto_studi_valore": "+25.6%",
-            "impatto_studi_descrizione": "Crescita salariale media a 5 anni per chi consegue la magistrale."
+            "impatto_studi_titolo": "Proseguimento con Laurea Magistrale",
+            "impatto_studi_valore": "79.4%",
+            "impatto_studi_descrizione": "Il 79.4% dei laureati triennali in ingegneria prosegue con la magistrale."
         },
         "giudizio_comparativo": _calcola_giudizio(85.0, "triennale"),
         "recensioni": [],
@@ -379,8 +379,8 @@ COURSE_KPI = {
             "tasso_occupazione_5_anni": 100.0,
             "retribuzione_netta_media_5_anni": 1950,
             "impatto_studi_titolo": "Crescita a 5 Anni",
-            "impatto_studi_valore": "+25.6%",
-            "impatto_studi_descrizione": "Aumento retributivo medio tra il 1° e 5° anno."
+            "impatto_studi_valore": "+30.0%",
+            "impatto_studi_descrizione": "Da 1.500€ a 1.950€ in 5 anni (+30.0%)."
         },
         "giudizio_comparativo": {
             "occupazione_vs_media": "superiore",
@@ -478,8 +478,8 @@ COURSE_KPI = {
             "tasso_occupazione_5_anni": 99.0,
             "retribuzione_netta_media_5_anni": 1900,
             "impatto_studi_titolo": "Crescita a 5 Anni",
-            "impatto_studi_valore": "+25.6%",
-            "impatto_studi_descrizione": "Aumento retributivo medio tra il 1° e 5° anno."
+            "impatto_studi_valore": "+26.7%",
+            "impatto_studi_descrizione": "Da 1.500€ a 1.900€ in 5 anni (+26.7%)."
         },
         "giudizio_comparativo": {
             "occupazione_vs_media": "superiore",
@@ -577,8 +577,8 @@ COURSE_KPI = {
             "tasso_occupazione_5_anni": 98.0,
             "retribuzione_netta_media_5_anni": 1950,
             "impatto_studi_titolo": "Crescita a 5 Anni",
-            "impatto_studi_valore": "+25.6%",
-            "impatto_studi_descrizione": "Aumento retributivo medio tra il 1° e 5° anno."
+            "impatto_studi_valore": "+30.0%",
+            "impatto_studi_descrizione": "Da 1.500€ a 1.950€ in 5 anni (+30.0%)."
         },
         "giudizio_comparativo": {
             "occupazione_vs_media": "superiore",
@@ -604,8 +604,8 @@ COURSE_KPI = {
             "tasso_occupazione_5_anni": 100.0,
             "retribuzione_netta_media_5_anni": 2000,
             "impatto_studi_titolo": "Crescita a 5 Anni",
-            "impatto_studi_valore": "+25.6%",
-            "impatto_studi_descrizione": "Aumento retributivo medio tra il 1° e 5° anno."
+            "impatto_studi_valore": "+29.0%",
+            "impatto_studi_descrizione": "Da 1.550€ a 2.000€ in 5 anni (+29.0%)."
         },
         "giudizio_comparativo": {
             "occupazione_vs_media": "superiore",
@@ -822,7 +822,45 @@ def _apply_opis_data():
         data["recensioni"] = []
 
 
+def calcola_variazione_retribuzione(s1, s5):
+    """
+    Calcola la variazione percentuale della retribuzione tra il primo e il quinto anno:
+    ∆s = ((s5 - s1) / s1) * 100
+    """
+    if s1 and s5 and s1 > 0:
+        delta = ((s5 - s1) / s1) * 100
+        sign = "+" if delta > 0 else ""
+        return round(delta, 1), f"{sign}{delta:.1f}%"
+    return None, None
+
+
+def _apply_salary_growth_calculations():
+    """
+    Per ogni corso magistrale con retribuzione a 1 e 5 anni (oppure a 3 anni),
+    calcola in modo reale la variazione percentuale:
+    ∆s = ((s5 - s1) / s1) * 100
+    aggiornando coerentemente la scheda d'impatto.
+    """
+    for course_id, data in COURSE_KPI.items():
+        alm = data.get("almalaurea", {})
+        s1 = alm.get("retribuzione_netta_media")
+        s5 = alm.get("retribuzione_netta_media_5_anni")
+        s3 = alm.get("retribuzione_netta_media_3_anni")
+
+        if s1 and s5 and s1 > 0:
+            delta, val_str = calcola_variazione_retribuzione(s1, s5)
+            alm["impatto_studi_titolo"] = "Crescita a 5 Anni"
+            alm["impatto_studi_valore"] = val_str
+            alm["impatto_studi_descrizione"] = f"Da {s1:,.0f}€ a {s5:,.0f}€ in 5 anni ({val_str}).".replace(",", ".")
+        elif s1 and s3 and not s5 and data.get("livello") == "magistrale" and s1 > 0:
+            delta, val_str = calcola_variazione_retribuzione(s1, s3)
+            alm["impatto_studi_titolo"] = "Crescita a 3 Anni"
+            alm["impatto_studi_valore"] = val_str
+            alm["impatto_studi_descrizione"] = f"Da {s1:,.0f}€ a {s3:,.0f}€ in 3 anni ({val_str}).".replace(",", ".")
+
+
 _apply_opis_data()
+_apply_salary_growth_calculations()
 
 
 # =============================================================================

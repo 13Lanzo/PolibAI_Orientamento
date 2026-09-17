@@ -319,10 +319,10 @@
           <span class="kpi-impact-icon">🚀</span>
         </div>
         <div class="kpi-impact-content">
-          <h4 class="kpi-impact-title">{{ kpiData()!.almalaurea.impatto_studi_titolo }}</h4>
+          <h4 class="kpi-impact-title">{{ getImpactTitle(kpiData()) }}</h4>
           <div class="kpi-impact-main">
-            <span class="kpi-impact-value">{{ kpiData()!.almalaurea.impatto_studi_valore }}</span>
-            <span class="kpi-impact-desc">{{ kpiData()!.almalaurea.impatto_studi_descrizione }}</span>
+            <span class="kpi-impact-value">{{ getImpactValue(kpiData()) }}</span>
+            <span class="kpi-impact-desc">{{ getImpactDescription(kpiData()) }}</span>
           </div>
         </div>
       </div>

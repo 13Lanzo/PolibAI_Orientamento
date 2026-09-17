@@ -1,0 +1,10 @@
+metric,observed,limit,utilization_percent,precision
+RPM,1,4000,0.025,exact_dashboard
+TPM_input,263900,4000000,6.5975,exact_dashboard
+RPD,5,150000,0.003333,exact_dashboard
+input_tokens_2026-09-08,650000,, ,approx_from_graph
+output_tokens_2026-09-08,1100,, ,approx_from_graph
+requests_2026-09-08,3,, ,approx_from_graph
+input_tokens_2026-09-17,1300000,, ,approx_from_graph
+output_tokens_2026-09-17,2800,, ,approx_from_graph
+requests_2026-09-17,5,, ,exact_dashboard_peak
