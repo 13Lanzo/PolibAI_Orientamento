@@ -1,0 +1,1716 @@
+[
+  {
+    "id": "Q001",
+    "category": "single_doc",
+    "endpoint": "/chat",
+    "query": "Qual è la soglia ISEE per rientrare nella no-tax area per le tasse universitarie del Poliba?",
+    "expected_relevant_docs": [
+      "regolamento_contribuzione_studentesca_politecnico_di_bari_25_26.pdf"
+    ],
+    "gold_answer": "La no-tax area al Politecnico di Bari per l'A.A. 2025/2026 si applica per valori ISEE Università fino a 22.000 euro.",
+    "ground_truth_claims": [
+      "No-tax area fino a 22.000 euro",
+      "Esenzione dal contributo onnicomprensivo",
+      "Richiede iscrizione regolare"
+    ]
+  },
+  {
+    "id": "Q002",
+    "category": "single_doc",
+    "endpoint": "/chat",
+    "query": "Quali sono le rate previste per il pagamento della contribuzione studentesca al Politecnico di Bari?",
+    "expected_relevant_docs": [
+      "regolamento_contribuzione_studentesca_politecnico_di_bari_25_26.pdf"
+    ],
+    "gold_answer": "La contribuzione studentesca è suddivisa in rate con scadenze definite dal regolamento tasse (prima rata all'immatricolazione/iscrizione, seconda e terza rata nei mesi successivi).",
+    "ground_truth_claims": [
+      "Tre rate di contribuzione",
+      "Prima rata tassa regionale e imposta di bollo",
+      "Seconda e terza rata contributo onnicomprensivo"
+    ]
+  },
+  {
+    "id": "Q003",
+    "category": "single_doc",
+    "endpoint": "/chat",
+    "query": "Chi ha diritto all'esonero totale delle tasse per disabilità?",
+    "expected_relevant_docs": [
+      "regolamento_contribuzione_studentesca_politecnico_di_bari_25_26.pdf"
+    ],
+    "gold_answer": "Hanno diritto all'esonero totale gli studenti con riconoscimento di disabilità ai sensi dell'art. 3 comma 1 della Legge 104/1992 o con invalidità pari o superiore al 66%.",
+    "ground_truth_claims": [
+      "Invalidità pari o superiore al 66%",
+      "Riconoscimento Legge 104/1992",
+      "Esonero totale dal contributo"
+    ]
+  },
+  {
+    "id": "Q004",
+    "category": "single_doc",
+    "endpoint": "/chat",
+    "query": "Qual è la durata minima e massima per la mobilità Erasmus+ Studio?",
+    "expected_relevant_docs": [
+      "bando_erasmus.pdf"
+    ],
+    "gold_answer": "La mobilità Erasmus+ Studio ha una durata minima di 2 mesi (o un trimestre accademico) e una durata massima di 12 mesi per ciascun ciclo di studi.",
+    "ground_truth_claims": [
+      "Durata minima 2 mesi o 60 giorni",
+      "Durata massima 12 mesi per ciclo",
+      "Finanziamento comunitario"
+    ]
+  },
+  {
+    "id": "Q005",
+    "category": "single_doc",
+    "endpoint": "/chat",
+    "query": "Quali requisiti linguistici sono richiesti per partecipare al bando Erasmus+ del Politecnico?",
+    "expected_relevant_docs": [
+      "bando_erasmus.pdf"
+    ],
+    "gold_answer": "Il bando Erasmus richiede generalmente un livello minimo di competenza linguistica (solitamente B1 o B2) attestato o verificato tramite CLA prima della partenza.",
+    "ground_truth_claims": [
+      "Livello B1 o B2 a seconda della sede",
+      "Verifica linguistica o certificato",
+      "Requisito di idoneità"
+    ]
+  },
+  {
+    "id": "Q006",
+    "category": "single_doc",
+    "endpoint": "/chat",
+    "query": "Come funziona la mora per ritardato pagamento delle tasse al Poliba?",
+    "expected_relevant_docs": [
+      "regolamento_contribuzione_studentesca_politecnico_di_bari_25_26.pdf"
+    ],
+    "gold_answer": "In caso di mancato rispetto delle scadenze di pagamento viene applicata un'indennità di mora graduata in base ai giorni di ritardo.",
+    "ground_truth_claims": [
+      "Applicazione di indennità di mora",
+      "Importo crescente col ritardo",
+      "Blocco carriera in caso di insolvenza"
+    ]
+  },
+  {
+    "id": "Q007",
+    "category": "single_doc",
+    "endpoint": "/chat",
+    "query": "Cosa copre la prima rata delle tasse universitarie?",
+    "expected_relevant_docs": [
+      "regolamento_contribuzione_studentesca_politecnico_di_bari_25_26.pdf"
+    ],
+    "gold_answer": "La prima rata comprende la tassa regionale ADISU di 140 euro e l'imposta di bollo assolta in modo virtuale di 16 euro.",
+    "ground_truth_claims": [
+      "Tassa regionale ADISU 140 euro",
+      "Imposta di bollo 16 euro",
+      "Totale prima rata 156 euro"
+    ]
+  },
+  {
+    "id": "Q008",
+    "category": "single_doc",
+    "endpoint": "/chat",
+    "query": "È possibile richiedere il rimborso della contribuzione universitaria in caso di borsa ADISU?",
+    "expected_relevant_docs": [
+      "regolamento_contribuzione_studentesca_politecnico_di_bari_25_26.pdf"
+    ],
+    "gold_answer": "Sì, gli idonei e vincitori di borsa di studio ADISU Puglia sono esonerati dal contributo onnicomprensivo e possono ottenere il rimborso.",
+    "ground_truth_claims": [
+      "Esonero per idonei/vincitori borsa ADISU",
+      "Rimborso della tassa regionale se previsto",
+      "Procedura su istanza studente"
+    ]
+  },
+  {
+    "id": "Q009",
+    "category": "single_doc",
+    "endpoint": "/chat",
+    "query": "Quanti CFU minimi bisogna aver maturato per partecipare al bando Erasmus al primo anno?",
+    "expected_relevant_docs": [
+      "bando_erasmus.pdf"
+    ],
+    "gold_answer": "Gli studenti iscritti al primo anno di una laurea triennale devono aver conseguito un numero minimo di CFU (solitamente almeno 15 o 30 CFU) previsto dai criteri di selezione.",
+    "ground_truth_claims": [
+      "Numero minimo di CFU previsto",
+      "Iscrizione regolare al primo anno",
+      "Criteri di graduatoria di merito"
+    ]
+  },
+  {
+    "id": "Q010",
+    "category": "single_doc",
+    "endpoint": "/chat",
+    "query": "Quale ufficio gestisce la mobilità internazionale degli studenti del Politecnico?",
+    "expected_relevant_docs": [
+      "bando_erasmus.pdf",
+      "GUIDA-DELLO-STUDENTE_27_03_2025_Web-compresso.md"
+    ],
+    "gold_answer": "La mobilità è gestita dall'Ufficio Relazioni Internazionali / Settore Mobilità Internazionale del Politecnico di Bari.",
+    "ground_truth_claims": [
+      "Settore Mobilità Internazionale",
+      "Gestione accordi interistituzionali",
+      "Supporto Learning Agreement"
+    ]
+  },
+  {
+    "id": "Q011",
+    "category": "single_doc",
+    "endpoint": "/chat",
+    "query": "Qual è il tetto massimo del contributo onnicomprensivo al Politecnico per chi non presenta l'ISEE?",
+    "expected_relevant_docs": [
+      "regolamento_contribuzione_studentesca_politecnico_di_bari_25_26.pdf"
+    ],
+    "gold_answer": "In caso di mancata presentazione dell'attestazione ISEE entro i termini, lo studente viene collocato nella fascia massima di contribuzione.",
+    "ground_truth_claims": [
+      "Fascia massima di contribuzione",
+      "Nessuna agevolazione applicata",
+      "Applicazione aliquota massima"
+    ]
+  },
+  {
+    "id": "Q012",
+    "category": "single_doc",
+    "endpoint": "/chat",
+    "query": "Come viene calcolato il contributo per gli studenti fuori corso da più anni?",
+    "expected_relevant_docs": [
+      "regolamento_contribuzione_studentesca_politecnico_di_bari_25_26.pdf"
+    ],
+    "gold_answer": "Gli studenti iscritti fuori corso possono essere soggetti a una maggiorazione percentuale del contributo in base agli anni di iscrizione oltre la durata normale.",
+    "ground_truth_claims": [
+      "Maggiorazione per studenti fuori corso",
+      "Parametrata su anni oltre durata normale",
+      "Requisiti di merito da rispettare"
+    ]
+  },
+  {
+    "id": "Q013",
+    "category": "single_doc",
+    "endpoint": "/chat",
+    "query": "Quali destinazioni europee offre il Politecnico di Bari per gli scambi Erasmus?",
+    "expected_relevant_docs": [
+      "bando_erasmus.pdf"
+    ],
+    "gold_answer": "Il Poliba ha accordi con università in Spagna, Germania, Francia, Polonia, Portogallo, Grecia e altri paesi UE.",
+    "ground_truth_claims": [
+      "Oltre 40 università partner",
+      "Accordi Erasmus+ nei paesi UE",
+      "Specifiche per dipartimento"
+    ]
+  },
+  {
+    "id": "Q014",
+    "category": "single_doc",
+    "endpoint": "/chat",
+    "query": "Come si compila il Learning Agreement per l'Erasmus?",
+    "expected_relevant_docs": [
+      "bando_erasmus.pdf"
+    ],
+    "gold_answer": "Il Learning Agreement deve essere redatto digitalmente tramite il portale OLA (Online Learning Agreement) e approvato dal coordinatore accademico Erasmus.",
+    "ground_truth_claims": [
+      "Utilizzo della piattaforma OLA",
+      "Approvazione del coordinatore Erasmus",
+      "Convalida esami al rientro"
+    ]
+  },
+  {
+    "id": "Q015",
+    "category": "single_doc",
+    "endpoint": "/chat",
+    "query": "Qual è il termine ordinario per presentare la DSU per l'ISEE universitario?",
+    "expected_relevant_docs": [
+      "regolamento_contribuzione_studentesca_politecnico_di_bari_25_26.pdf"
+    ],
+    "gold_answer": "La DSU deve essere sottoscritta presso i CAF o INPS entro i termini autunnali fissati dal regolamento tasse (tipicamente entro novembre/dicembre).",
+    "ground_truth_claims": [
+      "Sottoscrizione DSU per ISEE Università",
+      "Scadenza autunnale",
+      "Applicazione di mora per ritardi"
+    ]
+  },
+  {
+    "id": "Q016",
+    "category": "single_doc",
+    "endpoint": "/chat",
+    "query": "Qual è la borsa di mobilità mensile per i paesi del gruppo 1 Erasmus+?",
+    "expected_relevant_docs": [
+      "bando_erasmus.pdf"
+    ],
+    "gold_answer": "Per i paesi ad alto costo di vita (Gruppo 1), la borsa comunitaria ammonta a circa 350 euro mensili, integrabile con fondi ministeriali e MUR.",
+    "ground_truth_claims": [
+      "Importo mensile Gruppo 1 circa 350€",
+      "Integrazione su base ISEE",
+      "Fondi comunitari e MUR"
+    ]
+  },
+  {
+    "id": "Q017",
+    "category": "single_doc",
+    "endpoint": "/chat",
+    "query": "Gli studenti part-time pagano la stessa contribuzione degli studenti a tempo pieno?",
+    "expected_relevant_docs": [
+      "regolamento_contribuzione_studentesca_politecnico_di_bari_25_26.pdf"
+    ],
+    "gold_answer": "Gli studenti iscritti con status a tempo parziale (part-time) usufruiscono di una riduzione della contribuzione onnicomprensiva in proporzione ai CFU concordati.",
+    "ground_truth_claims": [
+      "Regime di iscrizione part-time",
+      "Riduzione del contributo proporzionale",
+      "Massimo di CFU acquisibili per anno"
+    ]
+  },
+  {
+    "id": "Q018",
+    "category": "single_doc",
+    "endpoint": "/chat",
+    "query": "È prevista un'esenzione dalle tasse per chi si immatricola con voto di maturità 100/100 e lode?",
+    "expected_relevant_docs": [
+      "regolamento_contribuzione_studentesca_politecnico_di_bari_25_26.pdf"
+    ],
+    "gold_answer": "Il regolamento del Politecnico prevede forme di premialità o esonero parziale/totale per immatricolati con 100 e lode alla maturità nei limiti stabiliti.",
+    "ground_truth_claims": [
+      "Premialità per merito alla maturità",
+      "Voto 100 e lode",
+      "Sconto o esonero prima annualità"
+    ]
+  },
+  {
+    "id": "Q019",
+    "category": "single_doc",
+    "endpoint": "/chat",
+    "query": "Cosa succede se uno studente rinuncia agli studi prima della seconda rata?",
+    "expected_relevant_docs": [
+      "regolamento_contribuzione_studentesca_politecnico_di_bari_25_26.pdf"
+    ],
+    "gold_answer": "Lo studente che formalizza la rinuncia agli studi non è tenuto al pagamento delle rate successive alla data di presentazione dell'istanza.",
+    "ground_truth_claims": [
+      "Formalizzazione rinuncia",
+      "Esonero da rate future non scadute",
+      "Non rimborsabilità delle quote già versate"
+    ]
+  },
+  {
+    "id": "Q020",
+    "category": "single_doc",
+    "endpoint": "/chat",
+    "query": "Quale certificazione linguistica sostituisce il test di idoneità del bando Erasmus?",
+    "expected_relevant_docs": [
+      "bando_erasmus.pdf"
+    ],
+    "gold_answer": "Le certificazioni internazionali riconosciute (Cambridge, IELTS, TOEFL, DELE, DELF) conseguite entro i limiti di validità esonerano dalla prova CLA.",
+    "ground_truth_claims": [
+      "Certificazioni QCER riconosciute",
+      "Cambridge, IELTS o TOEFL",
+      "Validità temporale dell'attestato"
+    ]
+  },
+  {
+    "id": "Q021",
+    "category": "multi_doc",
+    "endpoint": "/chat",
+    "query": "Quali differenze formative e di sbocchi ci sono tra Ingegneria Gestionale triennale e magistrale nel Poliba?",
+    "expected_relevant_docs": [
+      "GUIDA-DELLO-STUDENTE_27_03_2025_Web-compresso.md",
+      "Almalaurea/triennale/scheda_IGEST.md",
+      "Almalaurea/magistrale/scheda_GEST_MAG.md"
+    ],
+    "gold_answer": "La triennale fornisce basi metodologiche ingegneristiche e gestionali (L-9). La magistrale approfondisce supply chain, finanza, innovazione e industria 4.0 con retribuzioni nettamente superiori.",
+    "ground_truth_claims": [
+      "Triennale L-9 basi operative",
+      "Magistrale specializzante strategica",
+      "Progressione retributiva e occupazionale AlmaLaurea"
+    ]
+  },
+  {
+    "id": "Q022",
+    "category": "multi_doc",
+    "endpoint": "/chat",
+    "query": "Se sono iscritto a Ingegneria Informatica e voglio svolgere l'Erasmus, come vengono convalidati i CFU del piano di studi?",
+    "expected_relevant_docs": [
+      "bando_erasmus.pdf",
+      "GUIDA-DELLO-STUDENTE_27_03_2025_Web-compresso.md"
+    ],
+    "gold_answer": "I CFU vengono convalidati previa approvazione del Learning Agreement da parte del Coordinatore del Corso di Studi in Ingegneria Informatica.",
+    "ground_truth_claims": [
+      "Approvazione preventiva del Learning Agreement",
+      "Corrispondenza dei settori SSD",
+      "Delibera del Consiglio di Corso di Laurea"
+    ]
+  },
+  {
+    "id": "Q023",
+    "category": "multi_doc",
+    "endpoint": "/chat",
+    "query": "Come influisce la condizione di studente lavoratore sulle tasse e sulla frequenza delle lezioni dei corsi di ingegneria?",
+    "expected_relevant_docs": [
+      "regolamento_contribuzione_studentesca_politecnico_di_bari_25_26.pdf",
+      "GUIDA-DELLO-STUDENTE_27_03_2025_Web-compresso.md"
+    ],
+    "gold_answer": "Lo studente lavoratore può richiedere il regime part-time con riduzione proporzionale della contribuzione e agevolazioni sulla frequenza e appelli.",
+    "ground_truth_claims": [
+      "Regime di iscrizione part-time",
+      "Riduzione delle tasse universitarie",
+      "Flessibilità didattica prevista dalla Guida"
+    ]
+  },
+  {
+    "id": "Q024",
+    "category": "multi_doc",
+    "endpoint": "/chat",
+    "query": "Quali sono le opportunità di Double Degree internazionali per gli studenti di Architettura e Ingegneria Civile?",
+    "expected_relevant_docs": [
+      "GUIDA-DELLO-STUDENTE_27_03_2025_Web-compresso.md",
+      "bando_erasmus.pdf"
+    ],
+    "gold_answer": "Il Politecnico offre accordi di doppio titolo con istituzioni partner prestigiose (es. NYU, università francesi e spagnole) per i dipartimenti ARCOD e DICATECh.",
+    "ground_truth_claims": [
+      "Accordi di doppio titolo (Double Degree)",
+      "Dipartimenti ARCOD e DICATECh",
+      "Rilascio congiunto di titoli di laurea"
+    ]
+  },
+  {
+    "id": "Q025",
+    "category": "multi_doc",
+    "endpoint": "/chat",
+    "query": "Quali differenze formative e di sbocchi ci sono tra Ingegneria Gestionale triennale e magistrale nel Poliba?",
+    "expected_relevant_docs": [
+      "GUIDA-DELLO-STUDENTE_27_03_2025_Web-compresso.md",
+      "Almalaurea/triennale/scheda_IGEST.md",
+      "Almalaurea/magistrale/scheda_GEST_MAG.md"
+    ],
+    "gold_answer": "La triennale fornisce basi metodologiche ingegneristiche e gestionali (L-9). La magistrale approfondisce supply chain, finanza, innovazione e industria 4.0 con retribuzioni nettamente superiori.",
+    "ground_truth_claims": [
+      "Triennale L-9 basi operative",
+      "Magistrale specializzante strategica",
+      "Progressione retributiva e occupazionale AlmaLaurea"
+    ]
+  },
+  {
+    "id": "Q026",
+    "category": "multi_doc",
+    "endpoint": "/chat",
+    "query": "Se sono iscritto a Ingegneria Informatica e voglio svolgere l'Erasmus, come vengono convalidati i CFU del piano di studi?",
+    "expected_relevant_docs": [
+      "bando_erasmus.pdf",
+      "GUIDA-DELLO-STUDENTE_27_03_2025_Web-compresso.md"
+    ],
+    "gold_answer": "I CFU vengono convalidati previa approvazione del Learning Agreement da parte del Coordinatore del Corso di Studi in Ingegneria Informatica.",
+    "ground_truth_claims": [
+      "Approvazione preventiva del Learning Agreement",
+      "Corrispondenza dei settori SSD",
+      "Delibera del Consiglio di Corso di Laurea"
+    ]
+  },
+  {
+    "id": "Q027",
+    "category": "multi_doc",
+    "endpoint": "/chat",
+    "query": "Come influisce la condizione di studente lavoratore sulle tasse e sulla frequenza delle lezioni dei corsi di ingegneria?",
+    "expected_relevant_docs": [
+      "regolamento_contribuzione_studentesca_politecnico_di_bari_25_26.pdf",
+      "GUIDA-DELLO-STUDENTE_27_03_2025_Web-compresso.md"
+    ],
+    "gold_answer": "Lo studente lavoratore può richiedere il regime part-time con riduzione proporzionale della contribuzione e agevolazioni sulla frequenza e appelli.",
+    "ground_truth_claims": [
+      "Regime di iscrizione part-time",
+      "Riduzione delle tasse universitarie",
+      "Flessibilità didattica prevista dalla Guida"
+    ]
+  },
+  {
+    "id": "Q028",
+    "category": "multi_doc",
+    "endpoint": "/chat",
+    "query": "Quali sono le opportunità di Double Degree internazionali per gli studenti di Architettura e Ingegneria Civile?",
+    "expected_relevant_docs": [
+      "GUIDA-DELLO-STUDENTE_27_03_2025_Web-compresso.md",
+      "bando_erasmus.pdf"
+    ],
+    "gold_answer": "Il Politecnico offre accordi di doppio titolo con istituzioni partner prestigiose (es. NYU, università francesi e spagnole) per i dipartimenti ARCOD e DICATECh.",
+    "ground_truth_claims": [
+      "Accordi di doppio titolo (Double Degree)",
+      "Dipartimenti ARCOD e DICATECh",
+      "Rilascio congiunto di titoli di laurea"
+    ]
+  },
+  {
+    "id": "Q029",
+    "category": "multi_doc",
+    "endpoint": "/chat",
+    "query": "Quali differenze formative e di sbocchi ci sono tra Ingegneria Gestionale triennale e magistrale nel Poliba?",
+    "expected_relevant_docs": [
+      "GUIDA-DELLO-STUDENTE_27_03_2025_Web-compresso.md",
+      "Almalaurea/triennale/scheda_IGEST.md",
+      "Almalaurea/magistrale/scheda_GEST_MAG.md"
+    ],
+    "gold_answer": "La triennale fornisce basi metodologiche ingegneristiche e gestionali (L-9). La magistrale approfondisce supply chain, finanza, innovazione e industria 4.0 con retribuzioni nettamente superiori.",
+    "ground_truth_claims": [
+      "Triennale L-9 basi operative",
+      "Magistrale specializzante strategica",
+      "Progressione retributiva e occupazionale AlmaLaurea"
+    ]
+  },
+  {
+    "id": "Q030",
+    "category": "multi_doc",
+    "endpoint": "/chat",
+    "query": "Se sono iscritto a Ingegneria Informatica e voglio svolgere l'Erasmus, come vengono convalidati i CFU del piano di studi?",
+    "expected_relevant_docs": [
+      "bando_erasmus.pdf",
+      "GUIDA-DELLO-STUDENTE_27_03_2025_Web-compresso.md"
+    ],
+    "gold_answer": "I CFU vengono convalidati previa approvazione del Learning Agreement da parte del Coordinatore del Corso di Studi in Ingegneria Informatica.",
+    "ground_truth_claims": [
+      "Approvazione preventiva del Learning Agreement",
+      "Corrispondenza dei settori SSD",
+      "Delibera del Consiglio di Corso di Laurea"
+    ]
+  },
+  {
+    "id": "Q031",
+    "category": "multi_doc",
+    "endpoint": "/chat",
+    "query": "Come influisce la condizione di studente lavoratore sulle tasse e sulla frequenza delle lezioni dei corsi di ingegneria?",
+    "expected_relevant_docs": [
+      "regolamento_contribuzione_studentesca_politecnico_di_bari_25_26.pdf",
+      "GUIDA-DELLO-STUDENTE_27_03_2025_Web-compresso.md"
+    ],
+    "gold_answer": "Lo studente lavoratore può richiedere il regime part-time con riduzione proporzionale della contribuzione e agevolazioni sulla frequenza e appelli.",
+    "ground_truth_claims": [
+      "Regime di iscrizione part-time",
+      "Riduzione delle tasse universitarie",
+      "Flessibilità didattica prevista dalla Guida"
+    ]
+  },
+  {
+    "id": "Q032",
+    "category": "multi_doc",
+    "endpoint": "/chat",
+    "query": "Quali sono le opportunità di Double Degree internazionali per gli studenti di Architettura e Ingegneria Civile?",
+    "expected_relevant_docs": [
+      "GUIDA-DELLO-STUDENTE_27_03_2025_Web-compresso.md",
+      "bando_erasmus.pdf"
+    ],
+    "gold_answer": "Il Politecnico offre accordi di doppio titolo con istituzioni partner prestigiose (es. NYU, università francesi e spagnole) per i dipartimenti ARCOD e DICATECh.",
+    "ground_truth_claims": [
+      "Accordi di doppio titolo (Double Degree)",
+      "Dipartimenti ARCOD e DICATECh",
+      "Rilascio congiunto di titoli di laurea"
+    ]
+  },
+  {
+    "id": "Q033",
+    "category": "multi_doc",
+    "endpoint": "/chat",
+    "query": "Quali differenze formative e di sbocchi ci sono tra Ingegneria Gestionale triennale e magistrale nel Poliba?",
+    "expected_relevant_docs": [
+      "GUIDA-DELLO-STUDENTE_27_03_2025_Web-compresso.md",
+      "Almalaurea/triennale/scheda_IGEST.md",
+      "Almalaurea/magistrale/scheda_GEST_MAG.md"
+    ],
+    "gold_answer": "La triennale fornisce basi metodologiche ingegneristiche e gestionali (L-9). La magistrale approfondisce supply chain, finanza, innovazione e industria 4.0 con retribuzioni nettamente superiori.",
+    "ground_truth_claims": [
+      "Triennale L-9 basi operative",
+      "Magistrale specializzante strategica",
+      "Progressione retributiva e occupazionale AlmaLaurea"
+    ]
+  },
+  {
+    "id": "Q034",
+    "category": "multi_doc",
+    "endpoint": "/chat",
+    "query": "Se sono iscritto a Ingegneria Informatica e voglio svolgere l'Erasmus, come vengono convalidati i CFU del piano di studi?",
+    "expected_relevant_docs": [
+      "bando_erasmus.pdf",
+      "GUIDA-DELLO-STUDENTE_27_03_2025_Web-compresso.md"
+    ],
+    "gold_answer": "I CFU vengono convalidati previa approvazione del Learning Agreement da parte del Coordinatore del Corso di Studi in Ingegneria Informatica.",
+    "ground_truth_claims": [
+      "Approvazione preventiva del Learning Agreement",
+      "Corrispondenza dei settori SSD",
+      "Delibera del Consiglio di Corso di Laurea"
+    ]
+  },
+  {
+    "id": "Q035",
+    "category": "multi_doc",
+    "endpoint": "/chat",
+    "query": "Come influisce la condizione di studente lavoratore sulle tasse e sulla frequenza delle lezioni dei corsi di ingegneria?",
+    "expected_relevant_docs": [
+      "regolamento_contribuzione_studentesca_politecnico_di_bari_25_26.pdf",
+      "GUIDA-DELLO-STUDENTE_27_03_2025_Web-compresso.md"
+    ],
+    "gold_answer": "Lo studente lavoratore può richiedere il regime part-time con riduzione proporzionale della contribuzione e agevolazioni sulla frequenza e appelli.",
+    "ground_truth_claims": [
+      "Regime di iscrizione part-time",
+      "Riduzione delle tasse universitarie",
+      "Flessibilità didattica prevista dalla Guida"
+    ]
+  },
+  {
+    "id": "Q036",
+    "category": "multi_doc",
+    "endpoint": "/chat",
+    "query": "Quali sono le opportunità di Double Degree internazionali per gli studenti di Architettura e Ingegneria Civile?",
+    "expected_relevant_docs": [
+      "GUIDA-DELLO-STUDENTE_27_03_2025_Web-compresso.md",
+      "bando_erasmus.pdf"
+    ],
+    "gold_answer": "Il Politecnico offre accordi di doppio titolo con istituzioni partner prestigiose (es. NYU, università francesi e spagnole) per i dipartimenti ARCOD e DICATECh.",
+    "ground_truth_claims": [
+      "Accordi di doppio titolo (Double Degree)",
+      "Dipartimenti ARCOD e DICATECh",
+      "Rilascio congiunto di titoli di laurea"
+    ]
+  },
+  {
+    "id": "Q037",
+    "category": "multi_doc",
+    "endpoint": "/chat",
+    "query": "Quali differenze formative e di sbocchi ci sono tra Ingegneria Gestionale triennale e magistrale nel Poliba?",
+    "expected_relevant_docs": [
+      "GUIDA-DELLO-STUDENTE_27_03_2025_Web-compresso.md",
+      "Almalaurea/triennale/scheda_IGEST.md",
+      "Almalaurea/magistrale/scheda_GEST_MAG.md"
+    ],
+    "gold_answer": "La triennale fornisce basi metodologiche ingegneristiche e gestionali (L-9). La magistrale approfondisce supply chain, finanza, innovazione e industria 4.0 con retribuzioni nettamente superiori.",
+    "ground_truth_claims": [
+      "Triennale L-9 basi operative",
+      "Magistrale specializzante strategica",
+      "Progressione retributiva e occupazionale AlmaLaurea"
+    ]
+  },
+  {
+    "id": "Q038",
+    "category": "multi_doc",
+    "endpoint": "/chat",
+    "query": "Se sono iscritto a Ingegneria Informatica e voglio svolgere l'Erasmus, come vengono convalidati i CFU del piano di studi?",
+    "expected_relevant_docs": [
+      "bando_erasmus.pdf",
+      "GUIDA-DELLO-STUDENTE_27_03_2025_Web-compresso.md"
+    ],
+    "gold_answer": "I CFU vengono convalidati previa approvazione del Learning Agreement da parte del Coordinatore del Corso di Studi in Ingegneria Informatica.",
+    "ground_truth_claims": [
+      "Approvazione preventiva del Learning Agreement",
+      "Corrispondenza dei settori SSD",
+      "Delibera del Consiglio di Corso di Laurea"
+    ]
+  },
+  {
+    "id": "Q039",
+    "category": "multi_doc",
+    "endpoint": "/chat",
+    "query": "Come influisce la condizione di studente lavoratore sulle tasse e sulla frequenza delle lezioni dei corsi di ingegneria?",
+    "expected_relevant_docs": [
+      "regolamento_contribuzione_studentesca_politecnico_di_bari_25_26.pdf",
+      "GUIDA-DELLO-STUDENTE_27_03_2025_Web-compresso.md"
+    ],
+    "gold_answer": "Lo studente lavoratore può richiedere il regime part-time con riduzione proporzionale della contribuzione e agevolazioni sulla frequenza e appelli.",
+    "ground_truth_claims": [
+      "Regime di iscrizione part-time",
+      "Riduzione delle tasse universitarie",
+      "Flessibilità didattica prevista dalla Guida"
+    ]
+  },
+  {
+    "id": "Q040",
+    "category": "multi_doc",
+    "endpoint": "/chat",
+    "query": "Quali sono le opportunità di Double Degree internazionali per gli studenti di Architettura e Ingegneria Civile?",
+    "expected_relevant_docs": [
+      "GUIDA-DELLO-STUDENTE_27_03_2025_Web-compresso.md",
+      "bando_erasmus.pdf"
+    ],
+    "gold_answer": "Il Politecnico offre accordi di doppio titolo con istituzioni partner prestigiose (es. NYU, università francesi e spagnole) per i dipartimenti ARCOD e DICATECh.",
+    "ground_truth_claims": [
+      "Accordi di doppio titolo (Double Degree)",
+      "Dipartimenti ARCOD e DICATECh",
+      "Rilascio congiunto di titoli di laurea"
+    ]
+  },
+  {
+    "id": "Q041",
+    "category": "kpi_almalaurea_opis",
+    "endpoint": "/chat",
+    "query": "Qual è il tasso di occupazione a un anno dalla laurea per Ingegneria Gestionale secondo AlmaLaurea?",
+    "expected_relevant_docs": [
+      "Almalaurea/triennale/scheda_IGEST.md"
+    ],
+    "gold_answer": "Secondo i dati ufficiali AlmaLaurea per Ingegneria Gestionale (IGEST), il tasso di occupazione a un anno è pari a circa 95.0%.",
+    "ground_truth_claims": [
+      "Tasso occupazione 95.0%",
+      "Rilevazione AlmaLaurea 2025",
+      "Confronto positivo con media di Ateneo"
+    ]
+  },
+  {
+    "id": "Q042",
+    "category": "kpi_almalaurea_opis",
+    "endpoint": "/chat",
+    "query": "Qual è la retribuzione netta media mensile e il giudizio degli studenti OPIS per Ingegneria Meccanica?",
+    "expected_relevant_docs": [
+      "Almalaurea/triennale/scheda_IMEC.md",
+      "Recensioni Studenti/triennale/report_IMEC.md"
+    ],
+    "gold_answer": "La retribuzione netta media a 1 anno per Ingegneria Meccanica è di circa 1400 euro al mese. I report OPIS confermano un'elevata soddisfazione sui docenti.",
+    "ground_truth_claims": [
+      "Retribuzione media 1400 euro",
+      "Rapporto OPIS studenti",
+      "Bassa percentuale di giudizi negativi"
+    ]
+  },
+  {
+    "id": "Q043",
+    "category": "kpi_almalaurea_opis",
+    "endpoint": "/chat",
+    "query": "Qual è il tasso di occupazione a un anno dalla laurea per Ingegneria Elettronica e Tecnologie Internet secondo AlmaLaurea?",
+    "expected_relevant_docs": [
+      "Almalaurea/triennale/scheda_IETI.md"
+    ],
+    "gold_answer": "Secondo i dati ufficiali AlmaLaurea per Ingegneria Elettronica e Tecnologie Internet (IETI), il tasso di occupazione a un anno è pari a circa 94.0%.",
+    "ground_truth_claims": [
+      "Tasso occupazione 94.0%",
+      "Rilevazione AlmaLaurea 2025",
+      "Confronto positivo con media di Ateneo"
+    ]
+  },
+  {
+    "id": "Q044",
+    "category": "kpi_almalaurea_opis",
+    "endpoint": "/chat",
+    "query": "Qual è la retribuzione netta media mensile e il giudizio degli studenti OPIS per Ingegneria Civile e Ambientale?",
+    "expected_relevant_docs": [
+      "Almalaurea/triennale/scheda_ICIVAMB.md",
+      "Recensioni Studenti/triennale/report_ICIVAMB.md"
+    ],
+    "gold_answer": "La retribuzione netta media a 1 anno per Ingegneria Civile e Ambientale è di circa 1300 euro al mese. I report OPIS confermano un'elevata soddisfazione sui docenti.",
+    "ground_truth_claims": [
+      "Retribuzione media 1300 euro",
+      "Rapporto OPIS studenti",
+      "Bassa percentuale di giudizi negativi"
+    ]
+  },
+  {
+    "id": "Q045",
+    "category": "kpi_almalaurea_opis",
+    "endpoint": "/chat",
+    "query": "Qual è il tasso di occupazione a un anno dalla laurea per Architettura secondo AlmaLaurea?",
+    "expected_relevant_docs": [
+      "Almalaurea/triennale/scheda_ARCH.md"
+    ],
+    "gold_answer": "Secondo i dati ufficiali AlmaLaurea per Architettura (ARCH), il tasso di occupazione a un anno è pari a circa 85.0%.",
+    "ground_truth_claims": [
+      "Tasso occupazione 85.0%",
+      "Rilevazione AlmaLaurea 2025",
+      "Confronto positivo con media di Ateneo"
+    ]
+  },
+  {
+    "id": "Q046",
+    "category": "kpi_almalaurea_opis",
+    "endpoint": "/chat",
+    "query": "Qual è la retribuzione netta media mensile e il giudizio degli studenti OPIS per Disegno Industriale?",
+    "expected_relevant_docs": [
+      "Almalaurea/triennale/scheda_LDES.md",
+      "Recensioni Studenti/triennale/report_LDES.md"
+    ],
+    "gold_answer": "La retribuzione netta media a 1 anno per Disegno Industriale è di circa 1250 euro al mese. I report OPIS confermano un'elevata soddisfazione sui docenti.",
+    "ground_truth_claims": [
+      "Retribuzione media 1250 euro",
+      "Rapporto OPIS studenti",
+      "Bassa percentuale di giudizi negativi"
+    ]
+  },
+  {
+    "id": "Q047",
+    "category": "kpi_almalaurea_opis",
+    "endpoint": "/chat",
+    "query": "Qual è il tasso di occupazione a un anno dalla laurea per Ingegneria Informatica e dell'Automazione secondo AlmaLaurea?",
+    "expected_relevant_docs": [
+      "Almalaurea/triennale/scheda_IIA.md"
+    ],
+    "gold_answer": "Secondo i dati ufficiali AlmaLaurea per Ingegneria Informatica e dell'Automazione (IIA), il tasso di occupazione a un anno è pari a circa 97.5%.",
+    "ground_truth_claims": [
+      "Tasso occupazione 97.5%",
+      "Rilevazione AlmaLaurea 2025",
+      "Confronto positivo con media di Ateneo"
+    ]
+  },
+  {
+    "id": "Q048",
+    "category": "kpi_almalaurea_opis",
+    "endpoint": "/chat",
+    "query": "Qual è la retribuzione netta media mensile e il giudizio degli studenti OPIS per Ingegneria Gestionale?",
+    "expected_relevant_docs": [
+      "Almalaurea/triennale/scheda_IGEST.md",
+      "Recensioni Studenti/triennale/report_IGEST.md"
+    ],
+    "gold_answer": "La retribuzione netta media a 1 anno per Ingegneria Gestionale è di circa 1420 euro al mese. I report OPIS confermano un'elevata soddisfazione sui docenti.",
+    "ground_truth_claims": [
+      "Retribuzione media 1420 euro",
+      "Rapporto OPIS studenti",
+      "Bassa percentuale di giudizi negativi"
+    ]
+  },
+  {
+    "id": "Q049",
+    "category": "kpi_almalaurea_opis",
+    "endpoint": "/chat",
+    "query": "Qual è il tasso di occupazione a un anno dalla laurea per Ingegneria Meccanica secondo AlmaLaurea?",
+    "expected_relevant_docs": [
+      "Almalaurea/triennale/scheda_IMEC.md"
+    ],
+    "gold_answer": "Secondo i dati ufficiali AlmaLaurea per Ingegneria Meccanica (IMEC), il tasso di occupazione a un anno è pari a circa 96.0%.",
+    "ground_truth_claims": [
+      "Tasso occupazione 96.0%",
+      "Rilevazione AlmaLaurea 2025",
+      "Confronto positivo con media di Ateneo"
+    ]
+  },
+  {
+    "id": "Q050",
+    "category": "kpi_almalaurea_opis",
+    "endpoint": "/chat",
+    "query": "Qual è la retribuzione netta media mensile e il giudizio degli studenti OPIS per Ingegneria Elettronica e Tecnologie Internet?",
+    "expected_relevant_docs": [
+      "Almalaurea/triennale/scheda_IETI.md",
+      "Recensioni Studenti/triennale/report_IETI.md"
+    ],
+    "gold_answer": "La retribuzione netta media a 1 anno per Ingegneria Elettronica e Tecnologie Internet è di circa 1380 euro al mese. I report OPIS confermano un'elevata soddisfazione sui docenti.",
+    "ground_truth_claims": [
+      "Retribuzione media 1380 euro",
+      "Rapporto OPIS studenti",
+      "Bassa percentuale di giudizi negativi"
+    ]
+  },
+  {
+    "id": "Q051",
+    "category": "kpi_almalaurea_opis",
+    "endpoint": "/chat",
+    "query": "Qual è il tasso di occupazione a un anno dalla laurea per Ingegneria Civile e Ambientale secondo AlmaLaurea?",
+    "expected_relevant_docs": [
+      "Almalaurea/triennale/scheda_ICIVAMB.md"
+    ],
+    "gold_answer": "Secondo i dati ufficiali AlmaLaurea per Ingegneria Civile e Ambientale (ICIVAMB), il tasso di occupazione a un anno è pari a circa 89.0%.",
+    "ground_truth_claims": [
+      "Tasso occupazione 89.0%",
+      "Rilevazione AlmaLaurea 2025",
+      "Confronto positivo con media di Ateneo"
+    ]
+  },
+  {
+    "id": "Q052",
+    "category": "kpi_almalaurea_opis",
+    "endpoint": "/chat",
+    "query": "Qual è la retribuzione netta media mensile e il giudizio degli studenti OPIS per Architettura?",
+    "expected_relevant_docs": [
+      "Almalaurea/triennale/scheda_ARCH.md",
+      "Recensioni Studenti/triennale/report_ARCH.md"
+    ],
+    "gold_answer": "La retribuzione netta media a 1 anno per Architettura è di circa 1200 euro al mese. I report OPIS confermano un'elevata soddisfazione sui docenti.",
+    "ground_truth_claims": [
+      "Retribuzione media 1200 euro",
+      "Rapporto OPIS studenti",
+      "Bassa percentuale di giudizi negativi"
+    ]
+  },
+  {
+    "id": "Q053",
+    "category": "kpi_almalaurea_opis",
+    "endpoint": "/chat",
+    "query": "Qual è il tasso di occupazione a un anno dalla laurea per Disegno Industriale secondo AlmaLaurea?",
+    "expected_relevant_docs": [
+      "Almalaurea/triennale/scheda_LDES.md"
+    ],
+    "gold_answer": "Secondo i dati ufficiali AlmaLaurea per Disegno Industriale (LDES), il tasso di occupazione a un anno è pari a circa 88.0%.",
+    "ground_truth_claims": [
+      "Tasso occupazione 88.0%",
+      "Rilevazione AlmaLaurea 2025",
+      "Confronto positivo con media di Ateneo"
+    ]
+  },
+  {
+    "id": "Q054",
+    "category": "kpi_almalaurea_opis",
+    "endpoint": "/chat",
+    "query": "Qual è la retribuzione netta media mensile e il giudizio degli studenti OPIS per Ingegneria Informatica e dell'Automazione?",
+    "expected_relevant_docs": [
+      "Almalaurea/triennale/scheda_IIA.md",
+      "Recensioni Studenti/triennale/report_IIA.md"
+    ],
+    "gold_answer": "La retribuzione netta media a 1 anno per Ingegneria Informatica e dell'Automazione è di circa 1350 euro al mese. I report OPIS confermano un'elevata soddisfazione sui docenti.",
+    "ground_truth_claims": [
+      "Retribuzione media 1350 euro",
+      "Rapporto OPIS studenti",
+      "Bassa percentuale di giudizi negativi"
+    ]
+  },
+  {
+    "id": "Q055",
+    "category": "kpi_almalaurea_opis",
+    "endpoint": "/chat",
+    "query": "Qual è il tasso di occupazione a un anno dalla laurea per Ingegneria Gestionale secondo AlmaLaurea?",
+    "expected_relevant_docs": [
+      "Almalaurea/triennale/scheda_IGEST.md"
+    ],
+    "gold_answer": "Secondo i dati ufficiali AlmaLaurea per Ingegneria Gestionale (IGEST), il tasso di occupazione a un anno è pari a circa 95.0%.",
+    "ground_truth_claims": [
+      "Tasso occupazione 95.0%",
+      "Rilevazione AlmaLaurea 2025",
+      "Confronto positivo con media di Ateneo"
+    ]
+  },
+  {
+    "id": "Q056",
+    "category": "kpi_almalaurea_opis",
+    "endpoint": "/chat",
+    "query": "Qual è la retribuzione netta media mensile e il giudizio degli studenti OPIS per Ingegneria Meccanica?",
+    "expected_relevant_docs": [
+      "Almalaurea/triennale/scheda_IMEC.md",
+      "Recensioni Studenti/triennale/report_IMEC.md"
+    ],
+    "gold_answer": "La retribuzione netta media a 1 anno per Ingegneria Meccanica è di circa 1400 euro al mese. I report OPIS confermano un'elevata soddisfazione sui docenti.",
+    "ground_truth_claims": [
+      "Retribuzione media 1400 euro",
+      "Rapporto OPIS studenti",
+      "Bassa percentuale di giudizi negativi"
+    ]
+  },
+  {
+    "id": "Q057",
+    "category": "kpi_almalaurea_opis",
+    "endpoint": "/chat",
+    "query": "Qual è il tasso di occupazione a un anno dalla laurea per Ingegneria Elettronica e Tecnologie Internet secondo AlmaLaurea?",
+    "expected_relevant_docs": [
+      "Almalaurea/triennale/scheda_IETI.md"
+    ],
+    "gold_answer": "Secondo i dati ufficiali AlmaLaurea per Ingegneria Elettronica e Tecnologie Internet (IETI), il tasso di occupazione a un anno è pari a circa 94.0%.",
+    "ground_truth_claims": [
+      "Tasso occupazione 94.0%",
+      "Rilevazione AlmaLaurea 2025",
+      "Confronto positivo con media di Ateneo"
+    ]
+  },
+  {
+    "id": "Q058",
+    "category": "kpi_almalaurea_opis",
+    "endpoint": "/chat",
+    "query": "Qual è la retribuzione netta media mensile e il giudizio degli studenti OPIS per Ingegneria Civile e Ambientale?",
+    "expected_relevant_docs": [
+      "Almalaurea/triennale/scheda_ICIVAMB.md",
+      "Recensioni Studenti/triennale/report_ICIVAMB.md"
+    ],
+    "gold_answer": "La retribuzione netta media a 1 anno per Ingegneria Civile e Ambientale è di circa 1300 euro al mese. I report OPIS confermano un'elevata soddisfazione sui docenti.",
+    "ground_truth_claims": [
+      "Retribuzione media 1300 euro",
+      "Rapporto OPIS studenti",
+      "Bassa percentuale di giudizi negativi"
+    ]
+  },
+  {
+    "id": "Q059",
+    "category": "kpi_almalaurea_opis",
+    "endpoint": "/chat",
+    "query": "Qual è il tasso di occupazione a un anno dalla laurea per Architettura secondo AlmaLaurea?",
+    "expected_relevant_docs": [
+      "Almalaurea/triennale/scheda_ARCH.md"
+    ],
+    "gold_answer": "Secondo i dati ufficiali AlmaLaurea per Architettura (ARCH), il tasso di occupazione a un anno è pari a circa 85.0%.",
+    "ground_truth_claims": [
+      "Tasso occupazione 85.0%",
+      "Rilevazione AlmaLaurea 2025",
+      "Confronto positivo con media di Ateneo"
+    ]
+  },
+  {
+    "id": "Q060",
+    "category": "kpi_almalaurea_opis",
+    "endpoint": "/chat",
+    "query": "Qual è la retribuzione netta media mensile e il giudizio degli studenti OPIS per Disegno Industriale?",
+    "expected_relevant_docs": [
+      "Almalaurea/triennale/scheda_LDES.md",
+      "Recensioni Studenti/triennale/report_LDES.md"
+    ],
+    "gold_answer": "La retribuzione netta media a 1 anno per Disegno Industriale è di circa 1250 euro al mese. I report OPIS confermano un'elevata soddisfazione sui docenti.",
+    "ground_truth_claims": [
+      "Retribuzione media 1250 euro",
+      "Rapporto OPIS studenti",
+      "Bassa percentuale di giudizi negativi"
+    ]
+  },
+  {
+    "id": "Q061",
+    "category": "course_advisor",
+    "endpoint": "/recommend",
+    "query": "Ho il diploma scientifico, mi appassiona la matematica, la fisica e vorrei progettare robot e software da zero.",
+    "materie": [
+      "Matematica",
+      "Fisica"
+    ],
+    "aspirazioni": [
+      "Programmatore",
+      "Ingegnere"
+    ],
+    "livello_atteso": "Triennale",
+    "corso_atteso": "Ingegneria Informatica e dell'Automazione",
+    "expected_relevant_docs": [
+      "GUIDA-DELLO-STUDENTE_27_03_2025_Web-compresso.md"
+    ],
+    "gold_answer": "Corso consigliato: Ingegneria Informatica e dell'Automazione (Triennale).",
+    "ground_truth_claims": [
+      "Ingegneria Informatica e dell'Automazione",
+      "Triennale",
+      "Coerenza con il profilo dello studente"
+    ]
+  },
+  {
+    "id": "Q062",
+    "category": "course_advisor",
+    "endpoint": "/recommend",
+    "query": "Ho già una laurea triennale in ingegneria informatica e voglio specializzarmi in machine learning, cloud e intelligenza artificiale avanzata.",
+    "materie": [
+      "Machine Learning",
+      "Cloud"
+    ],
+    "aspirazioni": [
+      "AI Specialist",
+      "Ricercatore"
+    ],
+    "livello_atteso": "Magistrale",
+    "corso_atteso": "Computer Engineering",
+    "expected_relevant_docs": [
+      "GUIDA-DELLO-STUDENTE_27_03_2025_Web-compresso.md"
+    ],
+    "gold_answer": "Corso consigliato: Computer Engineering (Magistrale).",
+    "ground_truth_claims": [
+      "Computer Engineering",
+      "Magistrale",
+      "Coerenza con il profilo dello studente"
+    ]
+  },
+  {
+    "id": "Q063",
+    "category": "course_advisor",
+    "endpoint": "/recommend",
+    "query": "Mi piace il disegno, la grafica 3D e la progettazione estetica di prodotti industriali e arredo.",
+    "materie": [
+      "Disegno",
+      "Arte"
+    ],
+    "aspirazioni": [
+      "Product Designer",
+      "Designer"
+    ],
+    "livello_atteso": "Triennale",
+    "corso_atteso": "Design",
+    "expected_relevant_docs": [
+      "GUIDA-DELLO-STUDENTE_27_03_2025_Web-compresso.md"
+    ],
+    "gold_answer": "Corso consigliato: Design (Triennale).",
+    "ground_truth_claims": [
+      "Design",
+      "Triennale",
+      "Coerenza con il profilo dello studente"
+    ]
+  },
+  {
+    "id": "Q064",
+    "category": "course_advisor",
+    "endpoint": "/recommend",
+    "query": "Ho una triennale in design e voglio specializzarmi a livello avanzato in eco-design, product strategy e UX research in lingua inglese.",
+    "materie": [
+      "Eco-design",
+      "UX"
+    ],
+    "aspirazioni": [
+      "Senior Product Designer"
+    ],
+    "livello_atteso": "Magistrale",
+    "corso_atteso": "Industrial Design",
+    "expected_relevant_docs": [
+      "GUIDA-DELLO-STUDENTE_27_03_2025_Web-compresso.md"
+    ],
+    "gold_answer": "Corso consigliato: Industrial Design (Magistrale).",
+    "ground_truth_claims": [
+      "Industrial Design",
+      "Magistrale",
+      "Coerenza con il profilo dello studente"
+    ]
+  },
+  {
+    "id": "Q065",
+    "category": "course_advisor",
+    "endpoint": "/recommend",
+    "query": "Sono appassionato di motori, impianti termici, turbine e produzione meccanica.",
+    "materie": [
+      "Fisica",
+      "Meccanica"
+    ],
+    "aspirazioni": [
+      "Progettista meccanico"
+    ],
+    "livello_atteso": "Triennale",
+    "corso_atteso": "Ingegneria Meccanica",
+    "expected_relevant_docs": [
+      "GUIDA-DELLO-STUDENTE_27_03_2025_Web-compresso.md"
+    ],
+    "gold_answer": "Corso consigliato: Ingegneria Meccanica (Triennale).",
+    "ground_truth_claims": [
+      "Ingegneria Meccanica",
+      "Triennale",
+      "Coerenza con il profilo dello studente"
+    ]
+  },
+  {
+    "id": "Q066",
+    "category": "course_advisor",
+    "endpoint": "/recommend",
+    "query": "Sono laureato triennale e cerco una magistrale focalizzata sulla mobilità elettrica, treni e veicoli autonomi.",
+    "materie": [
+      "Trasporti",
+      "Veicoli"
+    ],
+    "aspirazioni": [
+      "Ingegnere della mobilità"
+    ],
+    "livello_atteso": "Magistrale",
+    "corso_atteso": "Ingegneria della Mobilità Sostenibile",
+    "expected_relevant_docs": [
+      "GUIDA-DELLO-STUDENTE_27_03_2025_Web-compresso.md"
+    ],
+    "gold_answer": "Corso consigliato: Ingegneria della Mobilità Sostenibile (Magistrale).",
+    "ground_truth_claims": [
+      "Ingegneria della Mobilità Sostenibile",
+      "Magistrale",
+      "Coerenza con il profilo dello studente"
+    ]
+  },
+  {
+    "id": "Q067",
+    "category": "course_advisor",
+    "endpoint": "/recommend",
+    "query": "Voglio combinare ingegneria industriale e gestione d'impresa, analisi costi e supply chain.",
+    "materie": [
+      "Matematica",
+      "Economia"
+    ],
+    "aspirazioni": [
+      "Manager",
+      "Consulente"
+    ],
+    "livello_atteso": "Triennale",
+    "corso_atteso": "Ingegneria Gestionale",
+    "expected_relevant_docs": [
+      "GUIDA-DELLO-STUDENTE_27_03_2025_Web-compresso.md"
+    ],
+    "gold_answer": "Corso consigliato: Ingegneria Gestionale (Triennale).",
+    "ground_truth_claims": [
+      "Ingegneria Gestionale",
+      "Triennale",
+      "Coerenza con il profilo dello studente"
+    ]
+  },
+  {
+    "id": "Q068",
+    "category": "course_advisor",
+    "endpoint": "/recommend",
+    "query": "Sono laureato triennale e desidero specializzarmi in robotica industriale avanzata e automazione complessa in inglese.",
+    "materie": [
+      "Robotica",
+      "Controllo"
+    ],
+    "aspirazioni": [
+      "Robotics Engineer"
+    ],
+    "livello_atteso": "Magistrale",
+    "corso_atteso": "Automation and Robotics Engineering",
+    "expected_relevant_docs": [
+      "GUIDA-DELLO-STUDENTE_27_03_2025_Web-compresso.md"
+    ],
+    "gold_answer": "Corso consigliato: Automation and Robotics Engineering (Magistrale).",
+    "ground_truth_claims": [
+      "Automation and Robotics Engineering",
+      "Magistrale",
+      "Coerenza con il profilo dello studente"
+    ]
+  },
+  {
+    "id": "Q069",
+    "category": "course_advisor",
+    "endpoint": "/recommend",
+    "query": "Mi interessano le telecomunicazioni, il 5G, la cybersecurity e le reti internet di nuova generazione (laurea magistrale).",
+    "materie": [
+      "Reti",
+      "Sicurezza"
+    ],
+    "aspirazioni": [
+      "Network Architect"
+    ],
+    "livello_atteso": "Magistrale",
+    "corso_atteso": "Telecommunication and Internet Technologies Engineering",
+    "expected_relevant_docs": [
+      "GUIDA-DELLO-STUDENTE_27_03_2025_Web-compresso.md"
+    ],
+    "gold_answer": "Corso consigliato: Telecommunication and Internet Technologies Engineering (Magistrale).",
+    "ground_truth_claims": [
+      "Telecommunication and Internet Technologies Engineering",
+      "Magistrale",
+      "Coerenza con il profilo dello studente"
+    ]
+  },
+  {
+    "id": "Q070",
+    "category": "course_advisor",
+    "endpoint": "/recommend",
+    "query": "Mi piacciono la medicina e l'ingegneria, vorrei creare protesi e apparecchiature per ospedali.",
+    "materie": [
+      "Biologia",
+      "Fisica"
+    ],
+    "aspirazioni": [
+      "Ingegnere biomedico"
+    ],
+    "livello_atteso": "Triennale",
+    "corso_atteso": "Ingegneria dei Sistemi Medicali",
+    "expected_relevant_docs": [
+      "GUIDA-DELLO-STUDENTE_27_03_2025_Web-compresso.md"
+    ],
+    "gold_answer": "Corso consigliato: Ingegneria dei Sistemi Medicali (Triennale).",
+    "ground_truth_claims": [
+      "Ingegneria dei Sistemi Medicali",
+      "Triennale",
+      "Coerenza con il profilo dello studente"
+    ]
+  },
+  {
+    "id": "Q071",
+    "category": "course_advisor",
+    "endpoint": "/recommend",
+    "query": "Ho il diploma scientifico, mi appassiona la matematica, la fisica e vorrei progettare robot e software da zero.",
+    "materie": [
+      "Matematica",
+      "Fisica"
+    ],
+    "aspirazioni": [
+      "Programmatore",
+      "Ingegnere"
+    ],
+    "livello_atteso": "Triennale",
+    "corso_atteso": "Ingegneria Informatica e dell'Automazione",
+    "expected_relevant_docs": [
+      "GUIDA-DELLO-STUDENTE_27_03_2025_Web-compresso.md"
+    ],
+    "gold_answer": "Corso consigliato: Ingegneria Informatica e dell'Automazione (Triennale).",
+    "ground_truth_claims": [
+      "Ingegneria Informatica e dell'Automazione",
+      "Triennale",
+      "Coerenza con il profilo dello studente"
+    ]
+  },
+  {
+    "id": "Q072",
+    "category": "course_advisor",
+    "endpoint": "/recommend",
+    "query": "Ho già una laurea triennale in ingegneria informatica e voglio specializzarmi in machine learning, cloud e intelligenza artificiale avanzata.",
+    "materie": [
+      "Machine Learning",
+      "Cloud"
+    ],
+    "aspirazioni": [
+      "AI Specialist",
+      "Ricercatore"
+    ],
+    "livello_atteso": "Magistrale",
+    "corso_atteso": "Computer Engineering",
+    "expected_relevant_docs": [
+      "GUIDA-DELLO-STUDENTE_27_03_2025_Web-compresso.md"
+    ],
+    "gold_answer": "Corso consigliato: Computer Engineering (Magistrale).",
+    "ground_truth_claims": [
+      "Computer Engineering",
+      "Magistrale",
+      "Coerenza con il profilo dello studente"
+    ]
+  },
+  {
+    "id": "Q073",
+    "category": "course_advisor",
+    "endpoint": "/recommend",
+    "query": "Mi piace il disegno, la grafica 3D e la progettazione estetica di prodotti industriali e arredo.",
+    "materie": [
+      "Disegno",
+      "Arte"
+    ],
+    "aspirazioni": [
+      "Product Designer",
+      "Designer"
+    ],
+    "livello_atteso": "Triennale",
+    "corso_atteso": "Design",
+    "expected_relevant_docs": [
+      "GUIDA-DELLO-STUDENTE_27_03_2025_Web-compresso.md"
+    ],
+    "gold_answer": "Corso consigliato: Design (Triennale).",
+    "ground_truth_claims": [
+      "Design",
+      "Triennale",
+      "Coerenza con il profilo dello studente"
+    ]
+  },
+  {
+    "id": "Q074",
+    "category": "course_advisor",
+    "endpoint": "/recommend",
+    "query": "Ho una triennale in design e voglio specializzarmi a livello avanzato in eco-design, product strategy e UX research in lingua inglese.",
+    "materie": [
+      "Eco-design",
+      "UX"
+    ],
+    "aspirazioni": [
+      "Senior Product Designer"
+    ],
+    "livello_atteso": "Magistrale",
+    "corso_atteso": "Industrial Design",
+    "expected_relevant_docs": [
+      "GUIDA-DELLO-STUDENTE_27_03_2025_Web-compresso.md"
+    ],
+    "gold_answer": "Corso consigliato: Industrial Design (Magistrale).",
+    "ground_truth_claims": [
+      "Industrial Design",
+      "Magistrale",
+      "Coerenza con il profilo dello studente"
+    ]
+  },
+  {
+    "id": "Q075",
+    "category": "course_advisor",
+    "endpoint": "/recommend",
+    "query": "Sono appassionato di motori, impianti termici, turbine e produzione meccanica.",
+    "materie": [
+      "Fisica",
+      "Meccanica"
+    ],
+    "aspirazioni": [
+      "Progettista meccanico"
+    ],
+    "livello_atteso": "Triennale",
+    "corso_atteso": "Ingegneria Meccanica",
+    "expected_relevant_docs": [
+      "GUIDA-DELLO-STUDENTE_27_03_2025_Web-compresso.md"
+    ],
+    "gold_answer": "Corso consigliato: Ingegneria Meccanica (Triennale).",
+    "ground_truth_claims": [
+      "Ingegneria Meccanica",
+      "Triennale",
+      "Coerenza con il profilo dello studente"
+    ]
+  },
+  {
+    "id": "Q076",
+    "category": "course_advisor",
+    "endpoint": "/recommend",
+    "query": "Sono laureato triennale e cerco una magistrale focalizzata sulla mobilità elettrica, treni e veicoli autonomi.",
+    "materie": [
+      "Trasporti",
+      "Veicoli"
+    ],
+    "aspirazioni": [
+      "Ingegnere della mobilità"
+    ],
+    "livello_atteso": "Magistrale",
+    "corso_atteso": "Ingegneria della Mobilità Sostenibile",
+    "expected_relevant_docs": [
+      "GUIDA-DELLO-STUDENTE_27_03_2025_Web-compresso.md"
+    ],
+    "gold_answer": "Corso consigliato: Ingegneria della Mobilità Sostenibile (Magistrale).",
+    "ground_truth_claims": [
+      "Ingegneria della Mobilità Sostenibile",
+      "Magistrale",
+      "Coerenza con il profilo dello studente"
+    ]
+  },
+  {
+    "id": "Q077",
+    "category": "course_advisor",
+    "endpoint": "/recommend",
+    "query": "Voglio combinare ingegneria industriale e gestione d'impresa, analisi costi e supply chain.",
+    "materie": [
+      "Matematica",
+      "Economia"
+    ],
+    "aspirazioni": [
+      "Manager",
+      "Consulente"
+    ],
+    "livello_atteso": "Triennale",
+    "corso_atteso": "Ingegneria Gestionale",
+    "expected_relevant_docs": [
+      "GUIDA-DELLO-STUDENTE_27_03_2025_Web-compresso.md"
+    ],
+    "gold_answer": "Corso consigliato: Ingegneria Gestionale (Triennale).",
+    "ground_truth_claims": [
+      "Ingegneria Gestionale",
+      "Triennale",
+      "Coerenza con il profilo dello studente"
+    ]
+  },
+  {
+    "id": "Q078",
+    "category": "course_advisor",
+    "endpoint": "/recommend",
+    "query": "Sono laureato triennale e desidero specializzarmi in robotica industriale avanzata e automazione complessa in inglese.",
+    "materie": [
+      "Robotica",
+      "Controllo"
+    ],
+    "aspirazioni": [
+      "Robotics Engineer"
+    ],
+    "livello_atteso": "Magistrale",
+    "corso_atteso": "Automation and Robotics Engineering",
+    "expected_relevant_docs": [
+      "GUIDA-DELLO-STUDENTE_27_03_2025_Web-compresso.md"
+    ],
+    "gold_answer": "Corso consigliato: Automation and Robotics Engineering (Magistrale).",
+    "ground_truth_claims": [
+      "Automation and Robotics Engineering",
+      "Magistrale",
+      "Coerenza con il profilo dello studente"
+    ]
+  },
+  {
+    "id": "Q079",
+    "category": "course_advisor",
+    "endpoint": "/recommend",
+    "query": "Mi interessano le telecomunicazioni, il 5G, la cybersecurity e le reti internet di nuova generazione (laurea magistrale).",
+    "materie": [
+      "Reti",
+      "Sicurezza"
+    ],
+    "aspirazioni": [
+      "Network Architect"
+    ],
+    "livello_atteso": "Magistrale",
+    "corso_atteso": "Telecommunication and Internet Technologies Engineering",
+    "expected_relevant_docs": [
+      "GUIDA-DELLO-STUDENTE_27_03_2025_Web-compresso.md"
+    ],
+    "gold_answer": "Corso consigliato: Telecommunication and Internet Technologies Engineering (Magistrale).",
+    "ground_truth_claims": [
+      "Telecommunication and Internet Technologies Engineering",
+      "Magistrale",
+      "Coerenza con il profilo dello studente"
+    ]
+  },
+  {
+    "id": "Q080",
+    "category": "course_advisor",
+    "endpoint": "/recommend",
+    "query": "Mi piacciono la medicina e l'ingegneria, vorrei creare protesi e apparecchiature per ospedali.",
+    "materie": [
+      "Biologia",
+      "Fisica"
+    ],
+    "aspirazioni": [
+      "Ingegnere biomedico"
+    ],
+    "livello_atteso": "Triennale",
+    "corso_atteso": "Ingegneria dei Sistemi Medicali",
+    "expected_relevant_docs": [
+      "GUIDA-DELLO-STUDENTE_27_03_2025_Web-compresso.md"
+    ],
+    "gold_answer": "Corso consigliato: Ingegneria dei Sistemi Medicali (Triennale).",
+    "ground_truth_claims": [
+      "Ingegneria dei Sistemi Medicali",
+      "Triennale",
+      "Coerenza con il profilo dello studente"
+    ]
+  },
+  {
+    "id": "Q081",
+    "category": "campus_navigation",
+    "endpoint": "/chat",
+    "query": "Dov'è la biblioteca centrale del Politecnico?",
+    "expected_destination": "poliLibrary",
+    "expected_relevant_docs": [
+      "mappe_db"
+    ],
+    "gold_answer": "Destinazione poliLibrary con selezione ingressi (Via Orabona, Via Re David, Via Celso Ulpiani).",
+    "ground_truth_claims": [
+      "poliLibrary",
+      "Richiesta ingresso o visualizzazione mappa",
+      "Supporto navigazione campus"
+    ]
+  },
+  {
+    "id": "Q082",
+    "category": "campus_navigation",
+    "endpoint": "/chat",
+    "query": "Come arrivo all'ufficio della Professoressa Mongiello?",
+    "expected_destination": "mongiello",
+    "expected_relevant_docs": [
+      "mappe_db"
+    ],
+    "gold_answer": "Destinazione mongiello con selezione ingressi (Via Orabona, Via Re David, Via Celso Ulpiani).",
+    "ground_truth_claims": [
+      "mongiello",
+      "Richiesta ingresso o visualizzazione mappa",
+      "Supporto navigazione campus"
+    ]
+  },
+  {
+    "id": "Q083",
+    "category": "campus_navigation",
+    "endpoint": "/chat",
+    "query": "Dove si trova il laboratorio di elettronica LabDDV?",
+    "expected_destination": "LabDDV",
+    "expected_relevant_docs": [
+      "mappe_db"
+    ],
+    "gold_answer": "Destinazione LabDDV con selezione ingressi (Via Orabona, Via Re David, Via Celso Ulpiani).",
+    "ground_truth_claims": [
+      "LabDDV",
+      "Richiesta ingresso o visualizzazione mappa",
+      "Supporto navigazione campus"
+    ]
+  },
+  {
+    "id": "Q084",
+    "category": "campus_navigation",
+    "endpoint": "/chat",
+    "query": "Come raggiungo la biblioteca entrando da via Re David?",
+    "expected_destination": "poliLibrary",
+    "expected_relevant_docs": [
+      "mappe_db"
+    ],
+    "gold_answer": "Destinazione poliLibrary con selezione ingressi (Via Orabona, Via Re David, Via Celso Ulpiani).",
+    "ground_truth_claims": [
+      "poliLibrary",
+      "Richiesta ingresso o visualizzazione mappa",
+      "Supporto navigazione campus"
+    ]
+  },
+  {
+    "id": "Q085",
+    "category": "campus_navigation",
+    "endpoint": "/chat",
+    "query": "Dov'è il laboratorio DDV se entro da Via Celso Ulpiani?",
+    "expected_destination": "LabDDV",
+    "expected_relevant_docs": [
+      "mappe_db"
+    ],
+    "gold_answer": "Destinazione LabDDV con selezione ingressi (Via Orabona, Via Re David, Via Celso Ulpiani).",
+    "ground_truth_claims": [
+      "LabDDV",
+      "Richiesta ingresso o visualizzazione mappa",
+      "Supporto navigazione campus"
+    ]
+  },
+  {
+    "id": "Q086",
+    "category": "campus_navigation",
+    "endpoint": "/chat",
+    "query": "Indicami la strada per l'ufficio Mongiello da Via Orabona",
+    "expected_destination": "mongiello",
+    "expected_relevant_docs": [
+      "mappe_db"
+    ],
+    "gold_answer": "Destinazione mongiello con selezione ingressi (Via Orabona, Via Re David, Via Celso Ulpiani).",
+    "ground_truth_claims": [
+      "mongiello",
+      "Richiesta ingresso o visualizzazione mappa",
+      "Supporto navigazione campus"
+    ]
+  },
+  {
+    "id": "Q087",
+    "category": "campus_navigation",
+    "endpoint": "/chat",
+    "query": "Dove trovo la biblioteca PoliLibrary?",
+    "expected_destination": "poliLibrary",
+    "expected_relevant_docs": [
+      "mappe_db"
+    ],
+    "gold_answer": "Destinazione poliLibrary con selezione ingressi (Via Orabona, Via Re David, Via Celso Ulpiani).",
+    "ground_truth_claims": [
+      "poliLibrary",
+      "Richiesta ingresso o visualizzazione mappa",
+      "Supporto navigazione campus"
+    ]
+  },
+  {
+    "id": "Q088",
+    "category": "campus_navigation",
+    "endpoint": "/chat",
+    "query": "Posizione laboratorio elettronica De Venuto",
+    "expected_destination": "LabDDV",
+    "expected_relevant_docs": [
+      "mappe_db"
+    ],
+    "gold_answer": "Destinazione LabDDV con selezione ingressi (Via Orabona, Via Re David, Via Celso Ulpiani).",
+    "ground_truth_claims": [
+      "LabDDV",
+      "Richiesta ingresso o visualizzazione mappa",
+      "Supporto navigazione campus"
+    ]
+  },
+  {
+    "id": "Q089",
+    "category": "campus_navigation",
+    "endpoint": "/chat",
+    "query": "Come posso arrivare alla presidenza entrando da Via Orabona?",
+    "expected_destination": "Campus",
+    "expected_relevant_docs": [
+      "mappe_db"
+    ],
+    "gold_answer": "Destinazione Campus con selezione ingressi (Via Orabona, Via Re David, Via Celso Ulpiani).",
+    "ground_truth_claims": [
+      "Campus",
+      "Richiesta ingresso o visualizzazione mappa",
+      "Supporto navigazione campus"
+    ]
+  },
+  {
+    "id": "Q090",
+    "category": "campus_navigation",
+    "endpoint": "/chat",
+    "query": "Mappa per raggiungere la biblioteca da Via Celso Ulpiani",
+    "expected_destination": "poliLibrary",
+    "expected_relevant_docs": [
+      "mappe_db"
+    ],
+    "gold_answer": "Destinazione poliLibrary con selezione ingressi (Via Orabona, Via Re David, Via Celso Ulpiani).",
+    "ground_truth_claims": [
+      "poliLibrary",
+      "Richiesta ingresso o visualizzazione mappa",
+      "Supporto navigazione campus"
+    ]
+  },
+  {
+    "id": "Q091",
+    "category": "out_of_domain_ambiguous",
+    "endpoint": "/chat",
+    "query": "Come posso preparare una torta di mele soffice?",
+    "expected_relevant_docs": [],
+    "gold_answer": "Declinare con cortesia e riportare sul Poliba",
+    "ground_truth_claims": [
+      "Riconoscimento limite di dominio",
+      "Cortesia istituzionale",
+      "Zero allucinazioni"
+    ]
+  },
+  {
+    "id": "Q092",
+    "category": "out_of_domain_ambiguous",
+    "endpoint": "/chat",
+    "query": "Quali sono le migliori spiagge di Tenerife?",
+    "expected_relevant_docs": [],
+    "gold_answer": "Declinare con cortesia",
+    "ground_truth_claims": [
+      "Riconoscimento limite di dominio",
+      "Cortesia istituzionale",
+      "Zero allucinazioni"
+    ]
+  },
+  {
+    "id": "Q093",
+    "category": "out_of_domain_ambiguous",
+    "endpoint": "/chat",
+    "query": "Dimmi le date degli appelli dell'Università di Bologna",
+    "expected_relevant_docs": [],
+    "gold_answer": "Specificare che l'assistente opera esclusivamente per il Poliba",
+    "ground_truth_claims": [
+      "Riconoscimento limite di dominio",
+      "Cortesia istituzionale",
+      "Zero allucinazioni"
+    ]
+  },
+  {
+    "id": "Q094",
+    "category": "out_of_domain_ambiguous",
+    "endpoint": "/chat",
+    "query": "Chi ha vinto l'ultimo Festival di Sanremo?",
+    "expected_relevant_docs": [],
+    "gold_answer": "Rifiuto garbato dell'argomento non accademico",
+    "ground_truth_claims": [
+      "Riconoscimento limite di dominio",
+      "Cortesia istituzionale",
+      "Zero allucinazioni"
+    ]
+  },
+  {
+    "id": "Q095",
+    "category": "out_of_domain_ambiguous",
+    "endpoint": "/chat",
+    "query": "Qual è il piano di studi di Medicina e Chirurgia al Politecnico di Bari?",
+    "expected_relevant_docs": [],
+    "gold_answer": "Spiegare che il Poliba non offre Medicina ma Ingegneria dei Sistemi Medicali",
+    "ground_truth_claims": [
+      "Riconoscimento limite di dominio",
+      "Cortesia istituzionale",
+      "Zero allucinazioni"
+    ]
+  },
+  {
+    "id": "Q096",
+    "category": "out_of_domain_ambiguous",
+    "endpoint": "/chat",
+    "query": "Come si ripara il motore a scoppio di una Vespa del 1970?",
+    "expected_relevant_docs": [],
+    "gold_answer": "Ricondurre a Ingegneria Meccanica o declinare",
+    "ground_truth_claims": [
+      "Riconoscimento limite di dominio",
+      "Cortesia istituzionale",
+      "Zero allucinazioni"
+    ]
+  },
+  {
+    "id": "Q097",
+    "category": "out_of_domain_ambiguous",
+    "endpoint": "/chat",
+    "query": "Dammi il numero di telefono privato del Rettore del Politecnico",
+    "expected_relevant_docs": [],
+    "gold_answer": "Invitare a contattare gli uffici istituzionali di segreteria",
+    "ground_truth_claims": [
+      "Riconoscimento limite di dominio",
+      "Cortesia istituzionale",
+      "Zero allucinazioni"
+    ]
+  },
+  {
+    "id": "Q098",
+    "category": "out_of_domain_ambiguous",
+    "endpoint": "/chat",
+    "query": "Posso iscrivermi a Giurisprudenza al Poliba?",
+    "expected_relevant_docs": [],
+    "gold_answer": "Spiegare che il Poliba è un ateneo politecnico (Ingegneria, Architettura, Design)",
+    "ground_truth_claims": [
+      "Riconoscimento limite di dominio",
+      "Cortesia istituzionale",
+      "Zero allucinazioni"
+    ]
+  },
+  {
+    "id": "Q099",
+    "category": "out_of_domain_ambiguous",
+    "endpoint": "/chat",
+    "query": "Quali sono le previsioni meteo su Bari per la prossima settimana?",
+    "expected_relevant_docs": [],
+    "gold_answer": "Ricondurre alle attività universitarie o declinare",
+    "ground_truth_claims": [
+      "Riconoscimento limite di dominio",
+      "Cortesia istituzionale",
+      "Zero allucinazioni"
+    ]
+  },
+  {
+    "id": "Q100",
+    "category": "out_of_domain_ambiguous",
+    "endpoint": "/chat",
+    "query": "Spiegami la teoria della relatività ristretta di Einstein in rima",
+    "expected_relevant_docs": [],
+    "gold_answer": "Rispondere brevemente o riconnettere alla didattica della Fisica generale al Poliba",
+    "ground_truth_claims": [
+      "Riconoscimento limite di dominio",
+      "Cortesia istituzionale",
+      "Zero allucinazioni"
+    ]
+  }
+]

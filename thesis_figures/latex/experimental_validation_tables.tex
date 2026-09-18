@@ -1,0 +1,87 @@
+% =============================================================================
+% TABELLE SPERIMENTALI DI VALIDAZIONE (POLIBAI ORIENTAMENTO)
+% Capitolo di Validazione Sperimentale: Confronto Architettura Attuale vs Ottimizzata
+% =============================================================================
+
+% -----------------------------------------------------------------------------
+% Tabella 1: Confronto Globale A/B
+% -----------------------------------------------------------------------------
+\begin{table}[htbp]
+\centering
+\small
+\caption{Confronto quantitativo globale tra la baseline Long-Context e l'architettura con Selective Retrieval.}
+\label{tab:ab_global_comparison}
+\begin{tabular}{lcccccc}
+\hline
+\textbf{Architettura} & \textbf{Input Token} & \textbf{Riduz. Token} & \textbf{p50 (ms)} & \textbf{p95 (ms)} & \textbf{$R_{max}$ (req/min)} & \textbf{Scalability Gain} \\
+\hline
+Baseline (53 doc) & 263,900 & 0.0\% & 7,249 & 8,321 & 15.2 & 1.0$\times$ \\
+Retrieval top-3 & 1,364 & 99.5\% & 3,080 & 15,761 & 2,931.5 & 192.9$\times$ \\
+Retrieval top-5 & 1,997 & 99.2\% & 3,565 & 17,707 & 2,003.4 & 131.8$\times$ \\
+Retrieval top-10 & 3,543 & 98.7\% & 4,485 & 15,284 & 1,129.1 & 74.3$\times$ \\
+\hline
+\end{tabular}
+\end{table}
+
+% -----------------------------------------------------------------------------
+% Tabella 2: Qualità del Retrieval e Fedeltà Generativa
+% -----------------------------------------------------------------------------
+\begin{table}[htbp]
+\centering
+\small
+\caption{Metriche di qualità del retrieval e della generazione al variare di $k$.}
+\label{tab:retrieval_and_quality}
+\begin{tabular}{lccccccc}
+\hline
+\textbf{Configurazione} & \textbf{Recall@k} & \textbf{Prec@k} & \textbf{MRR} & \textbf{nDCG@k} & \textbf{Correctness} & \textbf{Faithfulness} & \textbf{Hallucination Rate} \\
+\hline
+Baseline ($k=53$) & 1.0000 & 0.0214 & 0.5000 & 0.4500 & 0.8120 & 0.8106 & 0.1894 \\
+Retrieval $k=3$ & 0.5389 & 0.1667 & 0.6000 & 0.5517 & 0.4000 & 0.9317 & 0.0683 \\
+Retrieval $k=5$ & 0.5389 & 0.1000 & 0.6000 & 0.5517 & 0.4333 & 0.9317 & 0.0683 \\
+Retrieval $k=10$ & 0.5389 & 0.0500 & 0.6000 & 0.5517 & 0.4445 & 0.9317 & 0.0683 \\
+\hline
+\end{tabular}
+\end{table}
+
+% -----------------------------------------------------------------------------
+% Tabella 3: Scomposizione della Latenza End-to-End
+% -----------------------------------------------------------------------------
+\begin{table}[htbp]
+\centering
+\small
+\caption{Scomposizione empirica della latenza end-to-end ($t_0 \to t_5$) nei punti di misura dell'architettura.}
+\label{tab:latency_decomposition}
+\begin{tabular}{lccccc}
+\hline
+\textbf{Componente temporale} & \textbf{Intervallo} & \textbf{Baseline (ms)} & \textbf{Retrieval top-5 (ms)} & \textbf{$\Delta$ Assoluto} & \textbf{Impatto \%} \\
+\hline
+Rete locale \& Gateway & $t_1 - t_0$ & 12.4 & 8.2 & -4.2 ms & 0.2\% \\
+Intent Routing \& Retrieval & $t_2 - t_1$ & 0.0 & 28.5 & +28.5 ms & 0.8\% \\
+Elaborazione \& Inferenza LLM & $t_3 - t_2$ & 6,850.0 & 3,485.6 & -3,364.4 ms & 97.5\% \\
+Post-processing \& Serializzazione & $t_4 - t_3$ & 18.3 & 12.1 & -6.2 ms & 0.3\% \\
+Rendering Client UI & $t_5 - t_4$ & 45.0 & 30.0 & -15.0 ms & 1.2\% \\
+\hline
+\textbf{Latenza Totale End-to-End} & $t_5 - t_0$ & \textbf{6,925.7} & \textbf{3,564.4} & \textbf{-3,361.3 ms} & \textbf{100.0\%} \\
+\hline
+\end{tabular}
+\end{table}
+
+% -----------------------------------------------------------------------------
+% Tabella 4: Scalabilità Multiutente e Load Testing
+% -----------------------------------------------------------------------------
+\begin{table}[htbp]
+\centering
+\small
+\caption{Risultati del load testing multiutente con worker concorrenti (1, 2, 5, 10 utenti simultanei).}
+\label{tab:concurrency_load_testing}
+\begin{tabular}{ccccccc}
+\hline
+\textbf{Utenti Concorrenti} & \textbf{Completate} & \textbf{Durata (s)} & \textbf{Throughput (req/min)} & \textbf{p50 (ms)} & \textbf{p95 (ms)} & \textbf{Error Rate} \\
+\hline
+1 & 20 / 20 & 70.83 & 16.94 & 4,232 & 5,626 & 0.0\% \\
+2 & 20 / 20 & 37.03 & 32.40 & 4,269 & 5,841 & 0.0\% \\
+5 & 20 / 20 & 17.13 & 70.04 & 4,075 & 5,671 & 0.0\% \\
+10 & 20 / 20 & 9.61 & 124.84 & 3,890 & 5,671 & 0.0\% \\
+\hline
+\end{tabular}
+\end{table}
