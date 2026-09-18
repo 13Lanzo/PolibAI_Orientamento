@@ -185,8 +185,14 @@ export class CourseAdvisor {
       next: (response) => {
         clearInterval(interval);
         this.loadingProgress.set(100);
+        const raw: any = response;
+        const areeInteresse = raw.areeInteresse || raw.areasInteresse || raw.aree_interesse || [];
+        const normalizedResponse: CourseRecommendation = {
+          ...response,
+          areeInteresse
+        };
         const courseData = POLIBA_COURSES.find(c => c.nome === response.corsoConsigliato);
-        this.result.set({ ...response, courseData });
+        this.result.set({ ...normalizedResponse, courseData });
 
         // Gestione KPI: controlla se il backend ha allegato i dati
         if (response.kpiData) {

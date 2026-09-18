@@ -285,8 +285,65 @@ class SessionManager:
 
 
 # =============================================================================
-# 4. OPTIMIZED ENGINE WITH INTENT ROUTER & TELEMETRY
+# 4. PROMPT ADVISOR E OPTIMIZED ENGINE
 # =============================================================================
+
+ISTRUZIONI_ADVISOR = """
+Sei un orientatore universitario esperto del Politecnico di Bari (Poliba). Il tuo compito è analizzare gli interessi e le aspirazioni lavorative di uno studente e raccomandare il corso di laurea più adatto tra quelli offerti dal Poliba.
+
+Ecco i corsi disponibili al Poliba (A.A. 2024-2025):
+=== CORSI TRIENNALI ===
+- Architecture Sciences for Heritage (Triennale, L17, Dipartimento: ARCOD, in inglese, NUOVO)
+- Design (Triennale, L4, Dipartimento: ARCOD)
+- Costruzioni e Gestione Ambientale e Territoriale (Triennale Professionalizzante, L-P01, Dipartimento: DICATECh)
+- Ingegneria Civile e Ambientale (Triennale, L7, Dipartimento: DICATECh)
+- Ingegneria Edile (Triennale, L7, Dipartimento: DICATECh)
+- Ingegneria Gestionale (Triennale, L9, Dipartimento: DMMM)
+- Ingegneria Meccanica (Triennale, L9, Dipartimento: DMMM)
+- Management Engineering for Innovation (Triennale, L9, Dipartimento: DMMM, in inglese, NUOVO)
+- Ingegneria Industriale e dei Sistemi Navali (Triennale, L9, Dipartimento: DMMM)
+- Ingegneria Elettrica (Triennale, L9, Dipartimento: DEI)
+- Ingegneria dei Sistemi Aerospaziali (Triennale, L8, Dipartimento: DEI)
+- Ingegneria dei Sistemi Medicali (Triennale, L8, Dipartimento: DEI)
+- Ingegneria Informatica e dell'Automazione (Triennale, L8, Dipartimento: DEI)
+- Ingegneria Elettronica e delle Tecnologie Internet (Triennale, L8, Dipartimento: DEI)
+- Ingegneria della Creatività Digitale (Triennale, L8, Dipartimento: DEI, NUOVO)
+
+=== CORSI MAGISTRALI ===
+- Architettura (Magistrale a Ciclo Unico 5 anni, LM4, Dipartimento: ARCOD)
+- Industrial Design (Magistrale, LM12, Dipartimento: ARCOD, in inglese)
+- Ingegneria della Mobilità Sostenibile (Magistrale, LM26, Dipartimento: DICATECh)
+- Energy Engineering (Magistrale, LM30, Dipartimento: DEI, in inglese)
+- Automation and Robotics Engineering (Magistrale, LM32, Dipartimento: DEI, in inglese)
+- Computer Engineering (Magistrale, LM32, Dipartimento: DEI, in inglese)
+- Electronics Engineering (Magistrale, LM29, Dipartimento: DEI, in inglese)
+- Telecommunication and Internet Technologies Engineering (Magistrale, LM27, Dipartimento: DEI, in inglese)
+
+=== REGOLE SCELTA TRIENNALE vs MAGISTRALE ===
+- Consiglia TRIENNALE se studente con diploma o interessi base.
+- Consiglia MAGISTRALE se studente con laurea triennale o argomenti specialistici (AI avanzata, robotica industriale, big data, smart grid, eco-design avanzato).
+
+Rispondi SEMPRE ed ESCLUSIVAMENTE con un JSON valido strutturato esattamente così:
+{
+  "corsoConsigliato": "Nome esatto del corso dalla lista",
+  "dipartimento": "Codice dipartimento (ARCOD, DICATECh, DMMM, DEI)",
+  "motivazione": "2-3 frasi convincenti e personalizzate",
+  "puntiForza": ["punto 1", "punto 2", "punto 3"],
+  "sbocchiLavorativi": ["sbocco 1", "sbocco 2", "sbocco 3"],
+  "opportunitaInternazionali": "Descrizione breve delle opportunità internazionali",
+  "corsiAlternativi": ["Alternativa 1", "Alternativa 2"],
+  "consiglio": "Un consiglio motivazionale personale",
+  "areeInteresse": [
+    {"nome": "Area 1", "percentuale": 85},
+    {"nome": "Area 2", "percentuale": 70},
+    {"nome": "Area 3", "percentuale": 60},
+    {"nome": "Area 4", "percentuale": 50},
+    {"nome": "Area 5", "percentuale": 40},
+    {"nome": "Area 6", "percentuale": 30}
+  ]
+}
+IMPORTANTE: Il campo 'areeInteresse' è OBBLIGATORIO e deve contenere esattamente 6 aree con percentuale intera da 0 a 100 per il radar chart.
+"""
 
 class OptimizedPolibAIEngine:
     def __init__(self, api_key: Optional[str] = None):
@@ -454,14 +511,13 @@ class OptimizedPolibAIEngine:
         kb_context = "\n".join([f"Fonte {rc['doc_name']}: {rc['text'][:400]}" for rc in relevant_chunks])
 
         user_message = (
-            f"Materie: {', '.join(materie) if materie else 'non indicate'}\n"
-            f"Aspirazioni: {', '.join(aspirazioni) if aspirazioni else 'non indicate'}\n"
+            f"Materie dello studente: {', '.join(materie) if materie else 'non indicate'}\n"
+            f"Aspirazioni dello studente: {', '.join(aspirazioni) if aspirazioni else 'non indicate'}\n"
             f"Note: {note}\n"
-            "Raccomanda il corso di laurea più adatto secondo le regole Poliba (distingui accuratamente tra Triennale e Magistrale)."
+            "Analizza il profilo e restituisci il JSON con il corso consigliato e le 6 areeInteresse per il radar chart."
         )
 
-        from chatbot import istruzioni_advisor
-        prompt = f"{istruzioni_advisor}\n\n[CONTESTO SELETTIVO RIDOTTO]:\n{kb_context}\n\n{user_message}"
+        prompt = f"{ISTRUZIONI_ADVISOR}\n\n[CONTESTO SELETTIVO RIDOTTO]:\n{kb_context}\n\n{user_message}"
 
         input_tokens = 0
         output_tokens = 0
@@ -490,6 +546,27 @@ class OptimizedPolibAIEngine:
                 raw_text = raw_text.strip()
                 result_json = json.loads(raw_text)
                 
+                # Normalizzazione robusta del campo areeInteresse per il radar chart
+                if "areeInteresse" not in result_json:
+                    for alt_key in ["areasInteresse", "aree_interesse", "aree", "aree_di_interesse", "interests"]:
+                        if alt_key in result_json:
+                            result_json["areeInteresse"] = result_json.pop(alt_key)
+                            break
+
+                # Se areeInteresse è ancora vuoto o non conforme, genera 6 aree graduate
+                if not result_json.get("areeInteresse") or not isinstance(result_json.get("areeInteresse"), list) or len(result_json.get("areeInteresse")) < 3:
+                    m1 = materie[0] if materie else "Scienze & Logica"
+                    m2 = materie[1] if len(materie) > 1 else "Tecnologie Applicate"
+                    a1 = aspirazioni[0] if aspirazioni else "Ingegneria & Design"
+                    result_json["areeInteresse"] = [
+                        {"nome": m1, "percentuale": 90},
+                        {"nome": m2, "percentuale": 80},
+                        {"nome": a1, "percentuale": 75},
+                        {"nome": "Problem Solving", "percentuale": 70},
+                        {"nome": "Innovazione Digitale", "percentuale": 60},
+                        {"nome": "Ricerca & Sviluppo", "percentuale": 50}
+                    ]
+
                 # Allega KPI mirati
                 corso = result_json.get("corsoConsigliato", "")
                 cid = find_course_id_by_name(corso)
