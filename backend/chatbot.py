@@ -2,7 +2,6 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 from google import genai
 from google.genai import types
-import mysql.connector
 import os
 import traceback
 from dotenv import load_dotenv
@@ -46,11 +45,8 @@ In particolare:
 - GIUDIZIO COMPARATIVO: Confronta i dati del corso con la media di Ateneo solo quando la media è presente nei KPI o nei documenti forniti.
 - Non usare esempi numerici come fonte: ogni cifra deve provenire dal contesto KPI o dalla knowledge base Markdown.
 
-# [GUIDA E NAVIGAZIONE DEL CAMPUS]
-Agisci come una guida esperta del Campus del Politecnico di Bari.
-- Quando riconosci intenti legati alla navigazione ("dov'è...", "come raggiungo..."), identifica chiaramente la destinazione.
-- Fornisci indicazioni descrittive, logiche e passo-passo (es. "Entrando dall'ingresso principale di Via Orabona...").
-- Specifica SEMPRE l'Edificio (es. "Edificio Q01"), il Dipartimento e, se noto, il Piano o i punti di riferimento vicini (es. Bar, Biblioteca).
+# [INFORMAZIONI SU CAMPUS E SEDI]
+Fornisci indicazioni e chiarimenti sulle sedi del Politecnico di Bari (Campus di Via Orabona a Bari, sede di Taranto, Foggia, Brindisi) e sui dipartimenti (DEI, DMMM, DICATECh, ARCOD), descrivendo aule, biblioteche e strutture in modo chiaro e testuale.
 
 # [STILE DI COMUNICAZIONE E FORMATTAZIONE]
 - Tono: Cordiale, istituzionale ma giovanile, ispiratore e amichevole. Dai sempre del "tu" allo studente.
@@ -61,48 +57,8 @@ Agisci come una guida esperta del Campus del Politecnico di Bari.
   * Inserisci emoji coerenti (es. 🎓, 📍, 💡, 📅) per rendere l'interfaccia visivamente più accattivante, senza esagerare.
 """
 
-# =============================================================================
-# DATABASE MYSQL (XAMPP)
-# =============================================================================
-def get_db_connection():
-    try:
-        conn = mysql.connector.connect(
-            host="localhost", user="root", password="", database="poliba_chatbot"
-        )
-        return conn
-    except mysql.connector.Error as err:
-        print(f"Errore MySQL: {err}")
-        return None
-
-def get_percorso_from_mysql(chiave_cercata):
-    conn = get_db_connection()
-    percorso = None
-    if conn:
-        try:
-            cursor = conn.cursor(dictionary=True)
-            cursor.execute("SELECT immagine_url, descrizione FROM mappe WHERE chiave = %s", (chiave_cercata,))
-            row = cursor.fetchone()
-            if row:
-                percorso = {"img": row["immagine_url"], "desc": row["descrizione"]}
-            cursor.close()
-            conn.close()
-        except Exception as e:
-            print(f"Errore Query: {e}")
-    return percorso
-
-# =============================================================================
-# CARICAMENTO KNOWLEDGE BASE (PDF + MD) E INIZIALIZZAZIONE MODELLO
-# =============================================================================
-# =============================================================================
-# ENGINE E STATO CONVERSAZIONALE
-# =============================================================================
-contesto_utente = {"destinazione_pendente": None}
-
-
-
 @app.route('/chat', methods=['POST'])
 def chat_endpoint():
-    global contesto_utente
     data = request.json
     messaggio_utente = data.get('message', '')
     if not messaggio_utente: return jsonify({"error": "Messaggio vuoto"}), 400
@@ -110,86 +66,7 @@ def chat_endpoint():
     print(f"Domanda: {messaggio_utente}")
     messaggio_lower = messaggio_utente.lower()
 
-
-    # =============================================================================
-    # LOGICA MAPPE SPECIALIZZATA
-    # =============================================================================
-    
-    # A. IDENTIFICAZIONE LUOGO
-    if "dove" in messaggio_lower or "dov'è" in messaggio_lower or "posizione" in messaggio_lower or "come arrivo" in messaggio_lower:
-        destinazione = None
-        
-        if "biblioteca" in messaggio_lower or "library" in messaggio_lower:
-            destinazione = "poliLibrary"
-        elif "mongiello" in messaggio_lower:
-            destinazione = "mongiello"
-        elif "elettronica" in messaggio_lower or "de venuto" in messaggio_lower or "labddv" in messaggio_lower:
-            destinazione = "LabDDV"
-            
-        if destinazione:
-            contesto_utente = destinazione
-            
-            return jsonify({
-                "response": f"Per raggiungere {destinazione}, da quale ingresso accedi?",
-                "type": "options", 
-                "options": [
-                    {"label": "📍 Via Orabona (Principale)", "value": "Orabona1"},
-                    {"label": "📍 Via Orabona (Pedoni)", "value": "Orabona2"},
-                    {"label": "📍 Via Re David", "value": "reDavid"},
-                    {"label": "📍 Via Celso Ulpiani", "value": "ulpiani"}
-                ]
-            })
-
-    # B. GESTIONE RISPOSTA BOTTONI
-    ingressi_noti = ["Orabona1", "Orabona2", "reDavid", "ulpiani"]
-    
-    # Cerca se nel messaggio c'è un valore noto (es. value del bottone)
-    # Nota: Angular manda il 'value' (es. Orabona1), quindi cerchiamo quello
-    ingresso_trovato = next((i for i in ingressi_noti if i.lower() in messaggio_lower), None)
-
-    # Verifica se 'contesto_utente' è una stringa (la destinazione)
-    destinazione_salvata = contesto_utente if isinstance(contesto_utente, str) else None
-
-    if ingresso_trovato and destinazione_salvata:
-        start = ingresso_trovato
-        dest = destinazione_salvata
-        chiave_db = ""
-
-        # --- COSTRUZIONE CHIAVI ---
-        if dest == "poliLibrary":
-            if "Orabona" in start: chiave_db = "mappa_campus_poliLibrary_Orabona"
-            elif "reDavid" in start: chiave_db = "mappa_campus_poliLibrary_reDavid"
-            else: chiave_db = "mappa_campus_poliLibrary" # Fallback
-
-        elif dest == "mongiello":
-            chiave_db = f"ufficio_mongiello_{start}"
-
-        elif dest == "LabDDV":
-            chiave_db = f"immagine_campus_LabDDV_{start}"
-
-        print(f"Cerco chiave: {chiave_db}")
-        
-        percorso_data = get_percorso_from_mysql(chiave_db)
-        
-        # Reset contesto
-        contesto_utente = None 
-        
-        if percorso_data:
-            return jsonify({
-                "response": percorso_data["desc"],
-                "type": "map",
-                "mapUrl": percorso_data["img"],
-                "mapTitle": f"Percorso per {dest}"
-            })
-        else:
-            return jsonify({
-                "response": f"Non ho una mappa specifica per questo percorso ({start} -> {dest}). Prova un altro ingresso.", 
-                "type": "text"
-            })
-
-    # =============================================================================
-    # LOGICA AI 
-    # =============================================================================
+    # Richiesta esplicita di infografica senza corso specificato
     if messaggio_lower.strip() in ["mostra infografica", "infografica", "mostrami l'infografica", "voglio vedere l'infografica"]:
         return jsonify({
             "response": "Per poterti mostrare l'infografica esatta, ho bisogno di sapere a quale **Corso di Laurea** ti riferisci. Inserisci il nome del corso (es. 'Mostra infografica Ingegneria Gestionale').",
@@ -269,7 +146,29 @@ def analysis_endpoint():
             "available_ids": get_all_course_ids()
         }), 404
 
-    return jsonify(data)
+    resp = dict(data)
+    resp["course_id"] = course_id
+    return jsonify(resp)
+
+
+@app.route('/kpis', methods=['GET'])
+def kpis_endpoint():
+    """Restituisce l'elenco di tutti i corsi con i relativi KPI AlmaLaurea e OPIS."""
+    courses = []
+    for cid in get_all_course_ids():
+        kpi = get_kpi(cid)
+        if kpi:
+            courses.append({
+                "course_id": cid,
+                "nome": kpi.get("nome"),
+                "classe": kpi.get("classe"),
+                "dipartimento": kpi.get("dipartimento"),
+                "livello": kpi.get("livello"),
+                "tasso_occupazione_1_anno": kpi.get("almalaurea", {}).get("tasso_occupazione_1_anno"),
+                "retribuzione_netta_media": kpi.get("almalaurea", {}).get("retribuzione_netta_media"),
+                "soddisfazione_corso": kpi.get("almalaurea", {}).get("soddisfazione_corso")
+            })
+    return jsonify({"courses": courses})
 
 
 # =============================================================================

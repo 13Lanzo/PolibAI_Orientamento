@@ -126,15 +126,6 @@
             </div>
           </div>
 
-          <div *ngIf="msg.type === 'map'" class="msg-map">
-            <div class="map-title">📍 {{ msg.mapTitle }}</div>
-            <div class="map-img-box" (click)="openMap(msg.mapUrl)">
-              <img [src]="msg.mapUrl" alt="Mappa">
-              <div class="map-zoom">🔍 Apri mappa</div>
-            </div>
-            <p class="map-desc">{{ msg.text }}</p>
-          </div>
-
           <div *ngIf="msg.type === 'image'" class="infographic-container">
             <div *ngIf="msg.text || msg.htmlText" class="msg-text markdown-content"
               [innerHTML]="msg.htmlText || msg.text"></div>

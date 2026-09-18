@@ -413,8 +413,6 @@ class OptimizedPolibAIEngine:
     def route_intent(self, message: str) -> str:
         """Classifica l'intento per evitare chiamate LLM ridondanti o selezionare la fonte esatta."""
         msg_lower = message.lower()
-        if any(w in msg_lower for w in ["dov'è", "dove si trova", "come arrivo", "come raggiungo", "posizione biblioteca", "aula", "edificio"]):
-            return "MAPS_ROUTING"
         if any(w in msg_lower for w in ["consigliami un corso", "quale corso scegliere", "mi piace la matematica e", "aspirazioni lavorative", "orientamento"]):
             return "COURSE_ADVISOR"
         if any(w in msg_lower for w in ["retribuzione", "tasso di occupazione", "giudizi opis", "soddisfazione laureati", "kpi"]):
@@ -427,43 +425,7 @@ class OptimizedPolibAIEngine:
         intent = self.route_intent(message)
         t1 = time.perf_counter()
 
-        retrieved_chunks = []
-        context_text = ""
-        
-        # A. Intent Routing
-        if intent == "MAPS_ROUTING":
-            # Risposta deterministica veloce o query mirata
-            t2 = time.perf_counter()
-            dest = "poliLibrary" if "biblioteca" in message.lower() else ("LabDDV" if "lab" in message.lower() else "Edificio Principale")
-            t3 = time.perf_counter()
-            response_text = f"Per raggiungere {dest}, ti consiglio di accedere dall'ingresso principale di Via Orabona. Puoi selezionare l'ingresso per visualizzare la mappa topografica."
-            t4 = time.perf_counter()
-            t5 = time.perf_counter()
-            
-            return {
-                "response": response_text,
-                "type": "options",
-                "options": [
-                    {"label": "📍 Via Orabona (Principale)", "value": "Orabona1"},
-                    {"label": "📍 Via Re David", "value": "reDavid"}
-                ],
-                "telemetry": {
-                    "t0": t0, "t1": t1, "t2": t2, "t3": t3, "t4": t4, "t5": t5,
-                    "t_network_pre_ms": round((t1 - t0) * 1000, 2),
-                    "t_retrieval_ms": round((t2 - t1) * 1000, 2),
-                    "t_llm_ms": round((t3 - t2) * 1000, 2),
-                    "t_post_ms": round((t4 - t3) * 1000, 2),
-                    "t_total_ms": round((t5 - t0) * 1000, 2),
-                    "input_tokens": 0,
-                    "output_tokens": 0,
-                    "total_tokens": 0,
-                    "intent": intent,
-                    "top_k": 0,
-                    "retrieved_docs": []
-                }
-            }
-
-        # B. Selective Retrieval top-k
+        # Selective Retrieval top-k
         retrieved_chunks = self.retriever.search(message, top_k=top_k)
         t2 = time.perf_counter()
 

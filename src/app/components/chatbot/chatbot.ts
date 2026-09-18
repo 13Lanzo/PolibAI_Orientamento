@@ -89,10 +89,6 @@ export class Chatbot implements AfterViewChecked {
         this.callBackend(value);
     }
 
-    openMap(url: string | undefined) {
-        if (url) window.open(url, '_blank');
-    }
-
     loadInfographic(id: string, skipUserMsg = false) {
         const info = INFOGRAFICHE.find(i => i.id === id);
         if (info) {
