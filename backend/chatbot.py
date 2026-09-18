@@ -1,14 +1,13 @@
-
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from google import genai
-# pyrefly: ignore [missing-import]
 from google.genai import types
 import mysql.connector
 import os
 import traceback
 from dotenv import load_dotenv
 from kpi_data import get_kpi, get_all_course_ids, get_kpi_summary_for_prompt, find_course_id_by_name, COURSE_KPI
+from optimized_engine import OptimizedPolibAIEngine
 
 # Carica variabili d'ambiente
 load_dotenv()
@@ -16,12 +15,10 @@ load_dotenv()
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}})
 
-# --- CONFIGURAZIONE CHIAVE API ---
+# --- CONFIGURAZIONE CHIAVE API ED ENGINE OTTIMIZZATO (BM25 SELECTIVE RETRIEVAL) ---
 API_KEY = os.getenv("GOOGLE_API_KEY")
-if API_KEY:
-    client = genai.Client(api_key=API_KEY)
-else:
-    print("ERRORE: Chiave API mancante nel file .env")
+opt_engine = OptimizedPolibAIEngine(api_key=API_KEY)
+print(f"[CHATBOT] Motore Ottimizzato inizializzato con {len(opt_engine.indexer.chunks)} chunk BM25.")
 
 istruzioni_poliba = """
 # [RUOLO E IDENTITÀ]
@@ -96,125 +93,11 @@ def get_percorso_from_mysql(chiave_cercata):
 # =============================================================================
 # CARICAMENTO KNOWLEDGE BASE (PDF + MD) E INIZIALIZZAZIONE MODELLO
 # =============================================================================
-print("Inizializzazione Gemini e caricamento conoscenza...")
-uploaded_files = []
-markdown_context_parts = []
-try:
-    if API_KEY:
-        # Recupera file già caricati su Gemini per evitare caricamenti duplicati e velocizzare l'avvio
-        print("Recupero lista file già caricati su Gemini...")
-        existing_files = {}
-        try:
-            for f in client.files.list():
-                existing_files[f.display_name] = f
-            print(f"Trovati {len(existing_files)} file già caricati su Gemini File API.")
-        except Exception as list_err:
-            print(f"Errore nel recupero della lista file da Gemini API: {list_err}")
-            existing_files = {}
-
-        knowledge_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "knowledge")
-        if os.path.exists(knowledge_dir):
-            for root, dirs, files in os.walk(knowledge_dir):
-                for filename in sorted(files):
-                    filepath = os.path.join(root, filename)
-                    rel_path = os.path.relpath(filepath, knowledge_dir)
-                    import urllib.parse
-                    safe_name = urllib.parse.quote(filename)
-
-                    if filename.lower().endswith(".pdf"):
-                        if safe_name in existing_files:
-                            print(f"PDF già presente su Gemini: {rel_path} (riutilizzo)...")
-                            uploaded_files.append(existing_files[safe_name])
-                        else:
-                            print(f"Caricamento PDF: {rel_path}...")
-                            try:
-                                file_ref = client.files.upload(file=filepath, config={'display_name': safe_name})
-                                uploaded_files.append(file_ref)
-                                print(f"-> Caricato come URI: {file_ref.uri}")
-                            except Exception as upload_err:
-                                print(f"-> Upload PDF fallito ({upload_err}). Il file non sarà disponibile nella knowledge base.")
-                    elif filename.lower().endswith((".md", ".json")):
-                        ext = "MD" if filename.lower().endswith(".md") else "JSON"
-                        mime = "text/plain" if filename.lower().endswith(".md") else "application/json"
-                        
-                        if safe_name in existing_files:
-                            print(f"File {ext} già presente su Gemini: {rel_path} (riutilizzo)...")
-                            uploaded_files.append(existing_files[safe_name])
-                        else:
-                            print(f"Caricamento {ext}: {rel_path}...")
-                            try:
-                                file_ref = client.files.upload(file=filepath, config={'mime_type': mime, 'display_name': safe_name})
-                                uploaded_files.append(file_ref)
-                                print(f"-> Caricato come file API: {file_ref.uri}")
-                            except Exception as upload_err:
-                                print(f"-> Upload file fallito ({upload_err}), caricamento come testo...")
-                                with open(filepath, "r", encoding="utf-8") as f:
-                                    content = f.read()
-                                markdown_context_parts.append(f"--- DOCUMENTO {ext}: {rel_path} ---\n{content}\n--- FINE DOCUMENTO ---")
-                                print(f"-> Caricato come testo ({len(content)} caratteri)")
-        print(f"\nTotale: {len(uploaded_files)} file pronti via API + {len(markdown_context_parts)} testi fallback.")
-except Exception as e:
-    print(f"Errore caricamento knowledge: {e}")
-
-modello_scelto = None
-chat_session = None
-
-try:
-    if API_KEY:
-        for m in client.models.list():
-            if 'generateContent' in m.supported_actions:
-                if 'gemini-3.1-flash' in m.name:
-                    modello_scelto = m.name
-                    break
-                elif 'gemini-2.5-flash' in m.name:
-                    modello_scelto = m.name
-                elif 'gemini-3-flash-preview' in m.name:
-                    if not modello_scelto:
-                        modello_scelto = m.name
-
-        if not modello_scelto:
-            modello_scelto = "gemini-2.5-flash"
-            print(f"Nessun modello specifico trovato, fallback su: {modello_scelto}")
-        else:
-            print(f"TROVATO E SELEZIONATO: {modello_scelto}")
-            
-        initial_history = []
-        if uploaded_files:
-            parts = uploaded_files + ["Questi sono i documenti ufficiali del Politecnico di Bari (PDF, rapporti OPIS, dati AlmaLaurea, Guida dello Studente). Usali come base di conoscenza primaria per rispondere con precisione citando cifre esatte."]
-            parts_converted = [
-                types.Part.from_text(text=p) if isinstance(p, str) 
-                else types.Part(file_data=types.FileData(file_uri=p.uri, mime_type=p.mime_type)) 
-                for p in parts
-            ]
-            initial_history.append(types.Content(role="user", parts=parts_converted))
-            initial_history.append(types.Content(role="model", parts=[types.Part.from_text(text="Ho assimilato tutti i documenti: PDF ufficiali, rapporti OPIS, dati AlmaLaurea e Guida dello Studente. Citerò cifre e percentuali esatte nelle risposte.")]))
-        
-        # Inject Markdown knowledge base (only fallback ones now)
-        if markdown_context_parts:
-            md_text = "\n\n".join(markdown_context_parts)
-            initial_history.append(types.Content(role="user", parts=[types.Part.from_text(text=f"Ecco ulteriori dati testuali da usare come contesto:\n\n{md_text}")]))
-            initial_history.append(types.Content(role="model", parts=[types.Part.from_text(text="Perfetto! Ho assimilato i dati testuali aggiuntivi.")]))
-            
-            try:
-                config = types.GenerateContentConfig(
-                    system_instruction=istruzioni_poliba,
-                    tools=[{"google_search": {}}]
-                )
-                chat_session = client.chats.create(model=modello_scelto, config=config, history=initial_history)
-            except Exception as e:
-                print("Supporto system_instruction/tools assente. Fallback standard.")
-                config = types.GenerateContentConfig(
-                    tools=[{"google_search": {}}]
-                )
-                initial_history.insert(0, types.Content(role="user", parts=[types.Part.from_text(text=istruzioni_poliba)]))
-                initial_history.insert(1, types.Content(role="model", parts=[types.Part.from_text(text="Ricevuto. Seguirò queste istruzioni alla lettera.")]))
-                chat_session = client.chats.create(model=modello_scelto, config=config, history=initial_history)
-        else:
-            print("NESSUN MODELLO TROVATO.")
-except Exception as e:
-    print(f"Errore ricerca modelli: {e}")
-
+# =============================================================================
+# ENGINE E STATO CONVERSAZIONALE
+# =============================================================================
 contesto_utente = {"destinazione_pendente": None}
+
 
 
 @app.route('/chat', methods=['POST'])
@@ -312,13 +195,10 @@ def chat_endpoint():
             "response": "Per poterti mostrare l'infografica esatta, ho bisogno di sapere a quale **Corso di Laurea** ti riferisci. Inserisci il nome del corso (es. 'Mostra infografica Ingegneria Gestionale').",
             "type": "text"
         })
-    if not modello_scelto or not chat_session:
-        return jsonify({"error": "Errore AI: Modello non disponibile"}), 500
-
     try:
-        prompt = messaggio_utente
-        response = chat_session.send_message(message=prompt)
-        testo_risposta = response.text
+        session_id = data.get('sessionId', 'default_web_session')
+        ai_result = opt_engine.process_chat_optimized(messaggio_utente, session_id=session_id, top_k=5)
+        testo_risposta = ai_result.get("response", "")
 
         # =============================================================================
         # AGGIUNTA ID INFOGRAFICA ALLA RISPOSTA
@@ -348,11 +228,12 @@ def chat_endpoint():
                 infografica_selezionata = infografica_id
                 break
 
-        print(f"Risposta AI inviata. Infografica ID: {infografica_selezionata}")
+        print(f"[CHATBOT RAG] Risposta inviata (Top-5 BM25). Infografica ID: {infografica_selezionata}")
         risposta_json = {
             "response": testo_risposta,
             "type": "text",
-            "options": []
+            "options": ai_result.get("options", []),
+            "telemetry": ai_result.get("telemetry", {})
         }
         if infografica_selezionata:
             risposta_json["infograficaId"] = infografica_selezionata
@@ -505,74 +386,13 @@ def recommend_endpoint():
     if not materie and not aspirazioni:
         return jsonify({"error": "Inserisci almeno una materia o un'aspirazione"}), 400
 
-    print(f"[ADVISOR] Materie: {materie}, Aspirazioni: {aspirazioni}, Note: {note}")
-
-    if not modello_scelto:
-        return jsonify({"error": "Modello AI non disponibile"}), 500
-
-    user_message = f"""Materie preferite: {', '.join(materie) if materie else 'non specificate'}
-Aspirazioni lavorative: {', '.join(aspirazioni) if aspirazioni else 'non specificate'}
-Note aggiuntive: {note if note else 'nessuna'}
-
-Analizza il mio profilo e consigliami il corso di laurea più adatto al Politecnico di Bari."""
+    print(f"[ADVISOR OPTIMIZED] Materie: {materie}, Aspirazioni: {aspirazioni}, Note: {note}")
 
     try:
-        import json as json_module
-
-        # Build parts with knowledge files if available
-        parts = []
-        if uploaded_files:
-            for p in uploaded_files:
-                parts.append(types.Part(file_data=types.FileData(file_uri=p.uri, mime_type=p.mime_type)))
-        
-        # Arricchisci il prompt con i dati KPI disponibili
-        kpi_context = ""
-        for cid in get_all_course_ids():
-            summary = get_kpi_summary_for_prompt(cid)
-            if summary:
-                kpi_context += summary + "\n"
-        
-        # Inietta anche il contesto markdown (AlmaLaurea, OPIS, Guida Studente)
-        md_context = ""
-        if markdown_context_parts:
-            md_context = "\n\n--- KNOWLEDGE BASE MARKDOWN ---\n" + "\n\n".join(markdown_context_parts[:30]) + "\n--- FINE KNOWLEDGE BASE ---\n"
-        
-        if kpi_context or md_context:
-            enriched_prompt = f"{istruzioni_advisor}\n\n--- DATI QUANTITATIVI DISPONIBILI ---\n{kpi_context}\n--- FINE DATI ---\n{md_context}\n{user_message}"
-        else:
-            enriched_prompt = f"{istruzioni_advisor}\n\n{user_message}"
-        
-        parts.append(types.Part.from_text(text=enriched_prompt))
-
-        response = client.models.generate_content(model=modello_scelto, contents=parts)
-        response_text = response.text.strip()
-        
-        # Clean up response - remove markdown code blocks if present
-        if response_text.startswith("```"):
-            response_text = response_text.split("\n", 1)[1] if "\n" in response_text else response_text[3:]
-        if response_text.endswith("```"):
-            response_text = response_text[:-3]
-        response_text = response_text.strip()
-
-        parsed = json_module.loads(response_text)
-        corso_consigliato = parsed.get('corsoConsigliato', '')
-        print(f"[ADVISOR] Corso consigliato: {corso_consigliato}")
-        
-        # Cerca e allega i KPI del corso consigliato alla risposta
-        course_id = find_course_id_by_name(corso_consigliato)
-        if course_id:
-            kpi = get_kpi(course_id)
-            if kpi:
-                parsed['kpiData'] = kpi
-                parsed['courseKpiId'] = course_id
-                print(f"[ADVISOR] KPI allegati per: {course_id}")
-        
-        return jsonify(parsed)
-
-    except json_module.JSONDecodeError as je:
-        print(f"[ADVISOR] Errore parsing JSON: {je}")
-        print(f"[ADVISOR] Risposta raw: {response_text[:500]}")
-        return jsonify({"error": "Errore nel formato della risposta AI"}), 500
+        result = opt_engine.process_recommend_optimized(materie=materie, aspirazioni=aspirazioni, note=note)
+        if "error" in result and len(result) == 1:
+            return jsonify(result), 500
+        return jsonify(result)
     except Exception as e:
         errore = str(e)
         print(f"[ADVISOR] Errore: {errore}")
